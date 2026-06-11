@@ -1,9 +1,19 @@
-/* ═══════════════════════════════════════════════
-   TOBAGO PROPERTY FINDER — Shared Repo Refresher
-   Runs daily via GitHub Actions.
-   Searches 9 sites, merges with existing data,
-   tracks listing freshness, writes data/repo.json
-═══════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════
+   TOBAGO PROPERTY FINDER — Hybrid Crawler Refresh v2
+   Runs daily via GitHub Actions (server-side, no CORS).
+
+   Strategy per site:
+   1. CRAWL  — fetch listing index pages directly, follow
+               pagination, collect ALL listing URLs,
+               fetch each listing page.
+               Extraction order (cheapest first):
+                 a) JSON-LD structured data  (free)
+                 b) Claude HTML extraction   (cheap, no search tool)
+   2. SEARCH — fallback for JS-rendered sites, same
+               web-search method as before.
+
+   Output: data/repo.json  (same shape — app unchanged)
+═══════════════════════════════════════════════════════ */
 
 const fs = require('fs');
 const path = require('path');
@@ -15,54 +25,158 @@ const DATA_FILE = path.join(__dirname, 'data', 'repo.json');
 const MODEL = 'claude-haiku-4-5-20251001';
 const DAY = 24 * 60 * 60 * 1000;
 
-// Same tuned batches as the app
-const BATCHES = [
-  { label: 'pin.tt houses',  query: 'site:pin.tt/realestate/tobago house for sale', twoStage: false },
-  { label: 'pin.tt land',    query: 'site:pin.tt/realestate/tobago land for sale',  twoStage: false },
-  { label: 'terracaribbean', query: 'site:terracaribbean.com Tobago for sale', twoStage: true },
-  { label: 'charbonnerealty', query: 'property for sale Tobago site:charbonnerealty.com', twoStage: false },
-  { label: 'mybunchofkeys',   query: 'property for sale Tobago site:mybunchofkeys.com', twoStage: false },
-  { label: 'caribbeanMLS', query: 'site:caribbeanrealestatemls.com/real-estate/tobago for sale', twoStage: true },
-  { label: 'seajade (deep)', query: 'site:seajadeinvestments.com property for sale', twoStage: true },
-  { label: 'villas (deep)',  query: 'site:villasoftobago.com villa for sale', twoStage: true },
-  { label: 'realestatetobago (deep)', query: 'property land villa for sale site:realestatetobago.com', twoStage: true },
-  { label: 'rain-properties (deep)',  query: 'Tobago property for sale rain-properties-tobago.com/villatobuy.html', twoStage: true,
-    fetchUrl: 'https://www.rain-properties-tobago.com/villatobuy.html' }
+/* ── Budgets (tune to control cost & runtime) ── */
+const MAX_PAGES_PER_SITE    = 8;    // pagination depth
+const MAX_LISTINGS_PER_SITE = 50;   // listing pages fetched per site
+const MAX_EXTRACT_CALLS     = 30;   // Claude HTML-extraction calls (total)
+const EXTRACT_BATCH         = 4;    // listings per extraction call
+const FETCH_DELAY_MS        = 400;  // politeness delay between fetches
+const FETCH_TIMEOUT_MS      = 15000;
+
+/* ══════════════════════════════════════════
+   SITE CONFIG
+══════════════════════════════════════════ */
+const CRAWL_SITES = [
+  {
+    id: 'pin', name: 'pin.tt',
+    seeds: ['https://pin.tt/realestate/tobago/'],
+    // listing detail URLs typically live under /realestate/ with a slug/id
+    listingHint: /pin\.tt\/.*(realestate|property|ad|listing)/i
+  },
+  {
+    id: 'charb', name: 'charbonnerealty.com',
+    seeds: ['https://charbonnerealty.com/properties/', 'https://charbonnerealty.com/'],
+    listingHint: /charbonnerealty\.com\/.*(propert|listing|estate|land|villa|house)/i
+  },
+  {
+    id: 'ralestate', name: 'realestatetobago.com',
+    seeds: ['https://realestatetobago.com/properties/', 'https://realestatetobago.com/'],
+    listingHint: /realestatetobago\.com\/.*(propert|listing|land|villa|house|apartment)/i
+  },
+  {
+    id: 'rain', name: 'rain-properties-tobago.com',
+    seeds: ['https://www.rain-properties-tobago.com/villatobuy.html',
+            'https://www.rain-properties-tobago.com/property-sales'],
+    listingHint: /rain-properties-tobago\.com\/(?!index|contact|about)/i
+  },
+  {
+    id: 'keys', name: 'mybunchofkeys.com',
+    seeds: ['https://mybunchofkeys.com/properties/', 'https://mybunchofkeys.com/'],
+    listingHint: /mybunchofkeys\.com\/.*(propert|listing|land|villa|house)/i
+  }
 ];
 
-function buildPrompt(batch) {
-  const src = batch.fetchUrl
-    ? `Fetch and read this exact page: ${batch.fetchUrl}\nAlso run this web search: "${batch.query}"\nVisit individual listing pages to get full details including prices.\n\n`
-    : `Run this web search EXACTLY: "${batch.query}"\n\n` +
-      (batch.twoStage ? 'PRICE EXTRACTION: prices are missing from snippets on this site. VISIT the top 3-4 individual listing pages from the results and read the real asking price off each page. Prioritize accurate prices over quantity.\n\n' : '');
-  return 'You are a Tobago real estate data assistant.\n\n' + src +
-    'From the results, extract every property listing you can find.\n\n' +
-    'For EACH listing extract:\n' +
-    '- title\n- price (number in TT$, multiply USD by 6.8, 0 if unknown)\n' +
-    '- beds (number, 0 if unknown)\n- baths (number, 0 if unknown)\n' +
-    '- type (house/villa/apartment/land/commercial)\n' +
-    '- size (string e.g. "5000 sq ft", empty if unknown)\n' +
-    '- location (area in Tobago)\n- pool (true/false)\n' +
-    '- description (one sentence max)\n- features (array of up to 3 strings)\n' +
-    '- agent_name (string or empty)\n- agent_phone (string or empty)\n' +
-    '- url (full direct listing URL, not homepage)\n' +
-    '- site (domain name only)\n\n' +
-    'IMPORTANT:\n- Return ONLY a valid JSON array\n- No markdown, no backticks\n- Start with [ end with ]\n- Return [] if nothing found';
+/* Search-fallback sites (JS-rendered — direct fetch usually fails) */
+const SEARCH_BATCHES = [
+  { label: 'terracaribbean', query: 'site:terracaribbean.com Tobago for sale', twoStage: true },
+  { label: 'caribbeanMLS',   query: 'site:caribbeanrealestatemls.com/real-estate/tobago for sale', twoStage: true },
+  { label: 'seajade',        query: 'site:seajadeinvestments.com property for sale', twoStage: true },
+  { label: 'villas',         query: 'site:villasoftobago.com villa for sale', twoStage: true }
+];
+
+/* ══════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════ */
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+async function fetchPage(url) {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT_MS);
+  try {
+    const resp = await fetch(url, {
+      signal: ctrl.signal,
+      redirect: 'follow',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; TobagoPropertyFinder/1.0)',
+        'Accept': 'text/html,application/xhtml+xml'
+      }
+    });
+    clearTimeout(t);
+    if (!resp.ok) return null;
+    const type = resp.headers.get('content-type') || '';
+    if (!type.includes('html') && !type.includes('json')) return null;
+    return await resp.text();
+  } catch (e) { clearTimeout(t); return null; }
 }
 
-function extractJSON(text) {
+function absolutize(href, baseUrl) {
+  try { return new URL(href, baseUrl).href.split('#')[0]; } catch (e) { return null; }
+}
+
+function extractLinks(html, baseUrl) {
+  const links = new Set();
+  const re = /href\s*=\s*["']([^"'#]+)["']/gi;
+  let m;
+  while ((m = re.exec(html)) !== null) {
+    const abs = absolutize(m[1], baseUrl);
+    if (abs && abs.startsWith('http')) links.add(abs);
+  }
+  return [...links];
+}
+
+function htmlToText(html) {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&')
+    .replace(/&#?\w+;/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/* JSON-LD structured data — free extraction when present */
+function extractJsonLd(html, url, siteName) {
+  const out = [];
+  const re = /<script[^>]*type\s*=\s*["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+  let m;
+  while ((m = re.exec(html)) !== null) {
+    try {
+      let data = JSON.parse(m[1].trim());
+      const items = Array.isArray(data) ? data : (data['@graph'] || [data]);
+      for (const item of items) {
+        const type = String(item['@type'] || '');
+        if (!/RealEstate|Product|Residence|House|Apartment|Place|Offer|Accommodation/i.test(type)) continue;
+        const offers = item.offers || {};
+        const price = Number(offers.price || item.price || 0) || 0;
+        const cur = (offers.priceCurrency || '').toUpperCase();
+        out.push({
+          title: item.name || '',
+          price: cur === 'USD' ? Math.round(price * 6.8) : price,
+          beds: Number(item.numberOfRooms || item.numberOfBedrooms || 0) || 0,
+          baths: Number(item.numberOfBathroomsTotal || 0) || 0,
+          type: /land/i.test(item.name || '') ? 'land' : 'house',
+          size: item.floorSize && item.floorSize.value ? item.floorSize.value + ' sq ft' : '',
+          location: (item.address && (item.address.addressLocality || item.address.streetAddress)) || '',
+          pool: false,
+          description: (item.description || '').slice(0, 140),
+          features: [],
+          agent_name: '', agent_phone: '',
+          url: url, site: siteName,
+          _method: 'jsonld'
+        });
+      }
+    } catch (e) { /* malformed ld+json — skip */ }
+  }
+  return out.filter(l => l.title);
+}
+
+/* Robust JSON array extraction from Claude responses */
+function extractJSONArr(text) {
   if (!text) return [];
   text = text.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
-  const s = text.indexOf('['), e = text.lastIndexOf(']');
-  if (s === -1 || e <= s) return [];
-  const str = text.slice(s, e + 1);
+  const s = text.indexOf('[');
+  if (s === -1) return [];
+  const e = text.lastIndexOf(']');
+  // No closing ] (response truncated by max_tokens) -> take to end, recover below
+  const str = (e > s) ? text.slice(s, e + 1) : text.slice(s);
   try { const p = JSON.parse(str); return Array.isArray(p) ? p : []; }
   catch (err) {
     try {
-      const lastObj = str.lastIndexOf('},');
+      // Cut at the last complete object and close the array
+      const lastObj = str.lastIndexOf('}');
       if (lastObj > 0) {
-        const fixed = str.slice(0, lastObj + 1) + ']';
-        const p2 = JSON.parse(fixed);
+        const p2 = JSON.parse(str.slice(0, lastObj + 1) + ']');
         return Array.isArray(p2) ? p2 : [];
       }
     } catch (e2) {}
@@ -70,43 +184,166 @@ function extractJSON(text) {
   }
 }
 
-async function fetchBatch(batch, i) {
-  console.log(`[${i + 1}/${BATCHES.length}] ${batch.label}...`);
+async function claudeCall(body) {
+  const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': API_KEY,
+      'anthropic-version': '2023-06-01'
+    },
+    body: JSON.stringify(body)
+  });
+  const data = await resp.json();
+  if (data.error) throw new Error(data.error.message);
+  return (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
+}
+
+/* Claude HTML extraction — NO web_search tool = much cheaper */
+let extractCallsUsed = 0;
+async function claudeExtractBatch(pages, siteName) {
+  if (extractCallsUsed >= MAX_EXTRACT_CALLS) return [];
+  extractCallsUsed++;
+  const blocks = pages.map((p, i) =>
+    `--- PAGE ${i + 1} (URL: ${p.url}) ---\n${p.text.slice(0, 3500)}`
+  ).join('\n\n');
+  const prompt =
+    'Below are text extracts from ' + pages.length + ' Tobago property listing pages on ' + siteName + '.\n\n' +
+    blocks + '\n\n' +
+    'Extract ONE listing object per page. Fields:\n' +
+    'title, price (number TT$; if price shown in USD multiply by 6.8; 0 if none), beds (0 if n/a), baths (0 if n/a), ' +
+    'type (house/villa/apartment/land/commercial), size (string e.g. "5000 sq ft" or ""), location (Tobago area), ' +
+    'pool (true/false), description (one sentence), features (array max 3), agent_name, agent_phone, ' +
+    'url (use the URL shown for that page), site ("' + siteName + '").\n' +
+    'Skip pages that are clearly not property listings.\n' +
+    'Return ONLY a JSON array. No markdown.';
   try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': API_KEY,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: batch.twoStage ? 5000 : 4000,
-        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-        messages: [{ role: 'user', content: buildPrompt(batch) }]
-      })
+    const text = await claudeCall({
+      model: MODEL, max_tokens: 1800,
+      messages: [{ role: 'user', content: prompt }]
     });
-    const data = await resp.json();
-    if (data.error) { console.error(`  ERROR: ${data.error.message}`); return []; }
-    const text = (data.content || [])
-      .filter(b => b.type === 'text')
-      .map(b => b.text).join('');
-    const listings = extractJSON(text);
-    console.log(`  -> ${listings.length} listings (${listings.filter(l => l.price > 0).length} with price)`);
-    return listings;
+    return extractJSONArr(text).map(l => Object.assign(l, { _method: 'claude' }));
   } catch (e) {
-    console.error(`  FETCH ERROR: ${e.message}`);
+    console.error(`    extraction error: ${e.message}`);
     return [];
   }
 }
 
+/* ══════════════════════════════════════════
+   CRAWL ONE SITE
+══════════════════════════════════════════ */
+async function crawlSite(site) {
+  const report = { method: 'crawl', indexPages: 0, urlsFound: 0, fetched: 0, jsonld: 0, claude: 0, listings: [] };
+  console.log(`\n━━ CRAWL ${site.name} ━━`);
+
+  /* 1. Crawl index pages + pagination */
+  const indexQueue = [...site.seeds];
+  const indexSeen = new Set(indexQueue);
+  const listingUrls = new Set();
+
+  while (indexQueue.length && report.indexPages < MAX_PAGES_PER_SITE) {
+    const pageUrl = indexQueue.shift();
+    const html = await fetchPage(pageUrl);
+    await sleep(FETCH_DELAY_MS);
+    if (!html) { console.log(`  index FAIL: ${pageUrl}`); continue; }
+    report.indexPages++;
+
+    const links = extractLinks(html, pageUrl);
+    for (const link of links) {
+      if (!link.includes(site.name.replace('www.', ''))) continue;
+      // pagination links → queue as index pages
+      if (/[?&](page|paged|p)=\d+|\/page\/\d+/i.test(link)) {
+        if (!indexSeen.has(link) && indexSeen.size < MAX_PAGES_PER_SITE * 2) {
+          indexSeen.add(link); indexQueue.push(link);
+        }
+        continue;
+      }
+      // listing detail links
+      if (site.listingHint.test(link) && !site.seeds.includes(link)) {
+        // filter out obvious non-listing paths
+        if (/\/(tag|category|author|wp-|feed|login|contact|about|blog)\//i.test(link)) continue;
+        listingUrls.add(link);
+      }
+    }
+    console.log(`  index OK: ${pageUrl} (links so far: ${listingUrls.size})`);
+  }
+  report.urlsFound = listingUrls.size;
+
+  /* 2. Fetch listing pages */
+  const urls = [...listingUrls].slice(0, MAX_LISTINGS_PER_SITE);
+  const pendingForClaude = [];
+
+  for (const url of urls) {
+    const html = await fetchPage(url);
+    await sleep(FETCH_DELAY_MS);
+    if (!html) continue;
+    report.fetched++;
+
+    /* 2a. Try free JSON-LD first */
+    const ld = extractJsonLd(html, url, site.name);
+    if (ld.length) {
+      report.jsonld += ld.length;
+      report.listings.push(...ld);
+      continue;
+    }
+    /* 2b. Queue text for batched Claude extraction */
+    const text = htmlToText(html);
+    if (text.length > 200) pendingForClaude.push({ url, text });
+  }
+
+  /* 3. Batched Claude extraction for the rest */
+  for (let i = 0; i < pendingForClaude.length; i += EXTRACT_BATCH) {
+    const batch = pendingForClaude.slice(i, i + EXTRACT_BATCH);
+    const extracted = await claudeExtractBatch(batch, site.name);
+    report.claude += extracted.length;
+    report.listings.push(...extracted);
+    await sleep(800);
+  }
+
+  console.log(`  RESULT: ${report.listings.length} listings ` +
+    `(index pages: ${report.indexPages}, urls: ${report.urlsFound}, ` +
+    `fetched: ${report.fetched}, jsonld: ${report.jsonld}, claude: ${report.claude})`);
+  return report;
+}
+
+/* ══════════════════════════════════════════
+   SEARCH FALLBACK (JS-rendered sites)
+══════════════════════════════════════════ */
+function buildSearchPrompt(batch) {
+  return 'You are a Tobago real estate data assistant.\n\n' +
+    `Run this web search EXACTLY: "${batch.query}"\n\n` +
+    (batch.twoStage ? 'PRICE EXTRACTION: prices are missing from snippets on this site. VISIT the top 3-4 individual listing pages and read the real asking price off each page.\n\n' : '') +
+    'Extract every property listing. Fields per listing:\n' +
+    'title, price (TT$ number, USD x 6.8, 0 unknown), beds, baths, type, size, location, pool, ' +
+    'description (1 sentence), features (max 3), agent_name, agent_phone, url (direct listing URL), site (domain).\n\n' +
+    'Return ONLY a JSON array. No markdown. [] if nothing.';
+}
+
+async function searchBatch(batch) {
+  console.log(`\n━━ SEARCH ${batch.label} ━━`);
+  try {
+    const text = await claudeCall({
+      model: MODEL, max_tokens: 5000,
+      tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+      messages: [{ role: 'user', content: buildSearchPrompt(batch) }]
+    });
+    const listings = extractJSONArr(text).map(l => Object.assign(l, { _method: 'search' }));
+    console.log(`  RESULT: ${listings.length} listings (${listings.filter(l => l.price > 0).length} priced)`);
+    return listings;
+  } catch (e) {
+    console.error(`  ERROR: ${e.message}`);
+    return [];
+  }
+}
+
+/* ══════════════════════════════════════════
+   MERGE + FRESHNESS
+══════════════════════════════════════════ */
 function listingKey(p) {
   return ((p.title || '') + '|' + (p.site || '')).toLowerCase().replace(/\s+/g, ' ').trim();
 }
 
 (async function main() {
-  // Load existing repo
   let repo = { meta: {}, listings: [] };
   try {
     repo = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
@@ -117,36 +354,51 @@ function listingKey(p) {
   const existing = new Map(repo.listings.map(p => [listingKey(p), p]));
   console.log(`Existing listings: ${existing.size}`);
 
-  // Run batches SEQUENTIALLY with 3s gaps (no rate-limit races on a server)
-  let foundCount = 0, newCount = 0, updatedCount = 0;
-  for (let i = 0; i < BATCHES.length; i++) {
-    const listings = await fetchBatch(BATCHES[i], i);
-    for (const p of listings) {
-      if (!p.title) continue;
-      const key = listingKey(p);
-      foundCount++;
-      const prev = existing.get(key);
-      if (prev) {
-        // Update existing: refresh lastSeen, prefer non-zero price, keep firstSeen
-        prev.lastSeen = now;
-        prev.status = 'active';
-        if (p.price > 0) prev.price = p.price;
-        if (p.url && !prev.url) prev.url = p.url;
-        if (p.beds > 0) prev.beds = p.beds;
-        if (p.baths > 0) prev.baths = p.baths;
-        if (p.size && !prev.size) prev.size = p.size;
-        updatedCount++;
-      } else {
-        existing.set(key, Object.assign({}, p, {
-          firstSeen: now, lastSeen: now, status: 'active'
-        }));
-        newCount++;
-      }
-    }
-    if (i < BATCHES.length - 1) await new Promise(r => setTimeout(r, 3000));
+  const siteReports = {};
+  let allFound = [];
+
+  /* Phase 1 — crawl the direct-fetch sites */
+  for (const site of CRAWL_SITES) {
+    const rep = await crawlSite(site);
+    siteReports[site.name] = {
+      method: 'crawl', listings: rep.listings.length,
+      urlsFound: rep.urlsFound, jsonld: rep.jsonld, claude: rep.claude
+    };
+    allFound.push(...rep.listings);
   }
 
-  // Freshness pass: stale after 14 days unseen, drop after 30
+  /* Phase 2 — search fallback for JS sites */
+  for (const batch of SEARCH_BATCHES) {
+    const listings = await searchBatch(batch);
+    const siteName = listings[0] ? listings[0].site : batch.label;
+    siteReports[siteName || batch.label] = { method: 'search', listings: listings.length };
+    allFound.push(...listings);
+    await sleep(3000);
+  }
+
+  /* Merge */
+  let newCount = 0, updatedCount = 0;
+  for (const p of allFound) {
+    if (!p.title) continue;
+    delete p._method;
+    const key = listingKey(p);
+    const prev = existing.get(key);
+    if (prev) {
+      prev.lastSeen = now; prev.status = 'active';
+      if (p.price > 0) prev.price = p.price;
+      if (p.url && !prev.url) prev.url = p.url;
+      if (p.beds > 0) prev.beds = p.beds;
+      if (p.baths > 0) prev.baths = p.baths;
+      if (p.size && !prev.size) prev.size = p.size;
+      if (p.description && !prev.description) prev.description = p.description;
+      updatedCount++;
+    } else {
+      existing.set(key, Object.assign({}, p, { firstSeen: now, lastSeen: now, status: 'active' }));
+      newCount++;
+    }
+  }
+
+  /* Freshness pass */
   let staleCount = 0, droppedCount = 0;
   const merged = [];
   for (const [key, p] of existing) {
@@ -156,7 +408,6 @@ function listingKey(p) {
     merged.push(p);
   }
 
-  // Per-site counts
   const sources = {};
   merged.forEach(p => { const s = p.site || 'unknown'; sources[s] = (sources[s] || 0) + 1; });
 
@@ -165,12 +416,10 @@ function listingKey(p) {
       lastRefresh: new Date(now).toISOString(),
       totalListings: merged.length,
       activeCount: merged.filter(p => p.status === 'active').length,
-      staleCount: staleCount,
-      withPrice: merged.filter(p => p.price > 0).length,
-      newThisRun: newCount,
-      updatedThisRun: updatedCount,
-      droppedThisRun: droppedCount,
-      sources: sources
+      staleCount, withPrice: merged.filter(p => p.price > 0).length,
+      newThisRun: newCount, updatedThisRun: updatedCount, droppedThisRun: droppedCount,
+      extractCallsUsed,
+      sources, siteReports
     },
     listings: merged
   };
@@ -178,11 +427,16 @@ function listingKey(p) {
   fs.mkdirSync(path.dirname(DATA_FILE), { recursive: true });
   fs.writeFileSync(DATA_FILE, JSON.stringify(out, null, 1));
 
-  console.log('\n══════ REFRESH COMPLETE ══════');
-  console.log(`Total in repo : ${merged.length}`);
-  console.log(`Active        : ${out.meta.activeCount}`);
-  console.log(`Stale (>14d)  : ${staleCount}`);
-  console.log(`With price    : ${out.meta.withPrice}`);
-  console.log(`New this run  : ${newCount}`);
-  console.log(`Dropped (>30d): ${droppedCount}`);
+  console.log('\n════════ REFRESH COMPLETE ════════');
+  console.log(`Total in repo  : ${merged.length}`);
+  console.log(`Active         : ${out.meta.activeCount}`);
+  console.log(`With price     : ${out.meta.withPrice}`);
+  console.log(`New this run   : ${newCount}`);
+  console.log(`Stale (>14d)   : ${staleCount}`);
+  console.log(`Dropped (>30d) : ${droppedCount}`);
+  console.log(`Claude extract calls used: ${extractCallsUsed}/${MAX_EXTRACT_CALLS}`);
+  console.log('\nPer-site:');
+  Object.entries(siteReports).forEach(([s, r]) =>
+    console.log(`  ${s.padEnd(32)} ${String(r.listings).padStart(3)} listings  (${r.method}${r.jsonld ? ', ' + r.jsonld + ' via jsonld' : ''}${r.claude ? ', ' + r.claude + ' via claude' : ''})`));
 })();
+
