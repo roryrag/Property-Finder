@@ -1,0 +1,40 @@
+# ═══════════════════════════════════════════════
+# TOBAGO PROPERTY FINDER — Daily Listings Refresh
+# Place this file at: .github/workflows/refresh-listings.yml
+# ═══════════════════════════════════════════════
+name: Refresh Tobago Listings
+
+on:
+  schedule:
+    # Runs daily at 10:00 UTC (6:00 AM Tobago time)
+    - cron: '0 10 * * *'
+  # Also allows manual run from the Actions tab
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run refresh script
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: node refresh.js
+
+      - name: Commit updated repo.json
+        run: |
+          git config user.name "repo-refresher"
+          git config user.email "actions@github.com"
+          git add data/repo.json
+          git diff --staged --quiet || git commit -m "Daily listings refresh $(date -u +%Y-%m-%d)"
+          git push
