@@ -8,7 +8,6 @@ on:
   schedule:
     # Runs daily at 10:00 UTC (6:00 AM Tobago time)
     - cron: '0 10 * * *'
-  # Also allows manual run from the Actions tab
   workflow_dispatch:
 
 permissions:
@@ -31,19 +30,10 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           if [ -z "$ANTHROPIC_API_KEY" ]; then
-            echo "::error::ANTHROPIC_API_KEY secret is NOT set. Go to Settings -> Secrets and variables -> Actions -> New repository secret. Name it exactly ANTHROPIC_API_KEY"
+            echo "::error::ANTHROPIC_API_KEY secret is NOT set. Settings -> Secrets and variables -> Actions."
             exit 1
           fi
-          echo "Secret found (length: ${#ANTHROPIC_API_KEY} chars)"
-
-      - name: Check refresh.js exists
-        run: |
-          if [ ! -f refresh.js ]; then
-            echo "::error::refresh.js not found at repository root. It must be at the top level of the repo, not in a folder."
-            ls -la
-            exit 1
-          fi
-          echo "refresh.js found"
+          echo "Secret found"
 
       - name: Run refresh script
         env:
@@ -56,4 +46,7 @@ jobs:
           git config user.email "actions@github.com"
           git add data/repo.json
           git diff --staged --quiet || git commit -m "Daily listings refresh $(date -u +%Y-%m-%d)"
+          # Pull any commits made while we were running, keeping OUR fresh repo.json on conflict
+          git pull --rebase -X theirs origin main
           git push
+
