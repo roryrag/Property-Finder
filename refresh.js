@@ -50,11 +50,6 @@ const CRAWL_SITES = [
     listingHint: /charbonnerealty\.com\/.*(propert|listing|estate|land|villa|house)/i
   },
   {
-    id: 'ralestate', name: 'realestatetobago.com',
-    seeds: ['https://realestatetobago.com/properties/', 'https://realestatetobago.com/property/', 'https://realestatetobago.com/listings/', 'https://realestatetobago.com/'],
-    listingHint: /realestatetobago\.com\/.*(propert|listing|land|villa|house|apartment)/i
-  },
-  {
     id: 'rain', name: 'rain-properties-tobago.com',
     seeds: ['https://www.rain-properties-tobago.com/villatobuy.html',
             'https://www.rain-properties-tobago.com/property-sales'],
@@ -68,17 +63,29 @@ const CRAWL_SITES = [
 ];
 
 /* Search-fallback sites (JS-rendered — direct fetch usually fails) */
-const SEARCH_BATCHES = [
-  // Weakest sites first — they get fresh search quota
-  { label: 'caribbeanMLS',   query: 'site:caribbeanrealestatemls.com/real-estate/tobago for sale', twoStage: true },
-  { label: 'seajade',        query: 'site:seajadeinvestments.com property for sale', twoStage: true },
-  { label: 'villas',         query: 'site:villasoftobago.com villa for sale', twoStage: true },
-  { label: 'terracaribbean', query: 'site:terracaribbean.com Tobago for sale', twoStage: true },
-  // Search works better than crawl for these two — keep both methods
-  { label: 'pin.tt houses',  query: 'site:pin.tt/realestate/tobago house for sale', twoStage: false },
-  { label: 'pin.tt land',    query: 'site:pin.tt/realestate/tobago land for sale', twoStage: false },
-  { label: 'realestatetobago', query: 'property land villa for sale site:realestatetobago.com', twoStage: true }
-];
+/* Search work is split into two GROUPS that alternate across runs,
+   so each batch gets fresh search quota instead of starving at the
+   back of one giant queue. Controlled by the RUN_GROUP env var
+   (set by the workflow): 'A', 'B', or 'all' (default, runs everything). */
+const SEARCH_GROUPS = {
+  A: [
+    { label: 'caribbeanMLS', query: 'site:caribbeanrealestatemls.com/real-estate/tobago for sale', twoStage: true },
+    { label: 'seajade',      query: 'site:seajadeinvestments.com property for sale', twoStage: true },
+    { label: 'villas',       query: 'site:villasoftobago.com villa for sale', twoStage: true }
+  ],
+  B: [
+    { label: 'pin.tt houses',  query: 'site:pin.tt/realestate/tobago house for sale', twoStage: false },
+    { label: 'pin.tt land',    query: 'site:pin.tt/realestate/tobago land for sale', twoStage: false },
+    { label: 'terracaribbean', query: 'site:terracaribbean.com Tobago for sale', twoStage: true }
+  ]
+};
+
+const RUN_GROUP = (process.env.RUN_GROUP || 'all').trim();
+let SEARCH_BATCHES;
+if (RUN_GROUP === 'A')      SEARCH_BATCHES = SEARCH_GROUPS.A;
+else if (RUN_GROUP === 'B') SEARCH_BATCHES = SEARCH_GROUPS.B;
+else                        SEARCH_BATCHES = [...SEARCH_GROUPS.A, ...SEARCH_GROUPS.B];
+console.log('Run group: ' + RUN_GROUP + ' (' + SEARCH_BATCHES.length + ' search batches)');
 
 /* ══════════════════════════════════════════
    HELPERS
