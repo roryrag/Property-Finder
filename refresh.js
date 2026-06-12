@@ -40,8 +40,9 @@ const CRAWL_SITES = [
   {
     id: 'pin', name: 'pin.tt',
     seeds: ['https://pin.tt/realestate/tobago/'],
-    // listing detail URLs typically live under /realestate/ with a slug/id
-    listingHint: /pin\.tt\/.*(realestate|property|ad|listing)/i
+    listingHint: /pin\.tt\/(realestate\/|property|listing|ad\/)/i,
+    // pin.tt covers all of T&T — keep only Tobago-area URLs
+    mustMatch: /(tobago|crown-point|scarborough|bon-accord|buccoo|plymouth|charlotteville|speyside|signal-hill|lambeau|canaan|carnbee|mt-irvine|black-rock|grafton|castara|roxborough|mason-hall|lowlands|bacolet|patience-hill|les-coteaux)/i
   },
   {
     id: 'charb', name: 'charbonnerealty.com',
@@ -50,7 +51,7 @@ const CRAWL_SITES = [
   },
   {
     id: 'ralestate', name: 'realestatetobago.com',
-    seeds: ['https://realestatetobago.com/properties/', 'https://realestatetobago.com/'],
+    seeds: ['https://realestatetobago.com/properties/', 'https://realestatetobago.com/property/', 'https://realestatetobago.com/listings/', 'https://realestatetobago.com/'],
     listingHint: /realestatetobago\.com\/.*(propert|listing|land|villa|house|apartment)/i
   },
   {
@@ -68,10 +69,15 @@ const CRAWL_SITES = [
 
 /* Search-fallback sites (JS-rendered — direct fetch usually fails) */
 const SEARCH_BATCHES = [
-  { label: 'terracaribbean', query: 'site:terracaribbean.com Tobago for sale', twoStage: true },
+  // Weakest sites first — they get fresh search quota
   { label: 'caribbeanMLS',   query: 'site:caribbeanrealestatemls.com/real-estate/tobago for sale', twoStage: true },
   { label: 'seajade',        query: 'site:seajadeinvestments.com property for sale', twoStage: true },
-  { label: 'villas',         query: 'site:villasoftobago.com villa for sale', twoStage: true }
+  { label: 'villas',         query: 'site:villasoftobago.com villa for sale', twoStage: true },
+  { label: 'terracaribbean', query: 'site:terracaribbean.com Tobago for sale', twoStage: true },
+  // Search works better than crawl for these two — keep both methods
+  { label: 'pin.tt houses',  query: 'site:pin.tt/realestate/tobago house for sale', twoStage: false },
+  { label: 'pin.tt land',    query: 'site:pin.tt/realestate/tobago land for sale', twoStage: false },
+  { label: 'realestatetobago', query: 'property land villa for sale site:realestatetobago.com', twoStage: true }
 ];
 
 /* ══════════════════════════════════════════
@@ -94,7 +100,7 @@ async function fetchPage(url) {
     clearTimeout(t);
     if (!resp.ok) return null;
     const type = resp.headers.get('content-type') || '';
-    if (!type.includes('html') && !type.includes('json')) return null;
+    if (!type.includes('html') && !type.includes('json') && !type.includes('xml')) return null;
     return await resp.text();
   } catch (e) { clearTimeout(t); return null; }
 }
@@ -112,6 +118,37 @@ function extractLinks(html, baseUrl) {
     if (abs && abs.startsWith('http')) links.add(abs);
   }
   return [...links];
+}
+
+/* Sitemap discovery — most sites publish every page URL here.
+   Bypasses JS-rendered index pages entirely. */
+async function fetchSitemapUrls(site) {
+  const found = new Set();
+  const hosts = ['https://' + site.name, 'https://www.' + site.name];
+  const paths = ['/sitemap.xml', '/sitemap_index.xml', '/wp-sitemap.xml', '/sitemap-1.xml'];
+  for (const host of hosts) {
+    for (const p of paths) {
+      const xml = await fetchPage(host + p);
+      await sleep(FETCH_DELAY_MS);
+      if (!xml || xml.indexOf('<') === -1) continue;
+      const locs = [...xml.matchAll(/<loc>\s*([^<\s]+)\s*<\/loc>/gi)].map(m => m[1]);
+      if (!locs.length) continue;
+      const pageUrls  = locs.filter(u => !u.endsWith('.xml'));
+      const childMaps = locs.filter(u => u.endsWith('.xml')).slice(0, 6);
+      pageUrls.forEach(u => found.add(u));
+      for (const cm of childMaps) {
+        const cxml = await fetchPage(cm);
+        await sleep(FETCH_DELAY_MS);
+        if (!cxml) continue;
+        [...cxml.matchAll(/<loc>\s*([^<\s]+)\s*<\/loc>/gi)]
+          .map(m => m[1]).filter(u => !u.endsWith('.xml'))
+          .forEach(u => found.add(u));
+      }
+      if (found.size) return [...found];
+    }
+    if (found.size) break;
+  }
+  return [...found];
 }
 
 function htmlToText(html) {
@@ -262,11 +299,23 @@ async function crawlSite(site) {
       if (site.listingHint.test(link) && !site.seeds.includes(link)) {
         // filter out obvious non-listing paths
         if (/\/(tag|category|author|wp-|feed|login|contact|about|blog)\//i.test(link)) continue;
+        if (site.mustMatch && !site.mustMatch.test(link)) continue;
         listingUrls.add(link);
       }
     }
     console.log(`  index OK: ${pageUrl} (links so far: ${listingUrls.size})`);
   }
+  /* 1b. Sitemap discovery — often the complete catalog */
+  const smUrls = await fetchSitemapUrls(site);
+  let smMatched = 0;
+  for (const u of smUrls) {
+    if (!site.listingHint.test(u)) continue;
+    if (/\/(tag|category|author|wp-|feed|login|contact|about|blog)\//i.test(u)) continue;
+    if (site.mustMatch && !site.mustMatch.test(u)) continue;
+    if (!listingUrls.has(u)) { listingUrls.add(u); smMatched++; }
+  }
+  report.sitemap = smMatched;
+  console.log(`  sitemap: ${smUrls.length} urls found, ${smMatched} new listing urls matched`);
   report.urlsFound = listingUrls.size;
 
   /* 2. Fetch listing pages */
@@ -373,7 +422,7 @@ function listingKey(p) {
     const siteName = listings[0] ? listings[0].site : batch.label;
     siteReports[siteName || batch.label] = { method: 'search', listings: listings.length };
     allFound.push(...listings);
-    await sleep(3000);
+    await sleep(5000);
   }
 
   /* Merge */
@@ -439,4 +488,3 @@ function listingKey(p) {
   Object.entries(siteReports).forEach(([s, r]) =>
     console.log(`  ${s.padEnd(32)} ${String(r.listings).padStart(3)} listings  (${r.method}${r.jsonld ? ', ' + r.jsonld + ' via jsonld' : ''}${r.claude ? ', ' + r.claude + ' via claude' : ''})`));
 })();
-
