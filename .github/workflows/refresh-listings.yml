@@ -1,14 +1,26 @@
 # ═══════════════════════════════════════════════
 # TOBAGO PROPERTY FINDER — Daily Listings Refresh
 # Place this file at: .github/workflows/refresh-listings.yml
+#
+# Runs TWICE daily with alternating search groups so the
+# search-based sites each get fresh quota instead of
+# starving at the back of one big queue. Crawl sites run
+# every time. The repo MERGES, so both runs accumulate.
 # ═══════════════════════════════════════════════
 name: Refresh Tobago Listings
 
 on:
   schedule:
-    # Runs daily at 10:00 UTC (6:00 AM Tobago time)
+    # Group A — 10:00 UTC (6 AM Tobago): caribbeanMLS, seajade, villas
     - cron: '0 10 * * *'
+    # Group B — 14:00 UTC (10 AM Tobago): pin.tt, terracaribbean
+    - cron: '0 14 * * *'
   workflow_dispatch:
+    inputs:
+      group:
+        description: 'Search group to run (A, B, or all)'
+        required: false
+        default: 'all'
 
 permissions:
   contents: write
@@ -25,6 +37,19 @@ jobs:
         with:
           node-version: '24'
 
+      - name: Determine run group
+        id: group
+        run: |
+          # Manual run -> use the dropdown input. Scheduled run -> pick by cron time.
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "RUN_GROUP=${{ github.event.inputs.group }}" >> "$GITHUB_ENV"
+          elif [ "${{ github.event.schedule }}" = "0 14 * * *" ]; then
+            echo "RUN_GROUP=B" >> "$GITHUB_ENV"
+          else
+            echo "RUN_GROUP=A" >> "$GITHUB_ENV"
+          fi
+          echo "Selected group: $RUN_GROUP"
+
       - name: Check secret is configured
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -38,6 +63,7 @@ jobs:
       - name: Run refresh script
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          RUN_GROUP: ${{ env.RUN_GROUP }}
         run: node refresh.js
 
       - name: Commit updated repo.json
@@ -45,8 +71,8 @@ jobs:
           git config user.name "repo-refresher"
           git config user.email "actions@github.com"
           git add data/repo.json
-          git diff --staged --quiet || git commit -m "Daily listings refresh $(date -u +%Y-%m-%d)"
-          # Pull any commits made while we were running, keeping OUR fresh repo.json on conflict
+          git diff --staged --quiet || git commit -m "Listings refresh (group ${RUN_GROUP}) $(date -u +%Y-%m-%dT%H:%M)"
           git pull --rebase -X theirs origin main
           git push
-
+        env:
+          RUN_GROUP: ${{ env.RUN_GROUP }}
