@@ -83,7 +83,8 @@ const CRAWL_SITES = [
     id: 'ralestate', name: 'realestatetobago.com',
     seeds: ['https://realestatetobago.com/property-type/houses-for-sale/',
             'https://realestatetobago.com/property-type/land-for-sale/'],
-    listingHint: /realestatetobago\.com\/property\/[a-z0-9-]+\/?$/i
+    listingHint: /realestatetobago\.com\/property\/[a-z0-9-]+\/?$/i,
+    noSitemap: true   // its /property-sitemap.xml dumps rentals+sold+all cats
   },
   {
     // Seajade rebranded from seajadeinvestments.com to seajaderealty.com.
@@ -393,8 +394,12 @@ async function crawlSite(site) {
     }
     console.log(`  index OK: ${pageUrl} (links so far: ${listingUrls.size})`);
   }
-  /* 1b. Sitemap discovery — often the complete catalog */
-  const smUrls = await fetchSitemapUrls(site);
+  /* 1b. Sitemap discovery — often the complete catalog. Skipped for sites
+        whose sitemap dumps non-for-sale pages (realestatetobago's
+        /property-sitemap.xml lists rentals + sold + every category, inflating
+        the queue to ~140; its for-sale category indexes + pagination already
+        give the clean for-sale set). */
+  const smUrls = site.noSitemap ? [] : await fetchSitemapUrls(site);
   let smMatched = 0;
   for (const u of smUrls) {
     if (!site.listingHint.test(u)) continue;
