@@ -540,6 +540,9 @@ function parseSizeSqft(sizeStr) {
     // Normalize: lowercase type, treat 0/blank price as unknown (null).
     if (p.type) p.type = String(p.type).toLowerCase().trim();
     if (!(Number(p.price) > 0)) p.price = null;
+    // size must be a string — the app calls p.size.replace() (search
+    // extraction sometimes returns a bare number, which crashed card render)
+    if (p.size != null && typeof p.size !== 'string') p.size = String(p.size);
     const key = listingKey(p);
     const prev = existing.get(key);
     if (prev) {

@@ -2885,7 +2885,7 @@ function makeCard(p) {
     c += '<div class="prop-specs">';
     if (p.beds>0)  c += '<div class="spec-item"><span class="spec-icon">\uD83D\uDECC</span><div class="spec-val">'+p.beds+'</div><div class="spec-label">Beds</div></div>';
     if (p.baths>0) c += '<div class="spec-item"><span class="spec-icon">\uD83D\uDEC3</span><div class="spec-val">'+p.baths+'</div><div class="spec-label">Baths</div></div>';
-    if (p.size)    c += '<div class="spec-item"><span class="spec-icon">\uD83D\uDCCF</span><div class="spec-val">'+p.size.replace(' sq ft','')+'</div><div class="spec-label">Sq Ft</div></div>';
+    if (p.size)    c += '<div class="spec-item"><span class="spec-icon">\uD83D\uDCCF</span><div class="spec-val">'+String(p.size).replace(' sq ft','')+'</div><div class="spec-label">Sq Ft</div></div>';
     c += '</div>';
   }
   if (p.description) c += '<div class="prop-desc">'+p.description+'</div>';
