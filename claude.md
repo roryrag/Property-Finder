@@ -120,24 +120,33 @@ scratch — they were established empirically over many runs.**
 | charbonnerealty.com | CRAWL | reliable 19–34 listings |
 | mybunchofkeys.com | CRAWL | reliable 16–26 |
 | rain-properties-tobago.com | CRAWL | use `/villatobuy.html` + `/property-sales`; 12–19; prices on sub-pages |
-| seajadeinvestments.com | CRAWL | fully crawlable: index `/tobago-real-estate-listings?start=N` (Joomla pagination), detail `/tobago-real-estate-listings/property/[id]-[slug]`; also `/tobago-land-for-sale`, `/tobago-homes-for-sale` |
+| seajaderealty.com | CRAWL | **REBRANDED from seajadeinvestments.com (old domain 404s).** Index `/properties` is JS-rendered, but detail pages `/properties/rsNNN` (residential) and `/properties/tlNNN` (land) are fully server-rendered WITH prices. Listing IDs are embedded in the index HTML (not all as `<a href>`), so refresh.js extracts them via `idPattern`/`idBase`. ~33 listings (14 res + 19 land). |
 | villasoftobago.com | CRAWL | detail pages `/[name]-property-page.html`; MOSTLY RENTALS with "Enquire for price" — few prices |
-| realestatetobago.com | CRAWL | use `/property-type/houses-for-sale/`, `/property-type/land-for-sale/` — has real TT$ prices. (Homepage & generic search return nothing — that wasted weeks.) |
+| realestatetobago.com | ❌ DO NOT USE | Behind **Sucuri CloudProxy** — every server-side fetch gets a JS challenge (`Server: Sucuri/Cloudproxy`), so no content without a headless browser. Removed from CRAWL_SITES (2026-06). Its sitemap exposes ~152 URLs but detail fetches all hit the JS wall → 0 extracted. Do not re-add unless the architecture gains JS rendering. |
 | pin.tt | SEARCH only | richest search source (~17–26) but JS-rendered index defeats crawl; covers ALL of T&T so filter to Tobago areas |
 | terracaribbean.com | SEARCH | weak (1–6); JS-rendered |
 | caribbeanrealestatemls.com | SEARCH | listings at `/real-estate/tobago/[id]`; weak via search; JS-rendered index |
 
 ### refresh.js architecture
-- **CRAWL_SITES**: pin (search-only in practice), charb, rain, keys, seajade,
-  villas, ralestate — each with `seeds[]` and a `listingHint` regex; optional
-  `mustMatch` (pin.tt uses it to keep only Tobago URLs).
+- **CRAWL_SITES**: pin (search-only in practice), charb, rain, keys, seajade
+  (seajaderealty.com) — each with `seeds[]` and a `listingHint` regex; optional
+  `mustMatch` (pin.tt uses it to keep only Tobago URLs) and optional
+  `idPattern`/`idBase` (seajade uses it to extract listing IDs embedded in the
+  index HTML). realestatetobago.com removed (Sucuri-walled, see table above).
+- **Data hygiene**: this is a Tobago FOR-SALE repo. `RENTAL_RE` + `TRINIDAD_RE`
+  (top of refresh.js) reject rentals and non-Tobago (Trinidad) listings both at
+  the URL stage and post-extraction, and purge any already in the repo. National
+  agencies (mybunchofkeys, pin.tt) leak Trinidad listings; rain leaks rentals.
 - **SEARCH_GROUPS A/B**: search batches split into two groups, alternated by
   `RUN_GROUP` env var across two daily runs so each gets fresh search quota.
   A = caribbeanMLS, terracaribbean. B = pin.tt houses, pin.tt land.
 - **Sitemap discovery** (`fetchSitemapUrls`) tries sitemap.xml variants to
   bypass JS index pages (helps some sites, not all).
 - **Budgets**: MAX_PAGES_PER_SITE=8, MAX_LISTINGS_PER_SITE=50,
-  MAX_EXTRACT_CALLS=30, EXTRACT_BATCH=4.
+  MAX_EXTRACT_CALLS=40 (global ceiling), MAX_EXTRACT_CALLS_PER_SITE=8,
+  EXTRACT_BATCH=4. The per-site cap exists because the budget is a single
+  greedy counter consumed in crawl order — without it, the first sites
+  (charb, keys) ate all 30 calls and starved trailing sites (seajade) to 0.
 - **Merge logic**: listings accumulate across runs (keyed title|site). Unseen
   14+ days → status 'stale' (shows "possibly sold"); unseen 30+ days → dropped.
 - **JSON truncation recovery**: when a Claude response is cut off by max_tokens
