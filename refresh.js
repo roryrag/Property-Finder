@@ -60,6 +60,19 @@ const CRAWL_SITES = [
     id: 'keys', name: 'mybunchofkeys.com',
     seeds: ['https://mybunchofkeys.com/properties/', 'https://mybunchofkeys.com/'],
     listingHint: /mybunchofkeys\.com\/.*(propert|listing|land|villa|house)/i
+  },
+  {
+    id: 'ralestate', name: 'realestatetobago.com',
+    seeds: ['https://realestatetobago.com/property-type/houses-for-sale/',
+            'https://realestatetobago.com/property-type/land-for-sale/'],
+    listingHint: /realestatetobago\.com\/.*(propert|listing|land|villa|house|apartment)/i
+  },
+  {
+    id: 'seajade', name: 'seajadeinvestments.com',
+    seeds: ['https://seajadeinvestments.com/tobago-real-estate-listings',
+            'https://seajadeinvestments.com/tobago-land-for-sale',
+            'https://seajadeinvestments.com/tobago-homes-for-sale'],
+    listingHint: /seajadeinvestments\.com\/tobago-real-estate-listings\/property\//i
   }
 ];
 
@@ -71,7 +84,6 @@ const CRAWL_SITES = [
 const SEARCH_GROUPS = {
   A: [
     { label: 'caribbeanMLS', query: 'site:caribbeanrealestatemls.com/real-estate/tobago for sale', twoStage: true },
-    { label: 'seajade',      query: 'site:seajadeinvestments.com property for sale', twoStage: true },
     { label: 'villas',       query: 'site:villasoftobago.com villa for sale', twoStage: true }
   ],
   B: [
@@ -297,7 +309,7 @@ async function crawlSite(site) {
     for (const link of links) {
       if (!link.includes(site.name.replace('www.', ''))) continue;
       // pagination links → queue as index pages
-      if (/[?&](page|paged|p)=\d+|\/page\/\d+/i.test(link)) {
+      if (/[?&](page|paged|p|start)=\d+|\/page\/\d+/i.test(link)) {
         if (!indexSeen.has(link) && indexSeen.size < MAX_PAGES_PER_SITE * 2) {
           indexSeen.add(link); indexQueue.push(link);
         }
