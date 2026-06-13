@@ -2867,6 +2867,7 @@ function makeCard(p) {
   if(feats.length) waLines.push('');
   if(p.agent_name) waLines.push('\uD83D\uDC64 Agent: '+p.agent_name);
   if(p.agent_phone) waLines.push('\uD83D\uDCDE Phone: '+p.agent_phone);
+  if(p.url) waLines.push('🔗 '+p.url);
   waLines.push('Listed on: '+(p.site||''));
   var waMsg = encodeURIComponent(waLines.join('\n'));
 
@@ -2960,7 +2961,7 @@ function removeFromShortlist(id) {
 function shareShortlist() {
   if (!shortlist.length) return;
   var lines=['\uD83C\uDFE0 PROPERTY SHORTLIST','Tobago Property Finder',''];
-  shortlist.forEach(function(s,i){lines.push((i+1)+'. '+s.title);lines.push('   '+s.price);if(s.loc)lines.push('   '+s.loc);lines.push('');});
+  shortlist.forEach(function(s,i){lines.push((i+1)+'. '+s.title);lines.push('   '+s.price);if(s.loc)lines.push('   '+s.loc);if(s.url)lines.push('   '+s.url);lines.push('');});
   lines.push('Tobago Property Finder \u2014 '+new Date().toLocaleDateString());
   window.open('https://wa.me/?text='+encodeURIComponent(lines.join('\n')),'_blank');
 }
@@ -3277,8 +3278,8 @@ function addCoBrokerRequest(btn, propDataStr) {
 function cbUpdateStatus(id,status){ cbLoad(); var r=cbRequests.find(function(x){return x.id===id;}); if(r){r.status=status;cbSave();renderCoBrokerList();} }
 function cbSaveNotes(id){ cbLoad(); var r=cbRequests.find(function(x){return x.id===id;}); var el=document.getElementById('cbn-'+id); if(r&&el){r.notes=el.value;cbSave();} }
 function cbDelete(id){ if(!confirm('Remove this request?')) return; cbLoad(); cbRequests=cbRequests.filter(function(r){return r.id!==id;}); cbSave(); renderCoBrokerList(); var badge=document.getElementById('badge-cobroker'); if(badge){if(cbRequests.length>0){badge.textContent=cbRequests.length;}else{badge.classList.remove('show');}} }
-function cbSendWhatsApp(id){ cbLoad(); var req=cbRequests.find(function(r){return r.id===id;}); if(!req) return; var msg=encodeURIComponent('\uD83E\uDD1D *CO-BROKER REQUEST*\n\nHi'+(req.agentName?' '+req.agentName:'')+',\n\nI am '+( req.myName||'Agent')+(req.myAgency?', '+req.myAgency:'')+'. My client is interested in your listing and I would like to explore a co-broker arrangement:\n\n\uD83C\uDFE0 *'+req.title+'*\n\uD83D\uDCB0 '+req.price+'\n\uD83D\uDCCD '+req.location+', Tobago\n\uD83C\uDF10 '+req.site+'\n'+(req.myPhone?'\n\uD83D\uDCDE '+req.myPhone:'')+( req.myEmail?'\n\uD83D\uDCE7 '+req.myEmail:'')+'\n\nWould you be open to a co-broker arrangement? Thank you!'); var phone=req.agentPhone?req.agentPhone.replace(/\D/g,''):''; window.open((phone?'https://wa.me/'+phone:' https://wa.me/')+'?text='+msg,'_blank'); }
-function cbSendEmail(id){ cbLoad(); var req=cbRequests.find(function(r){return r.id===id;}); if(!req) return; var subj=encodeURIComponent('Co-Broker Request: '+req.title); var body=encodeURIComponent('Dear '+(req.agentName||'Agent')+',\n\nI am '+(req.myName||'Agent')+(req.myAgency?', '+req.myAgency:'')+' and I have a client interested in your property:\n\n'+req.title+'\nPrice: '+req.price+'\nLocation: '+req.location+', Tobago\nSite: '+req.site+'\n\nI would like to explore a co-broker arrangement.\n\n'+(req.myPhone?'Phone: '+req.myPhone+'\n':'')+(req.myEmail?'Email: '+req.myEmail+'\n':'')+'Kind regards,\n'+(req.myName||'Agent')); window.open('mailto:?subject='+subj+'&body='+body,'_blank'); }
+function cbSendWhatsApp(id){ cbLoad(); var req=cbRequests.find(function(r){return r.id===id;}); if(!req) return; var msg=encodeURIComponent('\uD83E\uDD1D *CO-BROKER REQUEST*\n\nHi'+(req.agentName?' '+req.agentName:'')+',\n\nI am '+( req.myName||'Agent')+(req.myAgency?', '+req.myAgency:'')+'. My client is interested in your listing and I would like to explore a co-broker arrangement:\n\n\uD83C\uDFE0 *'+req.title+'*\n\uD83D\uDCB0 '+req.price+'\n\uD83D\uDCCD '+req.location+', Tobago\n\uD83C\uDF10 '+req.site+(req.url?'\n🔗 '+req.url:'')+'\n'+(req.myPhone?'\n\uD83D\uDCDE '+req.myPhone:'')+( req.myEmail?'\n\uD83D\uDCE7 '+req.myEmail:'')+'\n\nWould you be open to a co-broker arrangement? Thank you!'); var phone=req.agentPhone?req.agentPhone.replace(/\D/g,''):''; window.open((phone?'https://wa.me/'+phone:' https://wa.me/')+'?text='+msg,'_blank'); }
+function cbSendEmail(id){ cbLoad(); var req=cbRequests.find(function(r){return r.id===id;}); if(!req) return; var subj=encodeURIComponent('Co-Broker Request: '+req.title); var body=encodeURIComponent('Dear '+(req.agentName||'Agent')+',\n\nI am '+(req.myName||'Agent')+(req.myAgency?', '+req.myAgency:'')+' and I have a client interested in your property:\n\n'+req.title+'\nPrice: '+req.price+'\nLocation: '+req.location+', Tobago\nSite: '+req.site+(req.url?'\nListing: '+req.url:'')+'\n\nI would like to explore a co-broker arrangement.\n\n'+(req.myPhone?'Phone: '+req.myPhone+'\n':'')+(req.myEmail?'Email: '+req.myEmail+'\n':'')+'Kind regards,\n'+(req.myName||'Agent')); window.open('mailto:?subject='+subj+'&body='+body,'_blank'); }
 function renderCoBrokerList() {
   cbLoad();
   var area=document.getElementById('cbListArea'); var bar=document.getElementById('cbSummaryBar');
@@ -4204,6 +4205,7 @@ function shareClientSl(contactId) {
     lines.push((i+1) + '. ' + (p.title || 'Property'));
     lines.push('   \uD83D\uDCB0 ' + (p.price || ''));
     if (p.loc) lines.push('   \uD83D\uDCCD ' + p.loc);
+    if (p.url) lines.push('   \uD83D\uDD17 ' + p.url);
     lines.push('');
   });
   lines.push('Tobago Property Finder \u2014 ' + new Date().toLocaleDateString('en-TT', {day:'numeric',month:'short',year:'numeric'}));
