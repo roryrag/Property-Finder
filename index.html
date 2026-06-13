@@ -2818,6 +2818,13 @@ function fmtPrice(p) {
   if (p>=1000) return 'TT$'+Math.round(p/1000)+'k';
   return 'TT$'+Number(p).toLocaleString();
 }
+// Small "View listing" link for Shortlist / Co-Broker entries. Returns '' for
+// missing/invalid URLs so entries without a link render cleanly.
+function listingLink(url) {
+  if (!url || String(url).indexOf('http') !== 0) return '';
+  return '<a href="' + String(url).replace(/"/g,'&quot;') + '" target="_blank" rel="noopener" ' +
+    'style="display:inline-block;margin-top:4px;font-size:11px;font-weight:600;color:var(--forest-l);text-decoration:none;">🔗 View listing</a>';
+}
 
 function renderResults(listings) {
   var skel=document.querySelector('.skeleton-wrap'); if(skel) skel.style.display='none';
@@ -2909,7 +2916,7 @@ function makeCard(p) {
   c += '<button class="prop-action-btn similar" onclick="searchSimilar('+"'"+((p.location||'Tobago').replace(/'/g,''))+"','"+((p.type||'').replace(/'/g,''))+"'"+')">\uD83D\uDD0D Similar</button>';
   c += '</div>';
   c += '<div class="prop-actions">';
-  c += '<button class="prop-action-btn shortlist" onclick="openSlPicker(this)" data-title="'+(p.title||'Property').replace(/"/g,'&quot;')+'" data-price="'+price+'" data-loc="'+loc+'" data-wa="'+waMsg+'">\u2764 Add</button>';
+  c += '<button class="prop-action-btn shortlist" onclick="openSlPicker(this)" data-title="'+(p.title||'Property').replace(/"/g,'&quot;')+'" data-price="'+price+'" data-loc="'+loc+'" data-url="'+(p.url||'').replace(/"/g,'&quot;')+'" data-wa="'+waMsg+'">\u2764 Add</button>';
   c += '<button class="prop-action-btn cobroker" onclick="addCoBrokerRequest(this,\''+cbData+'\')" data-prop="'+cbData+'">\uD83E\uDD1D Co-Broker</button>';
   c += '</div>';
   var _vfData = JSON.stringify({title:p.title||'',site:p.site||'',url:p.url||''}).replace(/"/g,'&quot;');
@@ -2935,9 +2942,10 @@ function addToShortlist(btn, waMsg) {
   var title = btn.getAttribute('data-title') || 'Property';
   var price = btn.getAttribute('data-price') || '';
   var loc   = btn.getAttribute('data-loc')   || '';
+  var url   = btn.getAttribute('data-url')   || '';
   var dup = shortlist.some(function(s){ return s.title===title && s.price===price; });
   if (dup) { switchTab('shortlist'); return; }
-  shortlist.push({ id:Date.now(), title:title, price:price, loc:loc, wa:waMsg });
+  shortlist.push({ id:Date.now(), title:title, price:price, loc:loc, url:url, wa:waMsg });
   btn.textContent = '\u2665 Saved'; btn.classList.add('done');
   renderShortlist();
   var badge=document.getElementById('badge-shortlist');
@@ -2965,7 +2973,7 @@ function renderShortlist() {
   }
   var h='<div class="section-hdr">'+shortlist.length+' saved <span style="font-size:12px;color:var(--muted)">'+shortlist.length+' propert'+(shortlist.length===1?'y':'ies')+'</span></div>';
   shortlist.forEach(function(s){
-    h+='<div class="sl-card"><div class="sl-card-body"><div class="sl-card-title">'+s.title+'</div><div class="sl-card-price">'+s.price+'</div><div class="sl-card-meta">'+s.loc+'</div></div><button class="sl-remove" onclick="removeFromShortlist('+s.id+')">&#10005;</button></div>';
+    h+='<div class="sl-card"><div class="sl-card-body"><div class="sl-card-title">'+s.title+'</div><div class="sl-card-price">'+s.price+'</div><div class="sl-card-meta">'+s.loc+'</div>'+listingLink(s.url)+'</div><button class="sl-remove" onclick="removeFromShortlist('+s.id+')">&#10005;</button></div>';
   });
   h+='<div class="sl-actions"><button class="sl-clear-btn" onclick="shortlist=[];renderShortlist();document.getElementById(\'badge-shortlist\').classList.remove(\'show\');">\uD83D\uDDD1 Clear all</button><button class="btn-wa" onclick="shareShortlist()"><svg class="wa-icon" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Share All</button></div>';
   area.innerHTML = h;
@@ -3283,7 +3291,7 @@ function renderCoBrokerList() {
   var LBLS={pending:'Pending',accepted:'Accepted',declined:'Declined',countered:'Countered'};
   var html='';
   cbRequests.slice().reverse().forEach(function(req){
-    html+='<div class="cb-card"><div class="cb-card-hdr '+req.status+'"><div class="cb-card-title">'+req.title+'</div><span class="cb-status-badge '+req.status+'">'+ICONS[req.status]+' '+LBLS[req.status]+'</span></div><div class="cb-card-body"><div class="cb-detail"><strong>\uD83D\uDCB0</strong> '+req.price+'</div><div class="cb-detail"><strong>\uD83D\uDCCD</strong> '+req.location+'</div>'+(req.agentName?'<div class="cb-detail"><strong>\uD83D\uDC64</strong> '+req.agentName+'</div>':'')+(req.agentPhone?'<div class="cb-detail"><strong>\uD83D\uDCDE</strong> '+req.agentPhone+'</div>':'')+'<div class="cb-date">Added: '+req.dateAdded+'</div><textarea class="cb-notes" id="cbn-'+req.id+'" rows="2" placeholder="Notes..." onblur="cbSaveNotes('+req.id+')">'+( req.notes||'')+'</textarea><div class="cb-commission"><div class="cb-comm-title">\uD83D\uDCB0 Commission Split Calculator</div><div class="cb-comm-row"><input class="cb-comm-input" type="number" id="cbs-'+req.id+'" placeholder="Sale price TT$"><input class="cb-comm-input" type="number" id="cbp-'+req.id+'" placeholder="Split % each" value="50"></div><button style="width:100%;margin-top:6px;padding:7px;background:var(--forest-m);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;" onclick="calcCommission('+req.id+')">Calculate</button><div class="cb-comm-result" id="cbr-'+req.id+'" style="display:none"></div></div><div class="cb-actions"><button class="cb-btn wa" onclick="cbSendWhatsApp('+req.id+')">\uD83D\uDCF2 WhatsApp</button><button class="cb-btn email" onclick="cbSendEmail('+req.id+')">\uD83D\uDCE7 Email</button>'+(req.status!=='accepted'?'<button class="cb-btn accept" onclick="cbUpdateStatus('+req.id+',\'accepted\')">\u2705</button>':'')+(req.status!=='declined'?'<button class="cb-btn decline" onclick="cbUpdateStatus('+req.id+',\'declined\')">\u274C</button>':'')+(req.status!=='countered'?'<button class="cb-btn counter" onclick="cbUpdateStatus('+req.id+',\'countered\')">\uD83D\uDD04</button>':'')+'<button class="cb-btn" onclick="cbDelete('+req.id+')" style="color:#aaa;">\uD83D\uDDD1</button></div></div></div>';
+    html+='<div class="cb-card"><div class="cb-card-hdr '+req.status+'"><div class="cb-card-title">'+req.title+'</div><span class="cb-status-badge '+req.status+'">'+ICONS[req.status]+' '+LBLS[req.status]+'</span></div><div class="cb-card-body"><div class="cb-detail"><strong>\uD83D\uDCB0</strong> '+req.price+'</div><div class="cb-detail"><strong>\uD83D\uDCCD</strong> '+req.location+'</div>'+(req.url?'<div class="cb-detail">'+listingLink(req.url)+'</div>':'')+(req.agentName?'<div class="cb-detail"><strong>\uD83D\uDC64</strong> '+req.agentName+'</div>':'')+(req.agentPhone?'<div class="cb-detail"><strong>\uD83D\uDCDE</strong> '+req.agentPhone+'</div>':'')+'<div class="cb-date">Added: '+req.dateAdded+'</div><textarea class="cb-notes" id="cbn-'+req.id+'" rows="2" placeholder="Notes..." onblur="cbSaveNotes('+req.id+')">'+( req.notes||'')+'</textarea><div class="cb-commission"><div class="cb-comm-title">\uD83D\uDCB0 Commission Split Calculator</div><div class="cb-comm-row"><input class="cb-comm-input" type="number" id="cbs-'+req.id+'" placeholder="Sale price TT$"><input class="cb-comm-input" type="number" id="cbp-'+req.id+'" placeholder="Split % each" value="50"></div><button style="width:100%;margin-top:6px;padding:7px;background:var(--forest-m);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;" onclick="calcCommission('+req.id+')">Calculate</button><div class="cb-comm-result" id="cbr-'+req.id+'" style="display:none"></div></div><div class="cb-actions"><button class="cb-btn wa" onclick="cbSendWhatsApp('+req.id+')">\uD83D\uDCF2 WhatsApp</button><button class="cb-btn email" onclick="cbSendEmail('+req.id+')">\uD83D\uDCE7 Email</button>'+(req.status!=='accepted'?'<button class="cb-btn accept" onclick="cbUpdateStatus('+req.id+',\'accepted\')">\u2705</button>':'')+(req.status!=='declined'?'<button class="cb-btn decline" onclick="cbUpdateStatus('+req.id+',\'declined\')">\u274C</button>':'')+(req.status!=='countered'?'<button class="cb-btn counter" onclick="cbUpdateStatus('+req.id+',\'countered\')">\uD83D\uDD04</button>':'')+'<button class="cb-btn" onclick="cbDelete('+req.id+')" style="color:#aaa;">\uD83D\uDDD1</button></div></div></div>';
   });
   area.innerHTML=html;
 }
@@ -4251,6 +4259,7 @@ function renderClientShortlists() {
               '<div class="client-sl-prop-title">' + (p.title || 'Property') + '</div>' +
               '<div class="client-sl-prop-price">' + (p.price || '') + '</div>' +
               '<div class="client-sl-prop-loc">' + (p.loc || '') + '</div>' +
+              listingLink(p.url) +
             '</div>' +
             '<button class="client-sl-prop-del" onclick="removePropFromClientSl(' + c.id + ',' + i + ')" title="Remove">\u00D7</button>' +
           '</div>';
@@ -4278,6 +4287,7 @@ function openSlPicker(btn) {
     title : btn.getAttribute('data-title') || 'Property',
     price : btn.getAttribute('data-price') || '',
     loc   : btn.getAttribute('data-loc')   || '',
+    url   : btn.getAttribute('data-url')   || '',
     wa    : btn.getAttribute('data-wa')    || ''
   };
   _slPickerProp = { prop: prop, btn: btn };
@@ -4354,7 +4364,7 @@ function slPickerAddGeneral() {
 
   var dup = shortlist.some(function(s) { return s.title === p.title && s.price === p.price; });
   if (!dup) {
-    shortlist.push({ id: Date.now(), title: p.title, price: p.price, loc: p.loc, wa: p.wa });
+    shortlist.push({ id: Date.now(), title: p.title, price: p.price, loc: p.loc, url: p.url || '', wa: p.wa });
     renderShortlist();
     var badge = document.getElementById('badge-shortlist');
     if (badge) { badge.textContent = shortlist.length; badge.classList.add('show'); }
