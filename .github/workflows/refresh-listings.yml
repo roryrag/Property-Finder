@@ -25,6 +25,13 @@ on:
 permissions:
   contents: write
 
+# Serialize runs so two refreshes never race to push main. Racing runs were
+# producing a textually MERGED repo.json (clean meta stapled onto a dirty
+# listings array) because git line-merges the big JSON file.
+concurrency:
+  group: refresh-listings
+  cancel-in-progress: false
+
 jobs:
   refresh:
     runs-on: ubuntu-latest
@@ -71,8 +78,28 @@ jobs:
           git config user.name "repo-refresher"
           git config user.email "actions@github.com"
           git add data/repo.json data/sold.json
-          git diff --staged --quiet || git commit -m "Listings refresh (group ${RUN_GROUP}) $(date -u +%Y-%m-%dT%H:%M)"
-          git pull --rebase -X theirs origin main
-          git push
+          if git diff --staged --quiet; then echo "No changes to commit"; exit 0; fi
+          # The generated JSON files are authoritative: refresh.js already
+          # merged the previous repo.json at read-time. NEVER let git
+          # textually merge them — keep a pristine copy and restore it after
+          # any rebase so we push the whole file, not a line-merged hybrid.
+          cp data/repo.json /tmp/repo.json
+          cp data/sold.json /tmp/sold.json
+          git commit -m "Listings refresh (group ${RUN_GROUP}) $(date -u +%Y-%m-%dT%H:%M)"
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git rebase origin/main || {
+              git checkout --theirs -- data/repo.json data/sold.json 2>/dev/null || true
+              git add data/repo.json data/sold.json
+              GIT_EDITOR=true git rebase --continue || git rebase --abort
+            }
+            cp /tmp/repo.json data/repo.json
+            cp /tmp/sold.json data/sold.json
+            git add data/repo.json data/sold.json
+            git diff --staged --quiet || git commit --amend --no-edit
+            if git push origin main; then echo "Pushed on attempt $attempt"; exit 0; fi
+            sleep $((RANDOM % 8 + 3))
+          done
+          echo "::error::push failed after 5 attempts"; exit 1
         env:
           RUN_GROUP: ${{ env.RUN_GROUP }}
