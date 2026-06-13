@@ -4534,9 +4534,12 @@ async function runDiagnostic() {
    existing search/valuator logic works as-is.
 ══════════════════════════════════════════ */
 var SHARED_REPO_URL_KEY = 'tpf_shared_repo_url';
+// Default shared repo so the app loads listings out-of-the-box. An agent can
+// still override this in Settings (their localStorage value takes precedence).
+var DEFAULT_SHARED_REPO_URL = 'https://raw.githubusercontent.com/roryrag/Property-Finder/main/data/repo.json';
 
 async function sharedRepoSync(showAlert) {
-  var url = localStorage.getItem(SHARED_REPO_URL_KEY);
+  var url = localStorage.getItem(SHARED_REPO_URL_KEY) || DEFAULT_SHARED_REPO_URL;
   if (!url) return false;
 
   var metaEl = document.getElementById('repoMeta');
