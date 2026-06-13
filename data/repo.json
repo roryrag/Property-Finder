@@ -1,18 +1,82 @@
 {
  "meta": {
-  "lastRefresh": "2026-06-13T19:02:25.897Z",
-  "totalListings": 72,
-  "activeCount": 72,
+  "lastRefresh": "2026-06-13T19:12:04.594Z",
+  "totalListings": 78,
+  "activeCount": 78,
   "staleCount": 0,
   "withPrice": 52,
+  "newThisRun": 6,
+  "updatedThisRun": 27,
+  "droppedThisRun": 0,
+  "rejectedRentalThisRun": 3,
+  "rejectedNonTobagoThisRun": 28,
+  "purgedFromRepoThisRun": 0,
+  "extractCallsUsed": 30,
   "sources": {
-   "pin.tt": 18,
+   "pin.tt": 19,
    "mybunchofkeys.com": 4,
    "seajadeinvestments.com": 12,
    "charbonnerealty.com": 23,
-   "terracaribbean.com": 15
+   "terracaribbean.com": 15,
+   "rain-properties-tobago.com": 5
   },
-  "note": "Manually re-purged after workflow JSON merge corruption (see commit msg)."
+  "siteReports": {
+   "pin.tt": {
+    "method": "search",
+    "listings": 3
+   },
+   "charbonnerealty.com": {
+    "method": "crawl",
+    "listings": 27,
+    "urlsFound": 124,
+    "jsonld": 0,
+    "claude": 27
+   },
+   "rain-properties-tobago.com": {
+    "method": "crawl",
+    "listings": 5,
+    "urlsFound": 34,
+    "jsonld": 0,
+    "claude": 5
+   },
+   "mybunchofkeys.com": {
+    "method": "crawl",
+    "listings": 29,
+    "urlsFound": 86,
+    "jsonld": 0,
+    "claude": 29
+   },
+   "realestatetobago.com": {
+    "method": "crawl",
+    "listings": 0,
+    "urlsFound": 152,
+    "jsonld": 0,
+    "claude": 0
+   },
+   "seajadeinvestments.com": {
+    "method": "crawl",
+    "listings": 0,
+    "urlsFound": 0,
+    "jsonld": 0,
+    "claude": 0
+   },
+   "caribbeanMLS": {
+    "method": "search",
+    "listings": 0
+   },
+   "villas": {
+    "method": "search",
+    "listings": 0
+   },
+   "pin.tt land": {
+    "method": "search",
+    "listings": 0
+   },
+   "terracaribbean": {
+    "method": "search",
+    "listings": 0
+   }
+  }
  },
  "listings": [
   {
@@ -53,7 +117,7 @@
    "url": "",
    "site": "pin.tt",
    "firstSeen": 1781187299336,
-   "lastSeen": 1781373814262,
+   "lastSeen": 1781377924594,
    "status": "active"
   },
   {
@@ -72,7 +136,7 @@
    "url": "",
    "site": "pin.tt",
    "firstSeen": 1781187299336,
-   "lastSeen": 1781373814262,
+   "lastSeen": 1781377924594,
    "status": "active"
   },
   {
@@ -543,7 +607,7 @@
    "url": "https://charbonnerealty.com/property-type/house/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781374692044,
+   "lastSeen": 1781377924594,
    "status": "active"
   },
   {
@@ -566,7 +630,7 @@
    "url": "https://charbonnerealty.com/property-type/apartment-condo/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781374692044,
+   "lastSeen": 1781377924594,
    "status": "active"
   },
   {
@@ -589,7 +653,7 @@
    "url": "https://charbonnerealty.com/property-type/commercial/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781374692044,
+   "lastSeen": 1781377924594,
    "status": "active"
   },
   {
@@ -612,7 +676,7 @@
    "url": "https://charbonnerealty.com/property-type/land/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781374692044,
+   "lastSeen": 1781377924594,
    "status": "active"
   },
   {
@@ -658,7 +722,7 @@
    "url": "https://charbonnerealty.com/property/burleigh-heights-home/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781374692044,
+   "lastSeen": 1781377924594,
    "status": "active"
   },
   {
@@ -681,7 +745,7 @@
    "url": "https://charbonnerealty.com/property/newly-built-signal-hill-home/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781374692044,
+   "lastSeen": 1781377924594,
    "status": "active"
   },
   {
@@ -704,7 +768,7 @@
    "url": "https://charbonnerealty.com/property/sherwood-park-home/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781374692044,
+   "lastSeen": 1781377924594,
    "status": "active"
   },
   {
@@ -726,7 +790,7 @@
    "url": "https://charbonnerealty.com/property/lot-106-hope-development/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781374692044,
+   "lastSeen": 1781377924594,
    "status": "active"
   },
   {
@@ -749,7 +813,7 @@
    "url": "https://charbonnerealty.com/property/three-bedroom-villa-in-tobago-plantations/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781374692044,
+   "lastSeen": 1781377924594,
    "status": "active"
   },
   {
@@ -772,12 +836,12 @@
    "url": "https://charbonnerealty.com/property/land-in-calder-hall/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781374692044,
+   "lastSeen": 1781377924594,
    "status": "active"
   },
   {
    "title": "Land on the quiet Sunningdale Lane",
-   "price": 2106800,
+   "price": 2108000,
    "beds": 0,
    "baths": 0,
    "type": "land",
@@ -795,14 +859,14 @@
    "url": "https://charbonnerealty.com/property/land-on-the-quiet-sunningdale-lane/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781374692044,
+   "lastSeen": 1781377924594,
    "status": "active"
   },
   {
    "title": "Villa Alamanda",
    "price": 2788000,
    "beds": 3,
-   "baths": 3,
+   "baths": 3.5,
    "type": "villa",
    "size": "1,808 sq ft",
    "location": "Grafton",
@@ -818,7 +882,7 @@
    "url": "https://charbonnerealty.com/property/villa-alamanda/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781374692044,
+   "lastSeen": 1781377924594,
    "status": "active"
   },
   {
@@ -840,7 +904,7 @@
    "url": "https://charbonnerealty.com/property/bacolet-park-land/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781374692044,
+   "lastSeen": 1781377924594,
    "status": "active"
   },
   {
@@ -861,7 +925,7 @@
    "url": "https://charbonnerealty.com/property/lot-5-arnos-vale/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781374692044,
+   "lastSeen": 1781377924594,
    "status": "active"
   },
   {
@@ -1022,7 +1086,7 @@
    "url": "https://charbonnerealty.com/property/gordon-heights-land/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781374692044,
+   "lastSeen": 1781377924594,
    "status": "active"
   },
   {
@@ -1044,7 +1108,7 @@
    "url": "https://charbonnerealty.com/property/davis-drive-bacolet-land/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781374692044,
+   "lastSeen": 1781377924594,
    "status": "active"
   },
   {
@@ -1067,7 +1131,7 @@
    "url": "https://charbonnerealty.com/property/lambeau-duplex/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781374692044,
+   "lastSeen": 1781377924594,
    "status": "active"
   },
   {
@@ -1090,7 +1154,7 @@
    "url": "https://charbonnerealty.com/property/riseland-trace-home/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781374692044,
+   "lastSeen": 1781377924594,
    "status": "active"
   },
   {
@@ -1112,7 +1176,7 @@
    "url": "https://charbonnerealty.com/property/lot-2-3-pentlands-arnos-vale/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781374692044,
+   "lastSeen": 1781377924594,
    "status": "active"
   },
   {
@@ -1135,14 +1199,14 @@
    "url": "https://charbonnerealty.com/property/arawak-avenue-signal-hill/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781374692044,
+   "lastSeen": 1781377924594,
    "status": "active"
   },
   {
    "title": "Pinehurst Drive Home",
    "price": 8840000,
    "beds": 4,
-   "baths": 4.5,
+   "baths": 4,
    "type": "house",
    "size": "5252 sq ft",
    "location": "Mount Irvine",
@@ -1158,7 +1222,7 @@
    "url": "https://charbonnerealty.com/property/pinehurst-drive-home/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781374692044,
+   "lastSeen": 1781377924594,
    "status": "active"
   },
   {
@@ -1181,7 +1245,7 @@
    "url": "https://charbonnerealty.com/property/whim-development-home/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781374692044,
+   "lastSeen": 1781377924594,
    "status": "active"
   },
   {
@@ -1630,6 +1694,122 @@
    "site": "terracaribbean.com",
    "firstSeen": 1781373814262,
    "lastSeen": 1781373814262,
+   "status": "active"
+  },
+  {
+   "title": "Lagoon Property & Land",
+   "price": null,
+   "beds": 0,
+   "baths": 0,
+   "type": "land",
+   "size": "",
+   "location": "Canaan",
+   "pool": false,
+   "description": "Land property available in Canaan area.",
+   "features": [],
+   "agent_name": "",
+   "agent_phone": "",
+   "url": "https://www.rain-properties-tobago.com/property-sales-lagoon-property-land",
+   "site": "rain-properties-tobago.com",
+   "firstSeen": 1781377924594,
+   "lastSeen": 1781377924594,
+   "status": "active"
+  },
+  {
+   "title": "Samaan Grove Yellow House",
+   "price": null,
+   "beds": 0,
+   "baths": 0,
+   "type": "house",
+   "size": "",
+   "location": "Canaan",
+   "pool": false,
+   "description": "Yellow house property in Samaan Grove, Canaan.",
+   "features": [],
+   "agent_name": "",
+   "agent_phone": "",
+   "url": "https://www.rain-properties-tobago.com/property-sales-samaan-grove-yellow-house",
+   "site": "rain-properties-tobago.com",
+   "firstSeen": 1781377924594,
+   "lastSeen": 1781377924594,
+   "status": "active"
+  },
+  {
+   "title": "Black Rock Dreams Condo",
+   "price": null,
+   "beds": 0,
+   "baths": 0,
+   "type": "apartment",
+   "size": "",
+   "location": "Black Rock",
+   "pool": false,
+   "description": "Condo property in Black Rock Dreams development.",
+   "features": [],
+   "agent_name": "",
+   "agent_phone": "",
+   "url": "https://www.rain-properties-tobago.com/property-sales-black-rock-dreams-condo",
+   "site": "rain-properties-tobago.com",
+   "firstSeen": 1781377924594,
+   "lastSeen": 1781377924594,
+   "status": "active"
+  },
+  {
+   "title": "Grafton Ridge Estate",
+   "price": null,
+   "beds": 0,
+   "baths": 0,
+   "type": "house",
+   "size": "",
+   "location": "Black Rock",
+   "pool": false,
+   "description": "Property in Grafton Ridge Estate development.",
+   "features": [],
+   "agent_name": "",
+   "agent_phone": "",
+   "url": "https://www.rain-properties-tobago.com/property-sales-grafton-ridge-estate",
+   "site": "rain-properties-tobago.com",
+   "firstSeen": 1781377924594,
+   "lastSeen": 1781377924594,
+   "status": "active"
+  },
+  {
+   "title": "Wilson Road Commercial Building",
+   "price": null,
+   "beds": 0,
+   "baths": 0,
+   "type": "commercial",
+   "size": "",
+   "location": "Wilson Road",
+   "pool": false,
+   "description": "Commercial building located on Wilson Road in Tobago.",
+   "features": [],
+   "agent_name": "",
+   "agent_phone": "",
+   "url": "https://www.rain-properties-tobago.com/property-sales-wilson-road-commercial-building",
+   "site": "rain-properties-tobago.com",
+   "firstSeen": 1781377924594,
+   "lastSeen": 1781377924594,
+   "status": "active"
+  },
+  {
+   "title": "5-bedroom house in Arnos Vale for sale",
+   "price_tts": 1750000,
+   "price_usd": 257353,
+   "beds": 5,
+   "baths": 0,
+   "type": "house",
+   "size": null,
+   "location": "Arnos Vale, Tobago",
+   "pool": 0,
+   "description": "5-bedroom house in Arnos Vale",
+   "features": [],
+   "agent_name": null,
+   "agent_phone": null,
+   "url": null,
+   "site": "pin.tt",
+   "price": null,
+   "firstSeen": 1781377924594,
+   "lastSeen": 1781377924594,
    "status": "active"
   }
  ]
