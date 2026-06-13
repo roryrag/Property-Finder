@@ -1,21 +1,21 @@
 {
  "meta": {
-  "lastRefresh": "2026-06-13T15:52:04.561Z",
-  "totalListings": 167,
-  "activeCount": 167,
+  "lastRefresh": "2026-06-13T17:09:50.015Z",
+  "totalListings": 171,
+  "activeCount": 171,
   "staleCount": 0,
-  "withPrice": 110,
-  "newThisRun": 6,
-  "updatedThisRun": 51,
+  "withPrice": 113,
+  "newThisRun": 4,
+  "updatedThisRun": 58,
   "droppedThisRun": 0,
   "extractCallsUsed": 30,
   "sources": {
    "pin.tt": 18,
-   "mybunchofkeys.com": 66,
+   "mybunchofkeys.com": 69,
    "seajadeinvestments.com": 14,
    "charbonnerealty.com": 24,
    "rain-properties-tobago.com": 35,
-   "terracaribbean.com": 10
+   "terracaribbean.com": 11
   },
   "siteReports": {
    "pin.tt": {
@@ -57,6 +57,18 @@
    "villas": {
     "method": "search",
     "listings": 0
+   },
+   "pin.tt houses": {
+    "method": "search",
+    "listings": 0
+   },
+   "pin.tt land": {
+    "method": "search",
+    "listings": 0
+   },
+   "terracaribbean.com": {
+    "method": "search",
+    "listings": 5
    }
   }
  },
@@ -658,7 +670,7 @@
    "url": "https://charbonnerealty.com/property-type/house/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -681,7 +693,7 @@
    "url": "https://charbonnerealty.com/property-type/apartment-condo/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -704,7 +716,7 @@
    "url": "https://charbonnerealty.com/property-type/commercial/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -727,7 +739,7 @@
    "url": "https://charbonnerealty.com/property-type/land/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -773,7 +785,7 @@
    "url": "https://charbonnerealty.com/property/burleigh-heights-home/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -796,7 +808,7 @@
    "url": "https://charbonnerealty.com/property/newly-built-signal-hill-home/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -819,7 +831,7 @@
    "url": "https://charbonnerealty.com/property/sherwood-park-home/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -841,7 +853,7 @@
    "url": "https://charbonnerealty.com/property/lot-106-hope-development/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -864,7 +876,7 @@
    "url": "https://charbonnerealty.com/property/three-bedroom-villa-in-tobago-plantations/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -887,7 +899,7 @@
    "url": "https://charbonnerealty.com/property/land-in-calder-hall/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -910,7 +922,7 @@
    "url": "https://charbonnerealty.com/property/land-on-the-quiet-sunningdale-lane/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -933,7 +945,7 @@
    "url": "https://charbonnerealty.com/property/villa-alamanda/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -955,7 +967,7 @@
    "url": "https://charbonnerealty.com/property/bacolet-park-land/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -976,7 +988,7 @@
    "url": "https://charbonnerealty.com/property/lot-5-arnos-vale/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -995,7 +1007,7 @@
    "url": "https://www.rain-properties-tobago.com/villa-rentals-bahari-blu",
    "site": "rain-properties-tobago.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -1014,7 +1026,7 @@
    "url": "https://www.rain-properties-tobago.com/villa-rentals-hibiscus-suite",
    "site": "rain-properties-tobago.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -1033,7 +1045,7 @@
    "url": "https://www.rain-properties-tobago.com/villa-rentals-amity-buccoo-apartment",
    "site": "rain-properties-tobago.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -1052,7 +1064,7 @@
    "url": "https://www.rain-properties-tobago.com/villa-rentals-beachy-buccoo-bay-apartment",
    "site": "rain-properties-tobago.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -1223,7 +1235,7 @@
    "url": "https://www.rain-properties-tobago.com/villa-rentals-yemanja-villa",
    "site": "rain-properties-tobago.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781270518632,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -1242,7 +1254,7 @@
    "url": "https://www.rain-properties-tobago.com/villa-rentals-bimiti-villa",
    "site": "rain-properties-tobago.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781270518632,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -1261,7 +1273,7 @@
    "url": "https://www.rain-properties-tobago.com/villa-rentals-eagles-base-villa-and-cottage",
    "site": "rain-properties-tobago.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781270518632,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -1280,7 +1292,7 @@
    "url": "https://www.rain-properties-tobago.com/villa-rentals-mon-reve-villa",
    "site": "rain-properties-tobago.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781270518632,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -1303,7 +1315,7 @@
    "url": "https://mybunchofkeys.com/property/one-woodbrook-place-podium-unit-for-sale-2m/",
    "site": "mybunchofkeys.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -1326,7 +1338,7 @@
    "url": "https://mybunchofkeys.com/property/paria-main-road-blanchisseuse-6/",
    "site": "mybunchofkeys.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -1372,7 +1384,7 @@
    "url": "https://mybunchofkeys.com/property/3-bedroom-townhouse-sunrise-park-trincity/",
    "site": "mybunchofkeys.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -1395,7 +1407,7 @@
    "url": "https://mybunchofkeys.com/property/the-terraces-hilltop-drive-champs-fleurs/",
    "site": "mybunchofkeys.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -1418,7 +1430,7 @@
    "url": "https://mybunchofkeys.com/property/1st-floor-caribi-tower-westmoorings/",
    "site": "mybunchofkeys.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -1441,7 +1453,7 @@
    "url": "https://mybunchofkeys.com/property/affordable-luxury-condos-park-place-felicity/",
    "site": "mybunchofkeys.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -1464,7 +1476,7 @@
    "url": "https://mybunchofkeys.com/property/%e2%9c%a8-residential-land-for-sale-%e2%9c%a8-home-farms-off-chin-chin-rd-cunupia%f0%9f%93%8d-%f0%9f%92%b2-asking-price-ttd-690000-%f0%9f%8f%b7%ef%b8%8f/",
    "site": "mybunchofkeys.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -1487,7 +1499,7 @@
    "url": "https://mybunchofkeys.com/property/flagstaff-apartment-for-sale/",
    "site": "mybunchofkeys.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -1533,7 +1545,7 @@
    "url": "https://mybunchofkeys.com/property/freeport-land-in-new-gated-community/",
    "site": "mybunchofkeys.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -1901,7 +1913,7 @@
    "url": "https://www.terracaribbean.com/T29958/Trinidad/Residential-Sale/Land/Tobago-Plantations--Tobago",
    "site": "terracaribbean.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781234938336,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -1924,7 +1936,7 @@
    "url": "https://terracaribbean.com/T32330/Trinidad/Residential-Sale/House/Tobago-Fairways-Villa--Tobago-Plantations/",
    "site": "terracaribbean.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781219489674,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -1947,7 +1959,7 @@
    "url": "https://www.terracaribbean.com/T28860/Trinidad/Residential-Sale/House/Turtles-Retreat-Villa-Tobago",
    "site": "terracaribbean.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -2039,7 +2051,7 @@
    "url": "https://charbonnerealty.com/property/gordon-heights-land/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -2061,7 +2073,7 @@
    "url": "https://charbonnerealty.com/property/davis-drive-bacolet-land/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -2084,7 +2096,7 @@
    "url": "https://charbonnerealty.com/property/lambeau-duplex/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -2107,7 +2119,7 @@
    "url": "https://charbonnerealty.com/property/riseland-trace-home/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -2129,7 +2141,7 @@
    "url": "https://charbonnerealty.com/property/lot-2-3-pentlands-arnos-vale/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -2152,7 +2164,7 @@
    "url": "https://charbonnerealty.com/property/arawak-avenue-signal-hill/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -2175,7 +2187,7 @@
    "url": "https://charbonnerealty.com/property/villa-cluster-37a/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -2198,7 +2210,7 @@
    "url": "https://charbonnerealty.com/property/pinehurst-drive-home/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -2221,7 +2233,7 @@
    "url": "https://charbonnerealty.com/property/whim-development-home/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -2392,7 +2404,7 @@
    "url": "https://www.rain-properties-tobago.com/villa-rentals-ledaji-apartment",
    "site": "rain-properties-tobago.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -2411,7 +2423,7 @@
    "url": "https://www.rain-properties-tobago.com/villa-rentals-paradise-on-point",
    "site": "rain-properties-tobago.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -2430,7 +2442,7 @@
    "url": "https://www.rain-properties-tobago.com/villa-rentals-seas-the-day-townhouse",
    "site": "rain-properties-tobago.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -2449,7 +2461,7 @@
    "url": "https://www.rain-properties-tobago.com/villa-rentals-townhouse-10",
    "site": "rain-properties-tobago.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -3030,7 +3042,7 @@
    "url": "https://mybunchofkeys.com/property/%f0%9f%8f%a1woodford-gardens-chaguanas-land-for-sale-625000-negotiable/",
    "site": "mybunchofkeys.com",
    "firstSeen": 1781270518632,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -3053,7 +3065,7 @@
    "url": "https://mybunchofkeys.com/property/%f0%9f%8f%a1-freeports-exclusive-gated-community-wyndham-palms-plot-for-sale%f0%9f%92%b0-price-tt1650000-negotiable/",
    "site": "mybunchofkeys.com",
    "firstSeen": 1781270518632,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -3076,7 +3088,7 @@
    "url": "https://mybunchofkeys.com/property/3-bedroom-house-la-resource-north-dabadie/",
    "site": "mybunchofkeys.com",
    "firstSeen": 1781270518632,
-   "lastSeen": 1781286934865,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -3239,7 +3251,7 @@
    "url": "https://www.terracaribbean.com/T30029/Trinidad/Residential-Sale/Apartment/Tobago-Plantations-Villa",
    "site": "terracaribbean.com",
    "firstSeen": 1781270518632,
-   "lastSeen": 1781270518632,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -3584,7 +3596,7 @@
    "url": "https://mybunchofkeys.com/property/modern-luxury-townhouse-minutes-from-the-airport-limited-presale-opportunity/",
    "site": "mybunchofkeys.com",
    "firstSeen": 1781365924561,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -3607,7 +3619,7 @@
    "url": "https://mybunchofkeys.com/property/for-rent-semi-furnished-1-bedroom-apartment-las-lomas-2500-month/",
    "site": "mybunchofkeys.com",
    "firstSeen": 1781365924561,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -3630,7 +3642,7 @@
    "url": "https://mybunchofkeys.com/property/%f0%9f%8f%a1%e2%9c%a8-new-rental-listing-glencoe-%e2%9c%a8%f0%9f%8f%a1-%f0%9f%8c%bf-spacious-family-home-furnished-pet-friendly-%f0%9f%8c%bf/",
    "site": "mybunchofkeys.com",
    "firstSeen": 1781365924561,
-   "lastSeen": 1781365924561,
+   "lastSeen": 1781370590015,
    "status": "active"
   },
   {
@@ -3700,6 +3712,98 @@
    "site": "mybunchofkeys.com",
    "firstSeen": 1781365924561,
    "lastSeen": 1781365924561,
+   "status": "active"
+  },
+  {
+   "title": "New Modern Townhouse development Woodbrook, POS",
+   "price": 1950000,
+   "beds": 2,
+   "baths": 2.5,
+   "type": "apartment",
+   "size": "1062 sq ft",
+   "location": "Woodbrook",
+   "pool": false,
+   "description": "Modern townhouse development less than 10 minutes from Queen's Park Savannah with completion expected within the month.",
+   "features": [
+    "Air Conditioning",
+    "2 Parking Spaces",
+    "Smart Security System"
+   ],
+   "agent_name": "PropSOLV Realty",
+   "agent_phone": "(868) 394-8616",
+   "url": "https://mybunchofkeys.com/property/new-modern-townhouse-development-woodbrook-pos/",
+   "site": "mybunchofkeys.com",
+   "firstSeen": 1781370590015,
+   "lastSeen": 1781370590015,
+   "status": "active"
+  },
+  {
+   "title": "Tumpuna Road, Guanapo, Arima LAND FOR SALE",
+   "price": 1050000,
+   "beds": 0,
+   "baths": 0,
+   "type": "land",
+   "size": "8460 sq ft",
+   "location": "Arima",
+   "pool": false,
+   "description": "8,460 sq ft of freehold land approved for residential or commercial use on a busy main road in Arima.",
+   "features": [
+    "Freehold Land",
+    "Prime location on main road",
+    "Approved for residential or commercial"
+   ],
+   "agent_name": "Cristel de Silva",
+   "agent_phone": "(868) 294-9118",
+   "url": "https://mybunchofkeys.com/property/tumpuna-road-guanapo-road-arima-land-for-sale/",
+   "site": "mybunchofkeys.com",
+   "firstSeen": 1781370590015,
+   "lastSeen": 1781370590015,
+   "status": "active"
+  },
+  {
+   "title": "St. Andrew's Village, Moka Maraval Luxury Apartment- Move In Ready, Near the golf course",
+   "price": 4100000,
+   "beds": 3,
+   "baths": 2.5,
+   "type": "apartment",
+   "size": "3048 sq.ft.",
+   "location": "Maraval Moka",
+   "pool": true,
+   "description": "Partly furnished luxury apartment near St. Andrew's Golf Club with mountain views, bonus room, and secure gated compound.",
+   "features": [
+    "Gated Compound",
+    "Shared Pool",
+    "Central Air Conditioning"
+   ],
+   "agent_name": "KW Realty",
+   "agent_phone": "(868) 686-5318",
+   "url": "https://mybunchofkeys.com/property/st-andrews-village-moka-maraval-luxury-apartment-move-in-ready-near-the-golf-course/",
+   "site": "mybunchofkeys.com",
+   "firstSeen": 1781370590015,
+   "lastSeen": 1781370590015,
+   "status": "active"
+  },
+  {
+   "title": "Bougainvillea, Tobago",
+   "price": "TTD 4250000 (USD 625000)",
+   "beds": 5,
+   "baths": "4 + 1 powder",
+   "type": "House",
+   "size": "6300 sq ft (land), 3400 sq ft (floor)",
+   "location": "Black Rock New Road Extension, Tobago",
+   "pool": true,
+   "description": "Beach front villa in Black Rock, sleeps 10, with 5 large bedrooms, open concept living overlooking landscaped garden and pool.",
+   "features": [
+    "Beachfront location",
+    "Beautiful sea views",
+    "Landscaped garden with pool"
+   ],
+   "agent_name": 0,
+   "agent_phone": 0,
+   "url": "https://www.terracaribbean.com/T28229/Trinidad/Residential-Sale/House/Bougainvillea--Tobago",
+   "site": "terracaribbean.com",
+   "firstSeen": 1781370590015,
+   "lastSeen": 1781370590015,
    "status": "active"
   }
  ]
