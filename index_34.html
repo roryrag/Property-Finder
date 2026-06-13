@@ -1328,6 +1328,7 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
 .ds-badge.sold{background:rgba(30,122,82,.1);color:var(--forest-l);border:1px solid rgba(30,122,82,.2);}
 .ds-badge.repo{background:rgba(196,154,60,.1);color:#7A5010;border:1px solid rgba(196,154,60,.2);}
 .ds-badge.static{background:var(--sand);color:var(--ink-l);border:1px solid var(--border);}
+.ds-badge.candidate{background:var(--purple-l);color:var(--purple);border:1px solid rgba(79,63,181,.2);}
 
 
 /* ── CLIENT SHORTLIST FEATURE ── */
@@ -1790,6 +1791,7 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
                 &#128196; Import Excel
                 <input type="file" id="excelImportInput" accept=".xlsx,.xls" style="display:none;" onchange="importExcel(this)">
               </label>
+              <button class="add-client-btn" onclick="exportAgentComps()">&#11015; Export</button>
               <button class="add-client-btn" onclick="toggleCompForm()">&#43; Add Sold</button>
             </div>
           </div>
@@ -1836,6 +1838,7 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
               <div class="empty-text" style="font-size:12px;">No sold comparables yet.<br>Add transactions you know about or import your Excel file.</div>
             </div>
           </div>
+          <div id="sharedCompList"></div>
         </div>
       </div>
     </div>
@@ -3323,7 +3326,7 @@ function saveSettings() {
   var repoUrlEl = document.getElementById('settingRepoUrl');
   if (repoUrlEl) {
     var ru = repoUrlEl.value.trim();
-    if (ru) { localStorage.setItem('tpf_shared_repo_url', ru); sharedRepoSync(true); }
+    if (ru) { localStorage.setItem('tpf_shared_repo_url', ru); sharedRepoSync(true); sharedSoldSync(false); }
     else localStorage.removeItem('tpf_shared_repo_url');
   }
   var msg=document.getElementById('settingsSavedMsg');
@@ -3621,6 +3624,7 @@ onAppLoad = function() {
 ══════════════════════════════════════════ */
 
 var COMPS_KEY  = 'tpf_sold_comps';
+var SHARED_SOLD_KEY = 'tpf_shared_sold_comps';
 var CAL_KEY    = 'tpf_val_cal';
 var soldComps  = [];
 var valCals    = {};        // per-area calibration %
@@ -3691,6 +3695,7 @@ function deleteComp(id) {
 
 function renderCompList() {
   compsLoad();
+  renderSharedCompList();
   var area = document.getElementById('compList');
   if (!area) return;
   if (!soldComps.length) {
@@ -3809,12 +3814,19 @@ function getRepoPSF(locKey) {
   };
 }
 
-/* ── Get sold comps PSF for a location ── */
+/* ── Shared sold comps (synced from data/sold.json) ── */
+function sharedSoldLoad() {
+  try { return JSON.parse(localStorage.getItem(SHARED_SOLD_KEY)) || []; }
+  catch(e) { return []; }
+}
+
+/* ── Get sold comps PSF for a location (agent-entered + shared/candidate) ── */
 function getSoldCompsPSF(locKey) {
   compsLoad();
-  if (!soldComps.length) return null;
+  var all = soldComps.concat(sharedSoldLoad());
+  if (!all.length) return null;
   var locBase = locKey.split('|')[0].toLowerCase();
-  var matches = soldComps.filter(function(c) {
+  var matches = all.filter(function(c) {
     return c.loc.toLowerCase().indexOf(locBase) !== -1 ||
            locBase.indexOf(c.loc.toLowerCase().split(' ')[0]) !== -1;
   });
@@ -4560,6 +4572,91 @@ async function sharedRepoSync(showAlert) {
 }
 
 /* ══════════════════════════════════════════
+   SHARED SOLD COMPS SYNC
+   Fetches data/sold.json (same base path as the
+   shared repo URL) — agent-verified comps and
+   "candidate" comps from delisted priced listings.
+   Stored separately from the user's own comps so
+   syncing never clobbers locally-added entries.
+══════════════════════════════════════════ */
+async function sharedSoldSync(showAlert) {
+  var repoUrl = localStorage.getItem(SHARED_REPO_URL_KEY);
+  if (!repoUrl) return false;
+  var soldUrl = repoUrl.replace(/repo.json/i, 'sold.json');
+  if (soldUrl === repoUrl) return false;
+
+  try {
+    var resp = await fetch(soldUrl + (soldUrl.indexOf('?') === -1 ? '?t=' : '&t=') + Date.now(), { cache: 'no-store' });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    var data = await resp.json();
+    var shared = Array.isArray(data) ? data : (data.listings || []);
+
+    localStorage.setItem(SHARED_SOLD_KEY, JSON.stringify(shared));
+    renderSharedCompList();
+    if (showAlert) alert('✅ Synced ' + shared.length + ' shared sold comparables.');
+    return true;
+  } catch(e) {
+    if (showAlert) alert('⚠️ Could not sync shared sold comps: ' + e.message);
+    return false;
+  }
+}
+
+/* ── Render shared/candidate comps (read-only) ── */
+function renderSharedCompList() {
+  var area = document.getElementById('sharedCompList');
+  if (!area) return;
+  var shared = sharedSoldLoad();
+  if (!shared.length) { area.innerHTML = ''; return; }
+
+  var html = '<div style="font-size:11px;color:var(--ink-l);margin:12px 0 8px;">' +
+    shared.length + ' shared comparable' + (shared.length !== 1 ? 's' : '') +
+    ' from the team repository</div>';
+  shared.forEach(function(c) {
+    var badge = c.source === 'candidate'
+      ? '<span class="ds-badge candidate">Unverified — delisted</span>'
+      : '<span class="ds-badge sold">Agent verified</span>';
+    html +=
+      '<div class="comp-item">' +
+        '<div class="comp-item-body">' +
+          '<div class="comp-item-title">' + (c.loc || 'Unknown area') +
+            (c.size ? ' — ' + Number(c.size).toLocaleString() + ' sq ft' : '') + '</div>' +
+          '<div class="comp-item-meta">TT$' + Number(c.price).toLocaleString() +
+            (c.date ? ' · ' + c.date : '') +
+            (c.notes ? ' · ' + c.notes : '') + '</div>' +
+          badge +
+        '</div>' +
+        (c.psf ? '<div class="comp-psf">TT$' + c.psf + '/sqft</div>' : '') +
+      '</div>';
+  });
+  area.innerHTML = html;
+}
+
+/* ── Export locally-added comps for merging into data/sold.json ── */
+function exportAgentComps() {
+  compsLoad();
+  var ownComps = soldComps.filter(function(c) { return c.source === 'agent' || c.source === 'excel'; });
+  if (!ownComps.length) { alert('No agent-added comparables to export yet.'); return; }
+
+  var payload = { listings: ownComps.map(function(c) {
+    return {
+      id: 'agent_' + c.id, loc: c.loc, size: c.size, price: c.price, psf: c.psf,
+      tenure: c.tenure, date: c.date, notes: c.notes, source: c.source, status: 'agent'
+    };
+  }) };
+
+  var blob = new Blob([JSON.stringify(payload, null, 1)], { type: 'application/json' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'sold-comps-export.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+
+  alert('✅ Exported ' + ownComps.length + ' comparable(s). Merge the listings array into data/sold.json via a PR to share with the team.');
+}
+
+/* ══════════════════════════════════════════
    LISTING VERIFY — live accuracy check
 ══════════════════════════════════════════ */
 async function verifyListing(btn, propStr) {
@@ -4619,6 +4716,7 @@ var _prevOnAppLoad_shared = onAppLoad;
 onAppLoad = function() {
   _prevOnAppLoad_shared();
   sharedRepoSync(false);
+  sharedSoldSync(false);
 };
 
 </script>

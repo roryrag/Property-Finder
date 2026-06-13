@@ -22,6 +22,7 @@ const API_KEY = process.env.ANTHROPIC_API_KEY;
 if (!API_KEY) { console.error('Missing ANTHROPIC_API_KEY'); process.exit(1); }
 
 const DATA_FILE = path.join(__dirname, 'data', 'repo.json');
+const SOLD_FILE = path.join(__dirname, 'data', 'sold.json');
 const MODEL = 'claude-haiku-4-5-20251001';
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -399,6 +400,13 @@ function listingKey(p) {
   return ((p.title || '') + '|' + (p.site || '')).toLowerCase().replace(/\s+/g, ' ').trim();
 }
 
+/* Parse a free-text size string ("5000 sq ft") to a numeric sqft value */
+function parseSizeSqft(sizeStr) {
+  if (!sizeStr) return 0;
+  const m = String(sizeStr).replace(/,/g, '').match(/([0-9.]+)/);
+  return m ? parseFloat(m[1]) : 0;
+}
+
 (async function main() {
   let repo = { meta: {}, listings: [] };
   try {
@@ -454,15 +462,61 @@ function listingKey(p) {
     }
   }
 
-  /* Freshness pass */
+  /* Freshness pass — listings unseen >30 days are dropped from the
+     for-sale repo. If they had a price, they become "candidate sold"
+     comparables: the listing disappeared (sold, withdrawn, or
+     re-listed elsewhere), so the last known price is a useful but
+     UNVERIFIED data point for the valuator until an agent confirms it. */
   let staleCount = 0, droppedCount = 0;
   const merged = [];
+  const candidates = [];
   for (const [key, p] of existing) {
     const unseenDays = (now - (p.lastSeen || now)) / DAY;
-    if (unseenDays > 30) { droppedCount++; continue; }
+    if (unseenDays > 30) {
+      droppedCount++;
+      if (p.price > 0) {
+        candidates.push({
+          id: 'cand_' + key.replace(/[^a-z0-9]+/g, '_'),
+          loc: p.location || '',
+          size: parseSizeSqft(p.size),
+          price: p.price,
+          psf: parseSizeSqft(p.size) > 0 ? Math.round(p.price / parseSizeSqft(p.size)) : 0,
+          tenure: 'freehold',
+          date: new Date(p.lastSeen || now).toISOString().slice(0, 10),
+          notes: (p.title || '') + ' — delisted from ' + (p.site || 'source site') + ', possibly sold',
+          source: 'candidate',
+          status: 'candidate',
+          title: p.title || '',
+          site: p.site || '',
+          url: p.url || ''
+        });
+      }
+      continue;
+    }
     if (unseenDays > 14) { p.status = 'stale'; staleCount++; }
     merged.push(p);
   }
+
+  /* Merge candidates into sold.json (dedup by id, don't touch agent entries) */
+  let sold = { meta: {}, listings: [] };
+  try {
+    sold = JSON.parse(fs.readFileSync(SOLD_FILE, 'utf8'));
+    if (!Array.isArray(sold.listings)) sold.listings = [];
+  } catch (e) { /* no existing sold.json — start fresh */ }
+
+  const soldIds = new Set(sold.listings.map(c => c.id));
+  let newCandidates = 0;
+  for (const c of candidates) {
+    if (!soldIds.has(c.id)) { sold.listings.push(c); soldIds.add(c.id); newCandidates++; }
+  }
+  sold.meta = {
+    lastRefresh: new Date(now).toISOString(),
+    totalComps: sold.listings.length,
+    agentCount: sold.listings.filter(c => c.source !== 'candidate').length,
+    candidateCount: sold.listings.filter(c => c.source === 'candidate').length,
+    newCandidatesThisRun: newCandidates
+  };
+  fs.writeFileSync(SOLD_FILE, JSON.stringify(sold, null, 1));
 
   const sources = {};
   merged.forEach(p => { const s = p.site || 'unknown'; sources[s] = (sources[s] || 0) + 1; });
@@ -490,6 +544,7 @@ function listingKey(p) {
   console.log(`New this run   : ${newCount}`);
   console.log(`Stale (>14d)   : ${staleCount}`);
   console.log(`Dropped (>30d) : ${droppedCount}`);
+  console.log(`Sold candidates: ${sold.listings.length} total (${newCandidates} new this run)`);
   console.log(`Claude extract calls used: ${extractCallsUsed}/${MAX_EXTRACT_CALLS}`);
   console.log('\nPer-site:');
   Object.entries(siteReports).forEach(([s, r]) =>
