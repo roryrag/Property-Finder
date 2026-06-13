@@ -1,17 +1,17 @@
 {
  "meta": {
-  "lastRefresh": "2026-06-12T21:06:15.132Z",
-  "totalListings": 161,
-  "activeCount": 161,
+  "lastRefresh": "2026-06-13T15:52:04.561Z",
+  "totalListings": 167,
+  "activeCount": 167,
   "staleCount": 0,
-  "withPrice": 104,
-  "newThisRun": 8,
-  "updatedThisRun": 53,
+  "withPrice": 110,
+  "newThisRun": 6,
+  "updatedThisRun": 51,
   "droppedThisRun": 0,
-  "extractCallsUsed": 29,
+  "extractCallsUsed": 30,
   "sources": {
    "pin.tt": 18,
-   "mybunchofkeys.com": 60,
+   "mybunchofkeys.com": 66,
    "seajadeinvestments.com": 14,
    "charbonnerealty.com": 24,
    "rain-properties-tobago.com": 35,
@@ -21,7 +21,7 @@
    "pin.tt": {
     "method": "crawl",
     "listings": 0,
-    "urlsFound": 64,
+    "urlsFound": 62,
     "jsonld": 0,
     "claude": 0
    },
@@ -41,22 +41,22 @@
    },
    "mybunchofkeys.com": {
     "method": "crawl",
-    "listings": 20,
-    "urlsFound": 57,
+    "listings": 18,
+    "urlsFound": 95,
     "jsonld": 0,
-    "claude": 20
+    "claude": 18
    },
-   "pin.tt houses": {
+   "caribbeanMLS": {
     "method": "search",
     "listings": 0
    },
-   "pin.tt land": {
+   "seajade": {
     "method": "search",
     "listings": 0
    },
-   "terracaribbean.com": {
+   "villas": {
     "method": "search",
-    "listings": 2
+    "listings": 0
    }
   }
  },
@@ -658,7 +658,7 @@
    "url": "https://charbonnerealty.com/property-type/house/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -681,7 +681,7 @@
    "url": "https://charbonnerealty.com/property-type/apartment-condo/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -704,7 +704,7 @@
    "url": "https://charbonnerealty.com/property-type/commercial/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -727,7 +727,7 @@
    "url": "https://charbonnerealty.com/property-type/land/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -773,7 +773,7 @@
    "url": "https://charbonnerealty.com/property/burleigh-heights-home/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -796,7 +796,7 @@
    "url": "https://charbonnerealty.com/property/newly-built-signal-hill-home/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -819,7 +819,7 @@
    "url": "https://charbonnerealty.com/property/sherwood-park-home/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -841,7 +841,7 @@
    "url": "https://charbonnerealty.com/property/lot-106-hope-development/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -864,7 +864,7 @@
    "url": "https://charbonnerealty.com/property/three-bedroom-villa-in-tobago-plantations/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -887,7 +887,7 @@
    "url": "https://charbonnerealty.com/property/land-in-calder-hall/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -910,14 +910,14 @@
    "url": "https://charbonnerealty.com/property/land-on-the-quiet-sunningdale-lane/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
    "title": "Villa Alamanda",
    "price": 2788000,
    "beds": 3,
-   "baths": 3,
+   "baths": 3.5,
    "type": "villa",
    "size": "1,808 sq ft",
    "location": "Grafton",
@@ -933,7 +933,7 @@
    "url": "https://charbonnerealty.com/property/villa-alamanda/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -955,7 +955,7 @@
    "url": "https://charbonnerealty.com/property/bacolet-park-land/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -976,7 +976,7 @@
    "url": "https://charbonnerealty.com/property/lot-5-arnos-vale/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -995,7 +995,7 @@
    "url": "https://www.rain-properties-tobago.com/villa-rentals-bahari-blu",
    "site": "rain-properties-tobago.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -1014,7 +1014,7 @@
    "url": "https://www.rain-properties-tobago.com/villa-rentals-hibiscus-suite",
    "site": "rain-properties-tobago.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -1033,7 +1033,7 @@
    "url": "https://www.rain-properties-tobago.com/villa-rentals-amity-buccoo-apartment",
    "site": "rain-properties-tobago.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -1052,7 +1052,7 @@
    "url": "https://www.rain-properties-tobago.com/villa-rentals-beachy-buccoo-bay-apartment",
    "site": "rain-properties-tobago.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -1147,7 +1147,7 @@
    "url": "https://www.rain-properties-tobago.com/villa-rentals-cool-o-breeze-o",
    "site": "rain-properties-tobago.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -1166,7 +1166,7 @@
    "url": "https://www.rain-properties-tobago.com/villa-rentals-glass-house",
    "site": "rain-properties-tobago.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -1185,7 +1185,7 @@
    "url": "https://www.rain-properties-tobago.com/villa-rentals-easy-as-villa",
    "site": "rain-properties-tobago.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -1204,7 +1204,7 @@
    "url": "https://www.rain-properties-tobago.com/villa-rentals-harambee-villa",
    "site": "rain-properties-tobago.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -1303,7 +1303,7 @@
    "url": "https://mybunchofkeys.com/property/one-woodbrook-place-podium-unit-for-sale-2m/",
    "site": "mybunchofkeys.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -1326,7 +1326,7 @@
    "url": "https://mybunchofkeys.com/property/paria-main-road-blanchisseuse-6/",
    "site": "mybunchofkeys.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781286934865,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -1356,7 +1356,7 @@
    "title": "3 Bedroom Townhouse Sunrise Park, Trincity",
    "price": 2100000,
    "beds": 3,
-   "baths": 2.5,
+   "baths": 2,
    "type": "apartment",
    "size": "",
    "location": "Trincity",
@@ -1372,7 +1372,7 @@
    "url": "https://mybunchofkeys.com/property/3-bedroom-townhouse-sunrise-park-trincity/",
    "site": "mybunchofkeys.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781286934865,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -1395,7 +1395,7 @@
    "url": "https://mybunchofkeys.com/property/the-terraces-hilltop-drive-champs-fleurs/",
    "site": "mybunchofkeys.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781286934865,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -1418,7 +1418,7 @@
    "url": "https://mybunchofkeys.com/property/1st-floor-caribi-tower-westmoorings/",
    "site": "mybunchofkeys.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -1441,7 +1441,7 @@
    "url": "https://mybunchofkeys.com/property/affordable-luxury-condos-park-place-felicity/",
    "site": "mybunchofkeys.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -1464,7 +1464,7 @@
    "url": "https://mybunchofkeys.com/property/%e2%9c%a8-residential-land-for-sale-%e2%9c%a8-home-farms-off-chin-chin-rd-cunupia%f0%9f%93%8d-%f0%9f%92%b2-asking-price-ttd-690000-%f0%9f%8f%b7%ef%b8%8f/",
    "site": "mybunchofkeys.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -1487,7 +1487,7 @@
    "url": "https://mybunchofkeys.com/property/flagstaff-apartment-for-sale/",
    "site": "mybunchofkeys.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -1510,7 +1510,7 @@
    "url": "https://mybunchofkeys.com/property/3-bedroom-house-la-resource-north-dabadie/",
    "site": "mybunchofkeys.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -1533,7 +1533,7 @@
    "url": "https://mybunchofkeys.com/property/freeport-land-in-new-gated-community/",
    "site": "mybunchofkeys.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -2039,7 +2039,7 @@
    "url": "https://charbonnerealty.com/property/gordon-heights-land/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -2061,7 +2061,7 @@
    "url": "https://charbonnerealty.com/property/davis-drive-bacolet-land/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -2084,7 +2084,7 @@
    "url": "https://charbonnerealty.com/property/lambeau-duplex/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -2107,7 +2107,7 @@
    "url": "https://charbonnerealty.com/property/riseland-trace-home/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -2129,7 +2129,7 @@
    "url": "https://charbonnerealty.com/property/lot-2-3-pentlands-arnos-vale/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -2152,7 +2152,7 @@
    "url": "https://charbonnerealty.com/property/arawak-avenue-signal-hill/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -2175,7 +2175,7 @@
    "url": "https://charbonnerealty.com/property/villa-cluster-37a/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -2198,7 +2198,7 @@
    "url": "https://charbonnerealty.com/property/pinehurst-drive-home/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -2221,7 +2221,7 @@
    "url": "https://charbonnerealty.com/property/whim-development-home/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -2392,7 +2392,7 @@
    "url": "https://www.rain-properties-tobago.com/villa-rentals-ledaji-apartment",
    "site": "rain-properties-tobago.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -2411,7 +2411,7 @@
    "url": "https://www.rain-properties-tobago.com/villa-rentals-paradise-on-point",
    "site": "rain-properties-tobago.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -2430,7 +2430,7 @@
    "url": "https://www.rain-properties-tobago.com/villa-rentals-seas-the-day-townhouse",
    "site": "rain-properties-tobago.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -2449,7 +2449,7 @@
    "url": "https://www.rain-properties-tobago.com/villa-rentals-townhouse-10",
    "site": "rain-properties-tobago.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -3030,7 +3030,7 @@
    "url": "https://mybunchofkeys.com/property/%f0%9f%8f%a1woodford-gardens-chaguanas-land-for-sale-625000-negotiable/",
    "site": "mybunchofkeys.com",
    "firstSeen": 1781270518632,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -3053,7 +3053,7 @@
    "url": "https://mybunchofkeys.com/property/%f0%9f%8f%a1-freeports-exclusive-gated-community-wyndham-palms-plot-for-sale%f0%9f%92%b0-price-tt1650000-negotiable/",
    "site": "mybunchofkeys.com",
    "firstSeen": 1781270518632,
-   "lastSeen": 1781298375132,
+   "lastSeen": 1781365924561,
    "status": "active"
   },
   {
@@ -3562,6 +3562,144 @@
    "site": "mybunchofkeys.com",
    "firstSeen": 1781298375132,
    "lastSeen": 1781298375132,
+   "status": "active"
+  },
+  {
+   "title": "Modern Luxury Townhouse | Minutes from the Airport | Limited Presale Opportunity",
+   "price": 1700000,
+   "beds": 3,
+   "baths": 2.5,
+   "type": "apartment",
+   "size": "1800 sq ft",
+   "location": "Piarco",
+   "pool": false,
+   "description": "Modern luxury townhouse with smart-home ready infrastructure, open-plan layout and large backyard, located 2 minutes from the airport.",
+   "features": [
+    "Private garage and visitor parking",
+    "CCTV monitoring and on-site security",
+    "Attic storage and optional smart-home automation"
+   ],
+   "agent_name": "PropSOLV Realty",
+   "agent_phone": "(868) 394-8616",
+   "url": "https://mybunchofkeys.com/property/modern-luxury-townhouse-minutes-from-the-airport-limited-presale-opportunity/",
+   "site": "mybunchofkeys.com",
+   "firstSeen": 1781365924561,
+   "lastSeen": 1781365924561,
+   "status": "active"
+  },
+  {
+   "title": "FOR RENT – SEMI-FURNISHED 1 BEDROOM APARTMENT | LAS LOMAS",
+   "price": 2500,
+   "beds": 1,
+   "baths": 1,
+   "type": "apartment",
+   "size": "",
+   "location": "Las Lomas",
+   "pool": false,
+   "description": "Cozy move-in-ready semi-furnished 1-bedroom apartment with WiFi included, ideal for working professionals or couples.",
+   "features": [
+    "WiFi included with stove and refrigerator",
+    "Air-conditioned with parking for 1-2 vehicles",
+    "Secure gated compound with automatic access"
+   ],
+   "agent_name": "Xippi Properties Ltd",
+   "agent_phone": "(868) 712-5742",
+   "url": "https://mybunchofkeys.com/property/for-rent-semi-furnished-1-bedroom-apartment-las-lomas-2500-month/",
+   "site": "mybunchofkeys.com",
+   "firstSeen": 1781365924561,
+   "lastSeen": 1781365924561,
+   "status": "active"
+  },
+  {
+   "title": "NEW RENTAL LISTING — GLENCOE Spacious Family Home | Furnished | Pet Friendly",
+   "price": 13000,
+   "beds": 4,
+   "baths": 3,
+   "type": "house",
+   "size": "",
+   "location": "Glencoe",
+   "pool": false,
+   "description": "Beautifully maintained two-storey home in a quiet neighbourhood offering generous living spaces, comfortable furnishings, and the perfect blend of privacy and convenience for families.",
+   "features": [
+    "Fully Furnished",
+    "Pet Friendly",
+    "Air Conditioned"
+   ],
+   "agent_name": "Marisa Cipriani-Ortiz",
+   "agent_phone": "(868) 620-9603",
+   "url": "https://mybunchofkeys.com/property/%f0%9f%8f%a1%e2%9c%a8-new-rental-listing-glencoe-%e2%9c%a8%f0%9f%8f%a1-%f0%9f%8c%bf-spacious-family-home-furnished-pet-friendly-%f0%9f%8c%bf/",
+   "site": "mybunchofkeys.com",
+   "firstSeen": 1781365924561,
+   "lastSeen": 1781365924561,
+   "status": "active"
+  },
+  {
+   "title": "NEW SALE LISTING — CASCADE A Hidden Oasis Just Minutes from the City",
+   "price": 3100000,
+   "beds": 4,
+   "baths": 3,
+   "type": "house",
+   "size": "4285 sq.ft.",
+   "location": "Cascade",
+   "pool": false,
+   "description": "Charming two-storey home offering the perfect balance of nature, privacy, and convenience with mature mango trees and lush greenery, just minutes from Port of Spain.",
+   "features": [
+    "Pet Friendly",
+    "Freehold Land",
+    "Private Balcony"
+   ],
+   "agent_name": "Jesse Mahabir",
+   "agent_phone": "(868) 475-0206",
+   "url": "https://mybunchofkeys.com/property/%f0%9f%8f%a1%e2%9c%a8-new-sale-listing-cascade-%e2%9c%a8%f0%9f%8f%a1-%f0%9f%8c%bf-a-hidden-oasis-just-minutes-from-the-city-%f0%9f%8c%bf/",
+   "site": "mybunchofkeys.com",
+   "firstSeen": 1781365924561,
+   "lastSeen": 1781365924561,
+   "status": "active"
+  },
+  {
+   "title": "NEW SALE LISTING — ANDERSON STREET, CUREPE",
+   "price": 1600000,
+   "beds": 2,
+   "baths": 2,
+   "type": "commercial",
+   "size": "6773 sq.ft.",
+   "location": "Curepe",
+   "pool": false,
+   "description": "Well-maintained property with open-plan layout offering exceptional flexibility for both residential and commercial use, ideally situated within walking distance to major amenities and UWI.",
+   "features": [
+    "Air Conditioned",
+    "Leasehold Land",
+    "Commercial or Residential Use"
+   ],
+   "agent_name": "Cherisse Aqui-Crosby",
+   "agent_phone": "(868) 689-6989",
+   "url": "https://mybunchofkeys.com/property/%f0%9f%8f%a2%e2%9c%a8-new-sale-listing-anderson-street-curepe-%e2%9c%a8%f0%9f%8f%a2/",
+   "site": "mybunchofkeys.com",
+   "firstSeen": 1781365924561,
+   "lastSeen": 1781365924561,
+   "status": "active"
+  },
+  {
+   "title": "Fully Furnished Student Apartment for Rent – St. Augustine",
+   "price": 10000,
+   "beds": 2,
+   "baths": 1,
+   "type": "apartment",
+   "size": "1200 sq.ft.",
+   "location": "St. Augustine",
+   "pool": false,
+   "description": "Fully furnished student apartment ideal for Hugh Wooding Law School students, offering a safe, comfortable, and peaceful environment suitable for up to 3 students sharing.",
+   "features": [
+    "Fully Furnished",
+    "Move in Ready",
+    "Safe Residential Neighborhood"
+   ],
+   "agent_name": "The Fulcrum Real Estate",
+   "agent_phone": "(868) 319-0691",
+   "url": "https://mybunchofkeys.com/property/fully-furnished-student-apartment-for-rent-st-augustine/",
+   "site": "mybunchofkeys.com",
+   "firstSeen": 1781365924561,
+   "lastSeen": 1781365924561,
    "status": "active"
   }
  ]
