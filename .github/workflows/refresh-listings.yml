@@ -11,7 +11,7 @@ name: Refresh Tobago Listings
 
 on:
   schedule:
-    # Group A — 10:00 UTC (6 AM Tobago): caribbeanMLS, seajade, villas
+    # Group A — 10:00 UTC (6 AM Tobago): caribbeanMLS, villas
     - cron: '0 10 * * *'
     # Group B — 14:00 UTC (10 AM Tobago): pin.tt, terracaribbean
     - cron: '0 14 * * *'

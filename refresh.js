@@ -29,7 +29,8 @@ const DAY = 24 * 60 * 60 * 1000;
 /* ── Budgets (tune to control cost & runtime) ── */
 const MAX_PAGES_PER_SITE    = 8;    // pagination depth
 const MAX_LISTINGS_PER_SITE = 50;   // listing pages fetched per site
-const MAX_EXTRACT_CALLS     = 30;   // Claude HTML-extraction calls (total)
+const MAX_EXTRACT_CALLS     = 40;   // Claude HTML-extraction calls (total ceiling)
+const MAX_EXTRACT_CALLS_PER_SITE = 8;  // per-site cap so trailing sites aren't starved
 const EXTRACT_BATCH         = 4;    // listings per extraction call
 const FETCH_DELAY_MS        = 400;  // politeness delay between fetches
 const FETCH_TIMEOUT_MS      = 15000;
@@ -73,18 +74,19 @@ const CRAWL_SITES = [
     seeds: ['https://mybunchofkeys.com/properties/', 'https://mybunchofkeys.com/'],
     listingHint: /mybunchofkeys\.com\/.*(propert|listing|land|villa|house)/i
   },
+  // NOTE: realestatetobago.com is NOT crawlable — it sits behind Sucuri
+  // CloudProxy, which serves a JavaScript challenge to every server-side
+  // fetch (no JS engine = no content). Do not re-add it as a crawl site.
   {
-    id: 'ralestate', name: 'realestatetobago.com',
-    seeds: ['https://realestatetobago.com/property-type/houses-for-sale/',
-            'https://realestatetobago.com/property-type/land-for-sale/'],
-    listingHint: /realestatetobago\.com\/.*(propert|listing|land|villa|house|apartment)/i
-  },
-  {
-    id: 'seajade', name: 'seajadeinvestments.com',
-    seeds: ['https://seajadeinvestments.com/tobago-real-estate-listings',
-            'https://seajadeinvestments.com/tobago-land-for-sale',
-            'https://seajadeinvestments.com/tobago-homes-for-sale'],
-    listingHint: /seajadeinvestments\.com\/tobago-real-estate-listings\/property\//i
+    // Seajade rebranded from seajadeinvestments.com to seajaderealty.com.
+    // Index is JS-rendered, but detail pages are fully server-rendered with
+    // prices. Listing IDs (rsNNN residential, tlNNN land) are embedded in the
+    // index HTML — some not as <a href>, so we extract them by ID pattern.
+    id: 'seajade', name: 'www.seajaderealty.com',
+    seeds: ['https://www.seajaderealty.com/properties'],
+    listingHint: /seajaderealty\.com\/properties\/(rs|tl)[0-9]+/i,
+    idPattern: /\b(rs|tl)[0-9]{2,}\b/gi,
+    idBase: 'https://www.seajaderealty.com/properties/'
   }
 ];
 
@@ -336,6 +338,16 @@ async function crawlSite(site) {
         listingUrls.add(link);
       }
     }
+    // Some sites (seajade) embed listing IDs in the page (JSON/text) rather
+    // than as <a href>. Extract them by pattern and build detail URLs.
+    if (site.idPattern && site.idBase) {
+      const ids = new Set((html.match(site.idPattern) || []).map(s => s.toLowerCase()));
+      for (const id of ids) {
+        const u = site.idBase + id;
+        if (site.mustMatch && !site.mustMatch.test(u)) continue;
+        listingUrls.add(u);
+      }
+    }
     console.log(`  index OK: ${pageUrl} (links so far: ${listingUrls.size})`);
   }
   /* 1b. Sitemap discovery — often the complete catalog */
@@ -374,10 +386,13 @@ async function crawlSite(site) {
     if (text.length > 200) pendingForClaude.push({ url, text });
   }
 
-  /* 3. Batched Claude extraction for the rest */
-  for (let i = 0; i < pendingForClaude.length; i += EXTRACT_BATCH) {
+  /* 3. Batched Claude extraction for the rest (capped per-site so a single
+        site can't exhaust the global budget and starve later sites) */
+  let siteCalls = 0;
+  for (let i = 0; i < pendingForClaude.length && siteCalls < MAX_EXTRACT_CALLS_PER_SITE; i += EXTRACT_BATCH) {
     const batch = pendingForClaude.slice(i, i + EXTRACT_BATCH);
     const extracted = await claudeExtractBatch(batch, site.name);
+    siteCalls++;
     report.claude += extracted.length;
     report.listings.push(...extracted);
     await sleep(800);
