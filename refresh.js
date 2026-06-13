@@ -34,6 +34,18 @@ const EXTRACT_BATCH         = 4;    // listings per extraction call
 const FETCH_DELAY_MS        = 400;  // politeness delay between fetches
 const FETCH_TIMEOUT_MS      = 15000;
 
+/* ── Data hygiene: this is a TOBAGO FOR-SALE repo ──
+   Some sources (rain, mybunchofkeys) mix in rentals and Trinidad
+   listings. These regexes purge them so the repo stays on-goal. */
+const RENTAL_RE = /\brental|for[-\s]?rent\b|per[-\s]?night|nightly|\/night\b/i;
+// Major Trinidad areas — used to reject non-Tobago listings that leak in
+// from national agencies (mybunchofkeys, pin.tt). Positive match = drop;
+// blank/unknown locations are kept (we don't guess them away).
+const TRINIDAD_RE = /\b(arouca|chaguanas|woodbrook|san[-\s]?juan|carapichaima|montrose|arima|couva|st\.?\s?augustine|tunapuna|diego[-\s]?martin|port[-\s]?of[-\s]?spain|maraval|trincity|piarco|valsayn|cunupia|sangre[-\s]?grande|fyzabad|marabella|gasparillo|claxton[-\s]?bay|point[-\s]?fortin|princes[-\s]?town|debe|penal|barataria|curepe|petit[-\s]?valley|westmoorings|chaguaramas|champs[-\s]?fleurs|d.abadie|charlieville|st\.?\s?james|mt\.?\s?lambert|newtown|tabaquite|endeavour|la\s?baja|st\.?\s?joseph|el\s?dorado|tacarigua|rousillac|siparia|glencoe|gasparee|palmiste|san\s?fernando|union\s?hall|las\s?lomas|cascade|freeport|moka|longdenville|blanchisseuse|toco|matelot|mayaro|manzanilla|guayaguayare|icacos|cedros|moruga|rio[-\s]?claro|aranguez|laventille|morvant|carenage|cocorite)\b/i;
+
+const isRental    = p => RENTAL_RE.test((p.url || '') + ' ' + (p.title || '') + ' ' + (p.description || ''));
+const isNonTobago = p => TRINIDAD_RE.test((p.location || '') + ' ' + (p.url || ''));
+
 /* ══════════════════════════════════════════
    SITE CONFIG
 ══════════════════════════════════════════ */
@@ -319,6 +331,7 @@ async function crawlSite(site) {
       if (site.listingHint.test(link) && !site.seeds.includes(link)) {
         // filter out obvious non-listing paths
         if (/\/(tag|category|author|wp-|feed|login|contact|about|blog)\//i.test(link)) continue;
+        if (RENTAL_RE.test(link)) continue;   // skip rentals at the URL stage
         if (site.mustMatch && !site.mustMatch.test(link)) continue;
         listingUrls.add(link);
       }
@@ -331,6 +344,7 @@ async function crawlSite(site) {
   for (const u of smUrls) {
     if (!site.listingHint.test(u)) continue;
     if (/\/(tag|category|author|wp-|feed|login|contact|about|blog)\//i.test(u)) continue;
+    if (RENTAL_RE.test(u)) continue;   // skip rentals at the URL stage
     if (site.mustMatch && !site.mustMatch.test(u)) continue;
     if (!listingUrls.has(u)) { listingUrls.add(u); smMatched++; }
   }
@@ -453,10 +467,16 @@ function parseSizeSqft(sizeStr) {
   }
 
   /* Merge */
-  let newCount = 0, updatedCount = 0;
+  let newCount = 0, updatedCount = 0, rejRental = 0, rejTrinidad = 0;
   for (const p of allFound) {
     if (!p.title) continue;
     delete p._method;
+    // Keep the repo on-goal: Tobago, for sale only.
+    if (isRental(p))    { rejRental++;   continue; }
+    if (isNonTobago(p)) { rejTrinidad++; continue; }
+    // Normalize: lowercase type, treat 0/blank price as unknown (null).
+    if (p.type) p.type = String(p.type).toLowerCase().trim();
+    if (!(Number(p.price) > 0)) p.price = null;
     const key = listingKey(p);
     const prev = existing.get(key);
     if (prev) {
@@ -479,10 +499,13 @@ function parseSizeSqft(sizeStr) {
      comparables: the listing disappeared (sold, withdrawn, or
      re-listed elsewhere), so the last known price is a useful but
      UNVERIFIED data point for the valuator until an agent confirms it. */
-  let staleCount = 0, droppedCount = 0;
+  let staleCount = 0, droppedCount = 0, purgedCount = 0;
   const merged = [];
   const candidates = [];
   for (const [key, p] of existing) {
+    // Purge off-goal entries already in the repo (rentals / non-Tobago).
+    // These are not real Tobago sales, so they don't become sold candidates.
+    if (isRental(p) || isNonTobago(p)) { purgedCount++; continue; }
     const unseenDays = (now - (p.lastSeen || now)) / DAY;
     if (unseenDays > 30) {
       droppedCount++;
@@ -540,6 +563,8 @@ function parseSizeSqft(sizeStr) {
       activeCount: merged.filter(p => p.status === 'active').length,
       staleCount, withPrice: merged.filter(p => p.price > 0).length,
       newThisRun: newCount, updatedThisRun: updatedCount, droppedThisRun: droppedCount,
+      rejectedRentalThisRun: rejRental, rejectedNonTobagoThisRun: rejTrinidad,
+      purgedFromRepoThisRun: purgedCount,
       extractCallsUsed,
       sources, siteReports
     },
@@ -554,6 +579,8 @@ function parseSizeSqft(sizeStr) {
   console.log(`Active         : ${out.meta.activeCount}`);
   console.log(`With price     : ${out.meta.withPrice}`);
   console.log(`New this run   : ${newCount}`);
+  console.log(`Rejected       : ${rejRental} rentals, ${rejTrinidad} non-Tobago (incoming)`);
+  console.log(`Purged from repo: ${purgedCount} off-goal entries (existing)`);
   console.log(`Stale (>14d)   : ${staleCount}`);
   console.log(`Dropped (>30d) : ${droppedCount}`);
   console.log(`Sold candidates: ${sold.listings.length} total (${newCandidates} new this run)`);
