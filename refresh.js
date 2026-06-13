@@ -17,6 +17,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const vm = require('vm');
 
 const API_KEY = process.env.ANTHROPIC_API_KEY;
 if (!API_KEY) { console.error('Missing ANTHROPIC_API_KEY'); process.exit(1); }
@@ -74,9 +75,16 @@ const CRAWL_SITES = [
     seeds: ['https://mybunchofkeys.com/properties/', 'https://mybunchofkeys.com/'],
     listingHint: /mybunchofkeys\.com\/.*(propert|listing|land|villa|house)/i
   },
-  // NOTE: realestatetobago.com is NOT crawlable — it sits behind Sucuri
-  // CloudProxy, which serves a JavaScript challenge to every server-side
-  // fetch (no JS engine = no content). Do not re-add it as a crawl site.
+  {
+    // Behind Sucuri CloudProxy (JS challenge) — handled transparently by the
+    // solver in fetchPage. listingHint is tight (/property/[slug]/ only) so the
+    // index doesn't inflate with category/pagination URLs. Has some Trinidad
+    // listings too, but TRINIDAD_RE filters those out.
+    id: 'ralestate', name: 'realestatetobago.com',
+    seeds: ['https://realestatetobago.com/property-type/houses-for-sale/',
+            'https://realestatetobago.com/property-type/land-for-sale/'],
+    listingHint: /realestatetobago\.com\/property\/[a-z0-9-]+\/?$/i
+  },
   {
     // Seajade rebranded from seajadeinvestments.com to seajaderealty.com.
     // Index is JS-rendered, but detail pages are fully server-rendered with
@@ -119,23 +127,58 @@ console.log('Run group: ' + RUN_GROUP + ' (' + SEARCH_BATCHES.length + ' search 
 ══════════════════════════════════════════ */
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-async function fetchPage(url) {
+/* Sucuri CloudProxy WAF returns a JS challenge instead of content: a small
+   obfuscated script that decodes to `document.cookie = 'sucuri_...=VAL'` then
+   reloads. It's deterministic (no CAPTCHA), so we evaluate it in a sandbox to
+   recover the cookie, then re-fetch with it. Cookie is cached per host.
+   (realestatetobago.com needs this; harmless no-op for every other site.) */
+const sucuriCookies = new Map();  // host -> "name=value"
+function solveSucuri(html) {
+  if (!/sucuri_cloudproxy_js/.test(html)) return null;
+  const m = html.match(/S='([^']+)'/);
+  if (!m) return null;
+  try {
+    const S = m[1];
+    const s = {}, w = String.fromCharCode;
+    const A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+    for (let u = 0; u < 64; u++) s[A.charAt(u)] = u;
+    let U = 0, r = '', l = 0, c, a;
+    for (let i = 0; i < S.length; i++) {
+      c = s[S.charAt(i)]; U = (U << 6) + c; l += 6;
+      while (l >= 8) { ((a = (U >>> (l -= 8)) & 0xff) || (i < (S.length - 2))) && (r += w(a)); }
+    }
+    const sandbox = { document: {}, location: { reload() {} } };
+    vm.runInContext(r, vm.createContext(sandbox), { timeout: 1000 });
+    return (sandbox.document.cookie || '').split(';')[0] || null;
+  } catch (e) { return null; }
+}
+
+async function fetchPage(url, _retried) {
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT_MS);
   try {
-    const resp = await fetch(url, {
-      signal: ctrl.signal,
-      redirect: 'follow',
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; TobagoPropertyFinder/1.0)',
-        'Accept': 'text/html,application/xhtml+xml'
-      }
-    });
+    let host = '';
+    try { host = new URL(url).host; } catch (e) {}
+    const headers = {
+      'User-Agent': 'Mozilla/5.0 (compatible; TobagoPropertyFinder/1.0)',
+      'Accept': 'text/html,application/xhtml+xml'
+    };
+    const cookie = sucuriCookies.get(host);
+    if (cookie) headers['Cookie'] = cookie;
+    const resp = await fetch(url, { signal: ctrl.signal, redirect: 'follow', headers });
     clearTimeout(t);
-    if (!resp.ok) return null;
     const type = resp.headers.get('content-type') || '';
-    if (!type.includes('html') && !type.includes('json') && !type.includes('xml')) return null;
-    return await resp.text();
+    const looksTextual = type.includes('html') || type.includes('json') || type.includes('xml');
+    // Read the body when it's textual OR when the request "failed" (the Sucuri
+    // challenge arrives as a 307 with an HTML body we must inspect).
+    const body = (looksTextual || !resp.ok) ? await resp.text() : null;
+    if (!_retried && body && /sucuri_cloudproxy_js/.test(body)) {
+      const c = solveSucuri(body);
+      if (c) { sucuriCookies.set(host, c); await sleep(300); return fetchPage(url, true); }
+    }
+    if (!resp.ok) return null;
+    if (!looksTextual) return null;
+    return body;
   } catch (e) { clearTimeout(t); return null; }
 }
 

@@ -122,17 +122,20 @@ scratch — they were established empirically over many runs.**
 | rain-properties-tobago.com | CRAWL | use `/villatobuy.html` + `/property-sales`; 12–19; prices on sub-pages |
 | seajaderealty.com | CRAWL | **REBRANDED from seajadeinvestments.com (old domain 404s).** Index `/properties` is JS-rendered, but detail pages `/properties/rsNNN` (residential) and `/properties/tlNNN` (land) are fully server-rendered WITH prices. Listing IDs are embedded in the index HTML (not all as `<a href>`), so refresh.js extracts them via `idPattern`/`idBase`. ~33 listings (14 res + 19 land). |
 | villasoftobago.com | CRAWL | detail pages `/[name]-property-page.html`; MOSTLY RENTALS with "Enquire for price" — few prices |
-| realestatetobago.com | ❌ DO NOT USE | Behind **Sucuri CloudProxy** — every server-side fetch gets a JS challenge (`Server: Sucuri/Cloudproxy`), so no content without a headless browser. Removed from CRAWL_SITES (2026-06). Its sitemap exposes ~152 URLs but detail fetches all hit the JS wall → 0 extracted. Do not re-add unless the architecture gains JS rendering. |
+| realestatetobago.com | CRAWL (via Sucuri solver) | Behind **Sucuri CloudProxy** (`Server: Sucuri/Cloudproxy`) — every fetch gets a JS challenge. `fetchPage` solves it in-process: the challenge is a deterministic obfuscated script (NOT a CAPTCHA) that sets a `sucuri_cloudproxy_uuid_*` cookie; `solveSucuri()` evals it in a `vm` sandbox to recover the cookie, caches it per host, and retries. Indexes: `/property-type/houses-for-sale/` + `/property-type/land-for-sale/` (~9 each), detail `/property/[slug]/` with real prices. listingHint MUST be tight (`/property/[slug]/$`) or the index inflates to 150+ junk URLs. Has some Trinidad listings (caught by TRINIDAD_RE). If the solver ever breaks, Sucuri changed its challenge format. |
 | pin.tt | SEARCH only | richest search source (~17–26) but JS-rendered index defeats crawl; covers ALL of T&T so filter to Tobago areas |
 | terracaribbean.com | SEARCH | weak (1–6); JS-rendered |
 | caribbeanrealestatemls.com | SEARCH | listings at `/real-estate/tobago/[id]`; weak via search; JS-rendered index |
 
 ### refresh.js architecture
 - **CRAWL_SITES**: pin (search-only in practice), charb, rain, keys, seajade
-  (seajaderealty.com) — each with `seeds[]` and a `listingHint` regex; optional
-  `mustMatch` (pin.tt uses it to keep only Tobago URLs) and optional
-  `idPattern`/`idBase` (seajade uses it to extract listing IDs embedded in the
-  index HTML). realestatetobago.com removed (Sucuri-walled, see table above).
+  (seajaderealty.com), ralestate (realestatetobago.com) — each with `seeds[]`
+  and a `listingHint` regex; optional `mustMatch` (pin.tt uses it to keep only
+  Tobago URLs) and optional `idPattern`/`idBase` (seajade uses it to extract
+  listing IDs embedded in the index HTML).
+- **Sucuri WAF solver** (`solveSucuri` + `fetchPage`): realestatetobago.com
+  serves a deterministic JS cookie-challenge; fetchPage solves it in a `vm`
+  sandbox and caches the cookie per host. No browser/dep needed.
 - **Data hygiene**: this is a Tobago FOR-SALE repo. `RENTAL_RE` + `TRINIDAD_RE`
   (top of refresh.js) reject rentals and non-Tobago (Trinidad) listings both at
   the URL stage and post-extraction, and purge any already in the repo. National
