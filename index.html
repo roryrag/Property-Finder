@@ -62,24 +62,34 @@
   --t:            all 0.18s cubic-bezier(.4,0,.2,1);
 }
 
+/* ════════════════════════════════════════════════
+   MIDNIGHT ESTATE — dark luxury / editorial (default)
+   Near-black canvas, gold hairlines, cream text.
+════════════════════════════════════════════════ */
 body.dark {
-  --forest:       #1A4F35;
-  --forest-m:     #226845;
-  --forest-l:     #2A8458;
-  --sand:         #1A1C19;
-  --cream:        #141612;
-  --white:        #1E2120;
-  --bg:           #121410;
-  --ink:          #EEF0EC;
-  --ink-m:        #B8C0B5;
-  --ink-l:        #7A857A;
-  --ink-xl:       #4A544A;
-  --border:       #2A2E2A;
-  --border-l:     #222622;
-  --gold-pale:    #1C1A0E;
-  --purple-l:     #16142A;
-  --shadow-sm:    0 2px 8px rgba(0,0,0,.3);
-  --shadow-md:    0 6px 24px rgba(0,0,0,.4);
+  --forest:       #0E2E1F;
+  --forest-m:     #15492F;
+  --forest-l:     #2F9D67;
+  --forest-xl:    #3BBA7E;
+  --gold:         #C9A24B;
+  --gold-l:       #E2C079;
+  --gold-pale:    #1E1A0E;
+  --sand:         #161B16;
+  --cream:        #10140E;
+  --white:        #141A15;
+  --bg:           #0B0F0D;
+  --ink:          #F3EEE3;
+  --ink-m:        #C7C1B3;
+  --ink-l:        #9C968A;
+  --ink-xl:       #6E6B62;
+  --border:       rgba(201,162,75,.16);
+  --border-l:     rgba(201,162,75,.08);
+  --purple-l:     #1A1630;
+  --shadow-xs:    0 1px 2px rgba(0,0,0,.4);
+  --shadow-sm:    0 2px 10px rgba(0,0,0,.45);
+  --shadow-md:    0 8px 30px rgba(0,0,0,.55);
+  --shadow-lg:    0 20px 60px rgba(0,0,0,.65);
+  --shadow-gold:  0 4px 24px rgba(201,162,75,.30);
 }
 
 /* ── RESET ── */
@@ -329,7 +339,55 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
   animation:tabIn .2s cubic-bezier(.4,0,.2,1);
 }
 @keyframes tabIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
-.tab-inner{padding:16px;max-width:520px;margin:0 auto;}
+.tab-inner{padding:22px 26px;max-width:1120px;margin:0 auto;}
+/* Forms/cards stay readable; results & wide content can break out full-width */
+.tab-inner > *{--col:1;}
+@media(max-width:680px){.tab-inner{padding:16px;}}
+
+/* ════════════════════════════════
+   DASHBOARD (landing) — full-width
+════════════════════════════════ */
+.dash{padding:20px 26px 50px;max-width:1180px;margin:0 auto;}
+.dash-greeting{margin-bottom:20px}
+.dash-greeting h2{font-family:'Playfair Display',serif;font-weight:600;font-size:28px;color:var(--ink);}
+.dash-sub{color:var(--ink-l);font-size:13px;margin-top:3px}
+.dash-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.dash-kpi{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:17px 18px;box-shadow:var(--shadow-xs)}
+.dash-kpi .lbl{color:var(--ink-l);font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:9px}
+.dash-kpi .v{font-family:'Playfair Display',serif;font-size:30px;font-weight:600;line-height:1;color:var(--ink)}
+.dash-kpi .v.gold{color:var(--gold-l)}
+.dash-kpi .v.green{color:var(--forest-l)}
+.dash-kpi .d{font-size:12px;color:var(--ink-l);margin-top:7px}
+.dash-cols{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
+.dash-panel{background:var(--white);border:1px solid var(--border);border-radius:18px;padding:18px 20px;margin-bottom:18px;box-shadow:var(--shadow-xs)}
+.dash-ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}
+.dash-ph h3{font-family:'Playfair Display',serif;font-weight:600;font-size:18px;color:var(--ink)}
+.dash-ph a{color:var(--gold-l);font-size:12px;cursor:pointer;font-weight:500}
+.dash-bar{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.dash-bar .nm{width:92px;font-size:12.5px;color:var(--ink-l);text-transform:capitalize}
+.dash-bar .track{flex:1;height:9px;background:var(--bg);border-radius:6px;overflow:hidden}
+.dash-bar .fill{height:100%;background:linear-gradient(90deg,var(--forest),var(--gold));border-radius:6px}
+.dash-bar .amt{width:78px;text-align:right;font-size:12.5px;color:var(--ink);font-weight:600;font-family:'Playfair Display',serif}
+.dash-lst{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}
+.dash-lcard{border:1px solid var(--border);border-radius:13px;overflow:hidden;background:var(--bg);transition:var(--t);cursor:pointer}
+.dash-lcard:hover{border-color:var(--gold);transform:translateY(-3px)}
+.dash-lcard .im{height:80px;background:linear-gradient(135deg,var(--forest),var(--forest-m));display:grid;place-items:center;font-size:24px;position:relative}
+.dash-lcard .tg{position:absolute;top:8px;left:8px;font-size:9px;letter-spacing:.08em;text-transform:uppercase;background:rgba(0,0,0,.35);color:var(--gold-l);padding:3px 8px;border-radius:12px}
+.dash-lcard .bd{padding:10px 12px}
+.dash-lcard .pr{font-family:'Playfair Display',serif;color:var(--gold-l);font-size:17px;font-weight:600}
+.dash-lcard .ti{font-size:12.5px;font-weight:600;margin:2px 0;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dash-lcard .lo{font-size:11px;color:var(--ink-l);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dash-pipe{display:flex;flex-direction:column;gap:10px}
+.dash-pipe-i{display:flex;align-items:center;gap:12px;padding:11px;border:1px solid var(--border);border-radius:12px;background:var(--bg)}
+.dash-pipe-i .ic{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-size:15px;background:var(--gold-pale);color:var(--gold-l)}
+.dash-pipe-i .tx{flex:1}.dash-pipe-i .tx b{font-size:13px;color:var(--ink)}.dash-pipe-i .tx span{font-size:11px;color:var(--ink-l);display:block}
+.dash-pipe-i .n{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:var(--ink)}
+.dash-alert{background:rgba(217,117,90,.1);border:1px solid rgba(217,117,90,.3);border-radius:12px;padding:12px 14px;font-size:12.5px;color:#d9755a;display:flex;gap:10px;align-items:flex-start}
+.dash-ok{font-size:12.5px;color:var(--ink-l);display:flex;gap:8px;align-items:center}
+.dash-repo-row{display:flex;justify-content:space-between;font-size:12.5px;padding:7px 0;border-bottom:1px solid var(--border-l)}
+.dash-repo-row:last-child{border-bottom:none}
+.dash-repo-row span{color:var(--ink-l)}.dash-repo-row b{color:var(--ink);font-weight:600}
+@media(max-width:900px){.dash{padding:16px}.dash-kpis{grid-template-columns:repeat(2,1fr)}.dash-cols{grid-template-columns:1fr}.dash-lst{grid-template-columns:1fr}}
 
 /* ════════════════════════════════
    SHARED COMPONENTS
@@ -656,8 +714,23 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
   animation:cardIn .3s cubic-bezier(.4,0,.2,1) both;
   transition:box-shadow .2s,transform .2s;
 }
-.prop-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);}
+.prop-card:hover{box-shadow:var(--shadow-md),0 0 0 1px var(--gold);transform:translateY(-5px);border-color:var(--gold);}
 @keyframes cardIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+/* Results fill the page as a responsive grid */
+#cardList{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:18px;align-items:start;}
+#cardList .prop-card{margin-bottom:0;}
+.results-count{font-size:15px;margin-bottom:8px;}
+/* Data-rich results stats strip */
+.result-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;}
+.rstat{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:11px 14px;}
+.rstat b{display:block;font-family:'Playfair Display',serif;font-size:19px;font-weight:600;color:var(--ink);line-height:1.1;}
+.rstat span{font-size:11px;color:var(--ink-l);text-transform:uppercase;letter-spacing:.06em;}
+@media(max-width:680px){.result-stats{grid-template-columns:repeat(2,1fr);}}
+/* Deal context badge on cards */
+.deal-badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.03em;padding:4px 9px;border-radius:20px;backdrop-filter:blur(6px);}
+.deal-badge.below{background:rgba(46,157,103,.9);color:#fff;}
+.deal-badge.above{background:rgba(201,162,75,.92);color:#1b1407;}
+.deal-badge.near{background:rgba(255,255,255,.85);color:#333;}
 
 /* Card image header */
 .prop-card-img{
@@ -1464,7 +1537,7 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
-<body>
+<body class="dark">
 
 <!-- ══════════ LOGIN ══════════ -->
 <div id="loginScreen" class="screen active">
@@ -1534,7 +1607,10 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
 
   <!-- TOP TOOLBAR -->
   <div class="top-toolbar" id="topToolbar">
-    <button class="nav-item active" id="nav-search" onclick="switchTab('search')">
+    <button class="nav-item active" id="nav-dashboard" onclick="switchTab('dashboard')">
+      <span class="nav-icon">&#9638;</span><span class="nav-label">Dashboard</span>
+    </button>
+    <button class="nav-item" id="nav-search" onclick="switchTab('search')">
       <span class="nav-icon">&#128269;</span><span class="nav-label">Search</span>
     </button>
     <button class="nav-item" id="nav-valuator" onclick="switchTab('valuator')">
@@ -1564,8 +1640,45 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
   <!-- SCROLL AREA -->
   <div class="app-scroll" id="appScroll">
 
+    <!-- DASHBOARD PANEL -->
+    <div class="tab-content active" id="panel-dashboard">
+      <div class="dash">
+        <div class="dash-greeting">
+          <h2 id="dashGreeting">Welcome back</h2>
+          <div class="dash-sub" id="dashSub">Your Tobago market at a glance</div>
+        </div>
+        <div class="dash-kpis" id="dashKpis"></div>
+        <div class="dash-cols">
+          <div class="dash-maincol">
+            <section class="dash-panel">
+              <div class="dash-ph"><h3>Market snapshot</h3><a onclick="switchTab('valuator')">Valuator &rarr;</a></div>
+              <div id="dashMarket"></div>
+            </section>
+            <section class="dash-panel">
+              <div class="dash-ph"><h3>Latest listings</h3><a onclick="switchTab('search')">Open search &rarr;</a></div>
+              <div class="dash-lst" id="dashLatest"></div>
+            </section>
+          </div>
+          <div class="dash-rail">
+            <section class="dash-panel">
+              <div class="dash-ph"><h3>My pipeline</h3></div>
+              <div class="dash-pipe" id="dashPipe"></div>
+            </section>
+            <section class="dash-panel">
+              <div class="dash-ph"><h3>Needs attention</h3></div>
+              <div id="dashAttention"></div>
+            </section>
+            <section class="dash-panel">
+              <div class="dash-ph"><h3>Repository</h3><a onclick="sharedRepoSync(true)">Sync &rarr;</a></div>
+              <div id="dashRepo"></div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- SEARCH PANEL -->
-    <div class="tab-content active" id="panel-search">
+    <div class="tab-content" id="panel-search">
       <div class="tab-inner">
         <div class="api-setup" id="apiSetup">
           <p>&#128273; <strong>One-time setup:</strong> Enter your Anthropic API key. Stored securely on this device.</p>
@@ -2158,11 +2271,13 @@ function toggleDark() {
   document.getElementById('darkToggle').textContent = isDark ? '\u2600' : '\u263D';
 }
 function initDark() {
-  if (localStorage.getItem(DARK_KEY) === '1') {
-    document.body.classList.add('dark');
-    var btn = document.getElementById('darkToggle');
-    if (btn) btn.textContent = '\u2600';
-  }
+  // Midnight Estate is the default look (dark). Only switch to the light
+  // theme if the agent explicitly chose it.
+  var pref = localStorage.getItem(DARK_KEY);
+  if (pref === '0') document.body.classList.remove('dark');
+  else document.body.classList.add('dark');
+  var btn = document.getElementById('darkToggle');
+  if (btn) btn.textContent = document.body.classList.contains('dark') ? '\u2600' : '\u263D';
 }
 
 /* ══════════════════════════════════════
@@ -2223,6 +2338,7 @@ function onAppLoad() {
   updateUsageUI();
   updateOnlineStatus();
   renderSearchHistory();
+  try { renderDashboard(); } catch(e) {}
   try { updateDropdownProfile(); } catch(e) {}
 }
 
@@ -2258,6 +2374,73 @@ function switchTab(tab) {
   if (panel) panel.classList.add('active');
   if (nav)   nav.classList.add('active');
   document.getElementById('appScroll').scrollTop = 0;
+  if (tab === 'dashboard') { try { renderDashboard(); } catch(e) {} }
+}
+
+/* ══════════════════════════════════════
+   DASHBOARD (landing) — real-data widgets
+══════════════════════════════════════ */
+function _dashKpi(lbl,val,desc,cls){ return '<div class="dash-kpi"><div class="lbl">'+lbl+'</div><div class="v '+(cls||'')+'">'+val+'</div><div class="d">'+desc+'</div></div>'; }
+function _dashPipe(ic,title,sub,n){ return '<div class="dash-pipe-i"><div class="ic">'+ic+'</div><div class="tx"><b>'+title+'</b><span>'+sub+'</span></div><div class="n">'+n+'</div></div>'; }
+function _dashRow(l,v){ return '<div class="dash-repo-row"><span>'+l+'</span><b>'+v+'</b></div>'; }
+function renderDashboard() {
+  var repo = repoLoad() || [];
+  var agent = sessionStorage.getItem('agentName') || 'Agent';
+  var hr = new Date().getHours();
+  var greet = hr < 12 ? 'Good morning' : (hr < 18 ? 'Good afternoon' : 'Good evening');
+  var gEl = document.getElementById('dashGreeting'); if (gEl) gEl.textContent = greet + ', ' + agent;
+  var age = repoAge();
+  var ageTxt = (age == null) ? 'not synced yet' : (age < 1 ? Math.round(age*24)+'h ago' : age+'d ago');
+  var freshTxt = (age == null) ? '—' : (age < 1 ? Math.round(age*24)+'h' : age+'d');
+  var subEl = document.getElementById('dashSub');
+  if (subEl) subEl.textContent = 'Your Tobago market at a glance · repository ' + ageTxt;
+
+  var priced = repo.filter(function(p){ return Number(p.price) > 0; });
+  var total = repo.length, withPrice = priced.length;
+  var avg = withPrice ? priced.reduce(function(a,p){ return a + Number(p.price); }, 0) / withPrice : 0;
+
+  var kpis = document.getElementById('dashKpis');
+  if (kpis) kpis.innerHTML =
+    _dashKpi('Active listings', total, total ? 'across Tobago' : 'sync to load', 'gold') +
+    _dashKpi('With price', withPrice, total ? Math.round(withPrice/total*100)+'% of inventory' : '—', '') +
+    _dashKpi('Avg asking', avg ? fmtPrice(Math.round(avg)) : '—', withPrice+' priced', '') +
+    _dashKpi('Repository', freshTxt, age==null ? 'never synced' : 'last refreshed', 'green');
+
+  var byType = {};
+  priced.forEach(function(p){ var t=(p.type||'other').toLowerCase(); (byType[t]=byType[t]||{s:0,n:0}); byType[t].s+=Number(p.price); byType[t].n++; });
+  var rows = Object.keys(byType).map(function(t){ return {t:t, avg:byType[t].s/byType[t].n}; }).sort(function(a,b){ return b.avg-a.avg; });
+  var maxAvg = rows.length ? rows[0].avg : 1;
+  var mEl = document.getElementById('dashMarket');
+  if (mEl) mEl.innerHTML = rows.length ? rows.map(function(r){
+    return '<div class="dash-bar"><div class="nm">'+r.t+'</div><div class="track"><div class="fill" style="width:'+Math.max(6,Math.round(r.avg/maxAvg*100))+'%"></div></div><div class="amt">'+fmtPrice(Math.round(r.avg))+'</div></div>';
+  }).join('') : '<div class="dash-ok">No priced listings yet — sync the repository.</div>';
+
+  var ICON={house:'🏠',villa:'🏘',apartment:'🏢',land:'🌿',commercial:'🏪'};
+  var latest = repo.slice().sort(function(a,b){ return (b.firstSeen||0)-(a.firstSeen||0); }).slice(0,4);
+  var lEl = document.getElementById('dashLatest');
+  if (lEl) lEl.innerHTML = latest.length ? latest.map(function(p){
+    var ic = ICON[(p.type||'').toLowerCase()] || '🏠';
+    return '<div class="dash-lcard" onclick="switchTab(\'search\')"><div class="im">'+ic+'<span class="tg">'+(p.type||'property')+'</span></div><div class="bd"><div class="pr">'+fmtPrice(p.price)+'</div><div class="ti">'+(p.title||'Property')+'</div><div class="lo">📍 '+(p.location||'Tobago')+'</div></div></div>';
+  }).join('') : '<div class="dash-ok">No listings yet — sync the repository to populate.</div>';
+
+  try { contactsLoad(); } catch(e){} try { clientSlLoad(); } catch(e){} try { cbLoad(); } catch(e){}
+  var clientSaved = 0; var csl = (typeof clientShortlists !== 'undefined' && clientShortlists) || {};
+  Object.keys(csl).forEach(function(k){ clientSaved += (csl[k]||[]).length; });
+  var cbPending = cbRequests.filter(function(r){ return r.status==='pending'; }).length;
+  var pEl = document.getElementById('dashPipe');
+  if (pEl) pEl.innerHTML =
+    _dashPipe('❤','Shortlisted','general list', shortlist.length) +
+    _dashPipe('👥','Clients', clientSaved+' saved', contacts.length) +
+    _dashPipe('🤝','Co-Broker', cbPending+' pending', cbRequests.length);
+
+  var stale = repo.filter(function(p){ return p.status==='stale'; }).length;
+  var aEl = document.getElementById('dashAttention');
+  if (aEl) aEl.innerHTML = stale>0
+    ? '<div class="dash-alert">⚠<div><b>'+stale+' listing'+(stale!==1?'s':'')+' possibly sold</b><br><span style="opacity:.85">Unseen 14+ days — verify before showing.</span></div></div>'
+    : '<div class="dash-ok">✅ All listings fresh — nothing flagged.</div>';
+
+  var rEl = document.getElementById('dashRepo');
+  if (rEl) rEl.innerHTML = _dashRow('Total listings', total) + _dashRow('With price', withPrice) + _dashRow('Last refreshed', ageTxt);
 }
 
 /* ══════════════════════════════════════
@@ -2444,6 +2627,7 @@ function repoUpdateUI() {
     if (metaEl)   metaEl.textContent=listings.length+' listings — zero API cost';
     if (labelEl)  labelEl.textContent='Search Local ('+listings.length+')';
   }
+  try { renderDashboard(); } catch(e) {}
 }
 async function repoRefresh() {
   var apiKey = localStorage.getItem('anthropic_key');
@@ -2755,7 +2939,7 @@ startSearch = async function() {
     allResults = filtered;
     saveToHistory(filters); trackUsage('search');
     var area = document.getElementById('resultsArea');
-    area.innerHTML = '<div class="mode-badge local">\u26A1 Local repository &mdash; instant &amp; free</div><div id="resultCount" class="results-count"></div><div id="cardList"></div>';
+    area.innerHTML = '<div class="mode-badge local">\u26A1 Local repository &mdash; instant &amp; free</div><div id="resultCount" class="results-count"></div><div id="resultStats"></div><div id="cardList"></div>';
     renderResults(filtered);
     return;
   }
@@ -2773,7 +2957,7 @@ startSearch = async function() {
     '<div class="mode-badge live">\u26A1 Live API search &mdash; uses credits</div>' +
     '<div class="skeleton-wrap">' + [1,2,3].map(function(){ return '<div class="skel-card"><div class="skel-img"></div><div class="skel-body"><div class="skel-line w80"></div><div class="skel-line w60"></div><div class="skel-line w40"></div></div></div>'; }).join('') + '</div>' +
     '<div class="status-card"><div class="status-top"><div class="spinner"></div><span>Searching 6 sites in parallel...</span></div><div class="site-dots">'+dotsHtml+'</div></div>' +
-    '<div id="resultCount" class="results-count" style="display:none"></div><div id="cardList"></div>';
+    '<div id="resultCount" class="results-count" style="display:none"></div><div id="resultStats"></div><div id="cardList"></div>';
 
   function searchTask(site) {
     return searchOneSite(apiKey, filters, site).then(function(listings) {
@@ -2796,8 +2980,7 @@ startSearch = async function() {
   if(statusCard) statusCard.style.display='none';
 
   allResults = scoreAndSort(allResults, filters);
-  var list=document.getElementById('cardList');
-  if(list) list.innerHTML=allResults.map(makeCard).join('');
+  paintResults(allResults);
   var ce=document.getElementById('resultCount');
   if(ce){ce.style.display='block'; ce.textContent=allResults.length>0?allResults.length+' listings found — sorted by relevance':'No listings found — try fewer filters.';}
   if(allResults.length>0) searchCache[ck]=allResults;
@@ -2806,7 +2989,7 @@ startSearch = async function() {
 
 function showCachedResults(listings) {
   var area=document.getElementById('resultsArea');
-  area.innerHTML='<div class="mode-badge cached">\u26A1 Cached results &mdash; <span style="cursor:pointer;text-decoration:underline" onclick="clearCacheSearch()">Refresh</span></div><div id="resultCount" class="results-count"></div><div id="cardList"></div>';
+  area.innerHTML='<div class="mode-badge cached">\u26A1 Cached results &mdash; <span style="cursor:pointer;text-decoration:underline" onclick="clearCacheSearch()">Refresh</span></div><div id="resultCount" class="results-count"></div><div id="resultStats"></div><div id="cardList"></div>';
   renderResults(listings);
 }
 function clearCacheSearch() { var f=getFilters(); delete searchCache[cacheKey(f)]; startSearch(); }
@@ -2828,13 +3011,55 @@ function listingLink(url) {
     'style="display:inline-block;margin-top:4px;font-size:11px;font-weight:600;color:var(--forest-l);text-decoration:none;">🔗 View listing</a>';
 }
 
+/* ── Data-rich helpers: per-type averages, PSF, deal context, stats strip ── */
+var _typeAvg = {};
+function parsePsf(sizeStr, price) {
+  if (!(price > 0)) return 0;
+  var m = String(sizeStr || '').replace(/,/g,'').match(/([0-9.]+)/);
+  var sqft = m ? parseFloat(m[1]) : 0;
+  return (sqft > 200) ? Math.round(price / sqft) : 0;  // ignore acreage/blank
+}
+function computeTypeAvg(listings) {
+  var g = {}; _typeAvg = {};
+  listings.forEach(function(p){ var pr = Number(p.price); if (pr > 0) { var t=(p.type||'other').toLowerCase(); (g[t]=g[t]||{s:0,n:0}); g[t].s+=pr; g[t].n++; } });
+  Object.keys(g).forEach(function(t){ if (g[t].n >= 3) _typeAvg[t] = g[t].s / g[t].n; }); // need 3+ for a meaningful avg
+}
+function dealBadge(p) {
+  var avg = _typeAvg[(p.type||'').toLowerCase()];
+  if (!avg || !(Number(p.price) > 0)) return '';
+  var r = p.price / avg;
+  if (r <= 0.9)  return '<span class="deal-badge below">▼ Below '+(p.type||'type')+' avg</span>';
+  if (r >= 1.12) return '<span class="deal-badge above">▲ Above '+(p.type||'type')+' avg</span>';
+  return '<span class="deal-badge near">≈ Around avg</span>';
+}
+function _rstat(v,l){ return '<div class="rstat"><b>'+v+'</b><span>'+l+'</span></div>'; }
+function buildResultStats(listings) {
+  var priced = listings.filter(function(p){ return Number(p.price) > 0; });
+  if (!priced.length) return '';
+  var prices = priced.map(function(p){ return Number(p.price); }).sort(function(a,b){ return a-b; });
+  var avg = prices.reduce(function(a,b){ return a+b; },0)/prices.length;
+  return '<div class="result-stats">' +
+    _rstat(listings.length, 'listings') +
+    _rstat(fmtPrice(Math.round(avg)), 'avg asking') +
+    _rstat(fmtPrice(prices[0])+' – '+fmtPrice(prices[prices.length-1]), 'price range') +
+    _rstat(priced.length, 'priced') +
+  '</div>';
+}
+function paintResults(listings) {
+  computeTypeAvg(listings);
+  var list = document.getElementById('cardList');
+  if (list) list.innerHTML = listings.map(makeCard).join('');
+  var rs = document.getElementById('resultStats');
+  if (rs) rs.innerHTML = buildResultStats(listings);
+}
+
 function renderResults(listings) {
   var skel=document.querySelector('.skeleton-wrap'); if(skel) skel.style.display='none';
   var statusCard=document.querySelector('.status-card'); if(statusCard) statusCard.style.display='none';
   var ce=document.getElementById('resultCount'); var list=document.getElementById('cardList');
   if (!listings.length) { if(ce){ce.style.display='block';ce.textContent='No listings found — try fewer filters.';} return; }
   if(ce){ce.style.display='block';ce.textContent=listings.length+' listing'+(listings.length!==1?'s':'')+' found';}
-  if(list) list.innerHTML=listings.map(makeCard).join('');
+  paintResults(listings);
 }
 
 function shareWA(btn) {
@@ -2883,6 +3108,7 @@ function makeCard(p) {
   if (propType) c += '<span class="prop-badge type">'+propType.toUpperCase()+'</span>';
   if (p.pool)   c += '<span class="prop-badge pool">\uD83C\uDFCA POOL</span>';
   if (p.status === 'stale') c += '<span class="prop-badge" style="background:rgba(217,119,6,.35);color:#fff;border:1px solid rgba(217,119,6,.5);">\u26A0 POSSIBLY SOLD</span>';
+  c += dealBadge(p);
   c += '</div>';
   c += '<div class="prop-card-price-tag"><span>'+price+'</span><small>'+(p.price?'TTD':'')+'</small></div>';
   c += '<div class="prop-card-title">'+(p.title||'Property listing')+'</div>';
@@ -2891,11 +3117,13 @@ function makeCard(p) {
   // Card body
   c += '<div class="prop-card-body">';
   // Specs row
-  if (p.beds>0 || p.baths>0 || p.size) {
+  var _psf = parsePsf(p.size, p.price);
+  if (p.beds>0 || p.baths>0 || p.size || _psf) {
     c += '<div class="prop-specs">';
     if (p.beds>0)  c += '<div class="spec-item"><span class="spec-icon">\uD83D\uDECC</span><div class="spec-val">'+p.beds+'</div><div class="spec-label">Beds</div></div>';
     if (p.baths>0) c += '<div class="spec-item"><span class="spec-icon">\uD83D\uDEC3</span><div class="spec-val">'+p.baths+'</div><div class="spec-label">Baths</div></div>';
     if (p.size)    c += '<div class="spec-item"><span class="spec-icon">\uD83D\uDCCF</span><div class="spec-val">'+String(p.size).replace(' sq ft','')+'</div><div class="spec-label">Sq Ft</div></div>';
+    if (_psf)      c += '<div class="spec-item"><span class="spec-icon">💵</span><div class="spec-val">'+_psf+'</div><div class="spec-label">$/sqft</div></div>';
     c += '</div>';
   }
   if (p.description) c += '<div class="prop-desc">'+p.description+'</div>';
