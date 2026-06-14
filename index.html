@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>BrokerBuddy</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><rect width='44' height='44' rx='10' fill='%230E2E1F'/><path d='M22 10L32 19H29V30C29 30.55 28.55 31 28 31H24V24H20V31H16C15.45 31 15 30.55 15 30V19H12L22 10Z' fill='%23E2C079'/><circle cx='22' cy='22.6' r='2.1' fill='%230C2A1C'/></svg>">
 <style>
 /* ═══════════════════════════════════════
    TOBAGO PROPERTY FINDER v3.1
@@ -235,6 +236,7 @@ body.dark .login-card{background:rgba(30,33,32,.97);}
   position:relative;z-index:100;
 }
 .hdr-left{display:flex;align-items:center;gap:10px;}
+#hdrPageTitle{font-family:'Playfair Display',serif;font-size:18px;font-weight:600;color:#fff;letter-spacing:-.2px;}
 .hdr-logo{
   width:30px;height:30px;
   background:linear-gradient(135deg,var(--gold),var(--gold-l));
@@ -2430,6 +2432,7 @@ function onAppLoad() {
   renderSearchHistory();
   try { renderDashboard(); } catch(e) {}
   try { updateDropdownProfile(); } catch(e) {}
+  var _t = document.getElementById('hdrPageTitle'); if (_t) _t.textContent = 'Dashboard';
 }
 
 window.onload = function() {
@@ -2465,7 +2468,10 @@ function switchTab(tab) {
   if (nav)   nav.classList.add('active');
   document.getElementById('appScroll').scrollTop = 0;
   if (tab === 'dashboard') { try { renderDashboard(); } catch(e) {} }
+  var titleEl = document.getElementById('hdrPageTitle');
+  if (titleEl) titleEl.textContent = TAB_TITLES[tab] || '';
 }
+var TAB_TITLES = { dashboard:'Dashboard', search:'Search', valuator:'Land Valuator', tools:'Tools', shortlist:'Shortlist', cobroker:'Co-Broker', settings:'Settings' };
 
 /* ══════════════════════════════════════
    DASHBOARD (landing) — real-data widgets

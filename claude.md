@@ -1,4 +1,6 @@
-# Tobago Property Finder — Project Guide for Claude Code
+# BrokerBuddy — Project Guide for Claude Code
+
+(Formerly "Tobago Property Finder" — rebranded to **BrokerBuddy** 2026-06.)
 
 A single-file, vanilla-JS web app for Tobago real estate agents. No framework,
 no build step. All client persistence is browser localStorage. A separate
@@ -34,7 +36,8 @@ hardcoded `APP_PIN = '1234'`.
 3. **Edits should be surgical.** Locate the exact function, edit in place.
    Don't reformat or "tidy" surrounding code.
 4. **All persistence is localStorage**, keys prefixed `tpf_` (see below).
-5. **Design system is fixed** — see below. Match it exactly; never introduce
+5. **Match the design system** — see below (Midnight Estate). Match it
+   exactly; it's CSS-variable driven, so re-theme at the token blocks. Never introduce
    default browser styling.
 
 ## localStorage keys
@@ -55,21 +58,35 @@ hardcoded `APP_PIN = '1234'`.
 
 ---
 
-## Design system (DO NOT DRIFT)
+## Design system — "Midnight Estate" (current direction)
 
-- **Fonts:** Playfair Display (headings) + DM Sans (body). Google Fonts.
-- **Palette:** forest greens `#0D3D28` / `#165C3E` / `#1E7A52`; gold `#C49A3C`;
-  cream/sand neutrals; ink `#141414` / `#4A4A4A`.
-- **Dark mode:** via `body.dark` class. Never pure white; surfaces
-  `#1E1E1E` / `#2A2A2A`; gold brightened.
+The app was redesigned (2026-06) into a dark-luxury **Midnight Estate** theme
+with a **dashboard layout**. Everything is driven by CSS variables in `:root`
+(light theme) and `body.dark` (Midnight). **Midnight is the default** — the app
+boots with `body class="dark"`; the ☀/☽ toggle switches to the light theme.
+Change tokens at the variable blocks, not per-component.
+
+- **Default = dark/Midnight:** near-black canvas `--bg:#0B0F0D`, panel surfaces
+  `--white:#141A15`, gold hairline borders `rgba(201,162,75,.16)`, cream text
+  `--ink:#F3EEE3`. Light theme preserved as the toggle-off option.
+- **Fonts:** Playfair Display (headings, big numbers, prices) + DM Sans (UI/body).
+- **Palette:** forest greens `#0E2E1F`/`#15492F`/`#2F9D67`; gold `#C9A24B` /
+  `#E2C079`; deal badges green=below-avg, gold=above-avg.
+- **Layout:** LEFT SIDEBAR nav (`.app-sidebar` = logo + vertical `.sidebar-nav`)
+  + `.app-main` (slim forest header with page title left, agent pill right, +
+  scroll). `#appScreen.active` is a CSS grid `236px 1fr`; collapses to
+  icon-only under 820px. Tab panels use `.tab-inner` (max 1120px); the
+  **Dashboard** is the landing screen (`#panel-dashboard`).
+- **Cards:** `--white` bg, gold hairline border, soft shadow, gold hover glow +
+  lift. Results render as a responsive grid (`#cardList`). Data-rich: stats
+  strip, deal badges (price vs type avg), $/sqft, sort + "deals only".
 - **Radius scale:** 6 / 10 / 14 / 20 / 28px.
-- **Cards:** white bg, 1px border, soft shadow. Real-estate cards show price as
-  large serif on a green image header, spec strip, hover lift.
 - **Buttons:** gradient forest green. WhatsApp buttons `#25D366`.
-- **Motion:** fadeSlideIn, staggered card entrance, 0.15–0.2s transitions; use
-  `transform` not layout props; respect `prefers-reduced-motion`.
-- **Mobile-first**, 44×44px min touch targets, 13px min body font, safe-area insets.
-- **Accessibility:** WCAG AA contrast.
+- **Brand:** name **BrokerBuddy**; logo = gold house-key on a forest crest
+  (inline SVG, ids `bbSide`/`bbLogin`; also the favicon data-URI in `<head>`).
+- **Login:** island scene (sun glow, palm silhouettes, layered sea) over forest.
+- **Motion:** fadeSlideIn, staggered card entrance, 0.15–0.2s; `transform` not
+  layout; respect `prefers-reduced-motion`. Mobile-first, WCAG AA contrast.
 
 ---
 
@@ -92,7 +109,11 @@ hardcoded `APP_PIN = '1234'`.
 - **Shared repo sync** — fetches data/repo.json on load; Verify button does a
   ~TT$0.05 live re-check of a single listing; "possibly sold" badge for stale.
 - **Diagnostic** — "Test sites" button reports per-site listing counts.
-- Dark mode, offline detection, top toolbar nav, agent dropdown, watermark.
+- **Dashboard landing** — KPIs, market-by-type, most-active-areas, latest
+  listings (badged), best-value finds, pipeline counts, possibly-sold alerts,
+  repository panel; all computed live from `tpf_repo` + localStorage.
+- Light/dark toggle (Midnight default), offline detection, left sidebar nav,
+  agent dropdown, watermark.
 
 ---
 
