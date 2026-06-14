@@ -2077,6 +2077,11 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
             </div>
           </div>
           <div id="sharedCompList"></div>
+          <div style="margin-top:12px;border-top:1px solid var(--border-l);padding-top:12px;">
+            <button class="add-client-btn" style="width:100%;" onclick="runBacktest()">&#129514; Backtest model accuracy</button>
+            <div style="font-size:11px;color:var(--ink-l);margin-top:6px;line-height:1.5;">Leave-one-out test of the valuation model against your confirmed sold comps. Needs 3+ sold comparables.</div>
+            <div id="backtestResult"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -4106,6 +4111,121 @@ function getSoldCompsPSF(locKey) {
   };
 }
 
+/* ════════════════════════════════════════════════
+   ROBUST SIMILARITY-WEIGHTED PSF (kNN) — model v2
+   Pools agent sold comps + crawler candidates + repo
+   asking listings; weights each by location, size,
+   recency and source quality; discounts asking to a
+   sold-equivalent; rejects outliers (MAD); returns
+   weighted percentile bands (P25/P50/P75) + effective
+   sample size. Primary PSF source for runValuator;
+   static VAL_DATA stays as the final fallback.
+════════════════════════════════════════════════ */
+var ASKING_HAIRCUT = 0.08;   // asking runs ~5-15% over sold → discount to sold-equivalent
+function _parseDateMs(d){ if(!d) return Date.now()-180*86400000; var t=Date.parse(d); return isNaN(t)?(Date.now()-180*86400000):t; }
+function _wQuantile(items, q){ // items sorted asc by v, each {v,w}
+  var sw=0,i; for(i=0;i<items.length;i++) sw+=items[i].w;
+  if(sw<=0) return items.length?items[Math.floor((items.length-1)*q)].v:0;
+  var target=q*sw, cum=0;
+  for(i=0;i<items.length;i++){ cum+=items[i].w; if(cum>=target) return items[i].v; }
+  return items[items.length-1].v;
+}
+function knnPSF(subject, opts){
+  opts = opts || {};
+  var size   = subject.size>0 ? subject.size : 5000;
+  var locFull= (subject.loc||'').toLowerCase();
+  var locBase= locFull.split('|')[0];
+  function locScore(cl){ cl=(cl||'').toLowerCase(); if(!cl) return 0; if(cl===locFull||cl===locBase) return 1.0; if(cl.indexOf(locBase)!==-1||locBase.indexOf(cl.split(' ')[0])!==-1) return 0.8; return 0; }
+
+  var cands=[];
+  compsLoad();
+  soldComps.concat(sharedSoldLoad()).forEach(function(c){
+    if(opts.excludeId && c.id===opts.excludeId) return;
+    var psf=Number(c.psf) || (c.price&&c.size? Number(c.price)/parseSizeSqft(c.size):0);
+    if(!(psf>5 && psf<2000)) return;
+    cands.push({ psf:psf, loc:c.loc, size:(parseSizeSqft(c.size)||size), dateMs:_parseDateMs(c.date), srcKind:(c.source==='candidate'?'candidate':'sold') });
+  });
+  (repoLoad()||[]).forEach(function(p){
+    if(!p.type || p.type.toLowerCase()!=='land') return;
+    var pr=Number(p.price); if(!(pr>0)) return;
+    var ps=parseSizeSqft(p.size); if(ps<100) return;
+    var psf=pr/ps; if(!(psf>5 && psf<1000)) return;
+    cands.push({ psf:psf, loc:p.location, size:ps, dateMs:(p.lastSeen||Date.now()), srcKind:'repo' });
+  });
+  if(!cands.length) return null;
+
+  var local=cands.filter(function(c){ return locScore(c.loc)>0; });
+  var broadened=false;
+  if(local.length<3){ local=cands; broadened=true; }   // island-wide fallback when an area is sparse
+
+  var sigma=0.6;   // log-size bandwidth
+  local.forEach(function(c){
+    var ls=c.size>0?Math.log(c.size/size):0;
+    var wSize=Math.exp(-(ls*ls)/(2*sigma*sigma));
+    var wRec =Math.exp(-Math.max(0,(Date.now()-c.dateMs)/86400000)/365);   // ~1yr decay
+    var wLoc =broadened?(locScore(c.loc)||0.25):(locScore(c.loc)||0.5);
+    var wSrc =c.srcKind==='sold'?1.0:(c.srcKind==='candidate'?0.7:0.55);
+    c.w=wSize*wRec*wLoc*wSrc;
+    c.adj=(c.srcKind==='sold')?c.psf:c.psf*(1-ASKING_HAIRCUT);   // asking → sold-equivalent
+  });
+
+  // MAD outlier rejection on adjusted PSF
+  var v=local.map(function(c){return c.adj;}).sort(function(a,b){return a-b;});
+  var med=v[Math.floor(v.length/2)];
+  var dv=v.map(function(x){return Math.abs(x-med);}).sort(function(a,b){return a-b;});
+  var mad=dv[Math.floor(dv.length/2)]||0;
+  var kept=(mad>0)?local.filter(function(c){return Math.abs(c.adj-med)<=3*1.4826*mad;}):local;
+  if(kept.length<2) kept=local;
+
+  var items=kept.map(function(c){return {v:c.adj,w:c.w};}).filter(function(x){return x.w>0;}).sort(function(a,b){return a.v-b.v;});
+  if(!items.length) return null;
+  var sumW=0,sumW2=0; items.forEach(function(x){sumW+=x.w;sumW2+=x.w*x.w;});
+  var nEff=sumW2>0?(sumW*sumW)/sumW2:items.length;
+  var p25=_wQuantile(items,0.25), p50=_wQuantile(items,0.5), p75=_wQuantile(items,0.75);
+  var soldN=kept.filter(function(c){return c.srcKind==='sold';}).length;
+  return {
+    p25:Math.round(p25), p50:Math.round(p50), p75:Math.round(p75),
+    n:kept.length, nEff:nEff,
+    dispersion:(p50>0?(p75-p25)/p50:1),
+    source:(soldN>=3?'sold':(soldN>0?'mixed':'repo')),
+    broadened:broadened
+  };
+}
+
+/* ── Backtest harness (#4): leave-one-out over confirmed (agent) sold comps.
+      Reports MdAPE, MAPE and P25–P75 interval coverage so model changes are
+      measured, not guessed. ── */
+function backtestValuator(){
+  compsLoad();
+  var truth=soldComps.filter(function(c){ return c.source==='agent' && Number(c.psf)>5 && Number(c.psf)<2000 && parseSizeSqft(c.size)>=100; });
+  if(truth.length<3) return { error:'Need at least 3 confirmed (agent-entered) sold comps to backtest — you have '+truth.length+'. Add sold comparables to enable this.' };
+  var errs=[], covered=0, used=0;
+  truth.forEach(function(c){
+    var pred=knnPSF({loc:c.loc, size:parseSizeSqft(c.size), tenure:c.tenure||'freehold'}, {excludeId:c.id});
+    if(!pred || pred.n<1) return;
+    var actual=Number(c.psf);
+    errs.push(Math.abs(pred.p50-actual)/actual);
+    if(actual>=pred.p25 && actual<=pred.p75) covered++;
+    used++;
+  });
+  if(!used) return { error:'Could not generate predictions (too few neighbours per comp).' };
+  errs.sort(function(a,b){return a-b;});
+  return { n:used, mdape:errs[Math.floor(errs.length/2)], mape:errs.reduce(function(a,b){return a+b;},0)/errs.length, coverage:covered/used };
+}
+function runBacktest(){
+  var el=document.getElementById('backtestResult'); if(!el) return;
+  var r=backtestValuator();
+  if(r.error){ el.innerHTML='<div class="error-box" style="margin-top:10px">'+r.error+'</div>'; return; }
+  var pct=function(x){return (x*100).toFixed(1)+'%';};
+  var col=r.mdape<0.1?'#2F9D67':(r.mdape<0.2?'#C9A24B':'#D9755A');
+  el.innerHTML='<div class="result-grid" style="margin-top:12px">'+
+    '<div class="result-box accent"><div class="result-box-label">Median error (MdAPE)</div><div class="result-box-val" style="color:'+col+'">'+pct(r.mdape)+'</div><div class="result-box-sub">lower is better</div></div>'+
+    '<div class="result-box"><div class="result-box-label">Mean error (MAPE)</div><div class="result-box-val">'+pct(r.mape)+'</div></div>'+
+    '<div class="result-box"><div class="result-box-label">Band coverage</div><div class="result-box-val">'+pct(r.coverage)+'</div><div class="result-box-sub">true PSF in P25–P75</div></div>'+
+    '<div class="result-box"><div class="result-box-label">Tested on</div><div class="result-box-val">'+r.n+'</div><div class="result-box-sub">leave-one-out</div></div>'+
+  '</div><div class="val-disclaimer" style="margin-top:10px">ℹ️ Leave-one-out over your confirmed sold comps. MdAPE = typical % gap between predicted and actual PSF; coverage near 50% means the P25–P75 band is honest.</div>';
+}
+
 /* ── OPTION 5: Calibration ── */
 function applyCalibration() {
   calsLoad();
@@ -4277,27 +4397,14 @@ function runValuator() {
   calsLoad();
   var savedCal = valCals[loc] || 0;
 
-  // ── Build PSF from best available source ──────────────────────
-  var soldData  = getSoldCompsPSF(loc);
-  var repoData  = getRepoPSF(loc);
+  // ── Build PSF: robust similarity-weighted kNN (primary), static fallback ──
+  var knn = knnPSF({ loc: loc, size: size, tenure: tenure });
   var staticDat = VAL_DATA[loc];
+  var psf, dataSource, dataPoints, dispersion = 0;
 
-  var psf, dataSource, dataPoints;
-
-  if (soldData && soldData.count >= 3) {
-    // Best: agent has 3+ sold comparables
-    psf = soldData; dataSource = 'sold'; dataPoints = soldData.count;
-  } else if (soldData && repoData) {
-    // Good: blend sold + repo
-    var blendMin = Math.round((soldData.min * soldData.count + repoData.min * repoData.count) / (soldData.count + repoData.count));
-    var blendMax = Math.round((soldData.max * soldData.count + repoData.max * repoData.count) / (soldData.count + repoData.count));
-    var blendAvg = Math.round((soldData.avg * soldData.count + repoData.avg * repoData.count) / (soldData.count + repoData.count));
-    psf = { min:blendMin, avg:blendAvg, max:blendMax, count: soldData.count + repoData.count };
-    dataSource = 'mixed'; dataPoints = psf.count;
-  } else if (soldData) {
-    psf = soldData; dataSource = 'sold'; dataPoints = soldData.count;
-  } else if (repoData && repoData.count >= 2) {
-    psf = repoData; dataSource = 'repo'; dataPoints = repoData.count;
+  if (knn && knn.n >= 2) {
+    psf = { min: knn.p25, avg: knn.p50, max: knn.p75 };
+    dataSource = knn.source; dataPoints = Math.max(1, Math.round(knn.nEff)); dispersion = knn.dispersion;
   } else if (staticDat) {
     // Fallback: static research data with WIDER uncertainty
     psf = {
@@ -4324,6 +4431,11 @@ function runValuator() {
     else confLevel = 'verylow';
     confLabel = { high:'MEDIUM', medium:'LOW', low:'VERY LOW', verylow:'VERY LOW' }[confLevel] || 'VERY LOW';
   }
+  // Wide disagreement among comps (P25–P75 spread > 55% of median) → downgrade
+  if (dispersion > 0.55) {
+    confLevel = { high:'medium', medium:'low', low:'verylow', verylow:'verylow' }[confLevel];
+  }
+  confLabel = { high:'HIGH', medium:'MEDIUM', low:'LOW', verylow:'VERY LOW' }[confLevel];
 
   // ── Size adjustment ───────────────────────────────────────────
   var sizeFactor =
