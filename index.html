@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Tobago Property Finder</title>
+<title>BrokerBuddy</title>
 <style>
 /* ═══════════════════════════════════════
    TOBAGO PROPERTY FINDER v3.1
@@ -131,14 +131,13 @@ input,select,textarea,button{font-family:'DM Sans',sans-serif;}
   text-align:center;margin-bottom:1.75rem;
   width:100%;
 }
+.login-scene{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+.scene-svg{position:absolute;bottom:0;left:0;width:100%;height:100%;}
 .login-logo-mark{
-  width:60px;height:60px;margin:0 auto 14px;
-  background:linear-gradient(135deg,var(--gold),var(--gold-l));
-  border-radius:var(--r-md);
+  width:64px;height:64px;margin:0 auto 16px;
   display:flex;align-items:center;justify-content:center;
-  box-shadow:var(--shadow-gold);
-  font-size:28px;
 }
+.login-logo-mark svg{width:64px;height:64px;filter:drop-shadow(0 10px 22px rgba(201,162,75,.28));}
 .login-brand h1{
   font-family:'Playfair Display',serif;
   font-size:28px;color:#fff;font-weight:500;
@@ -313,6 +312,34 @@ body.dark .login-card{background:rgba(30,33,32,.97);}
   margin:10px 2px;flex-shrink:0;
 }
 .bottom-nav{display:none;}
+
+/* ════════════════════════════════
+   SIDEBAR LAYOUT (left nav)
+════════════════════════════════ */
+#appScreen.active{display:grid;grid-template-columns:236px 1fr;height:100vh;overflow:hidden;}
+.app-sidebar{background:var(--forest);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:18px 13px;overflow-y:auto;scrollbar-width:thin;}
+.sidebar-logo{display:flex;align-items:center;gap:11px;padding:4px 6px 20px;}
+.sb-logo-svg{width:42px;height:42px;flex-shrink:0;}
+.sb-brand b{font-family:'Playfair Display',serif;font-size:18px;color:#fff;display:block;line-height:1.05;letter-spacing:-.2px;}
+.sb-brand span{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.42);}
+.sidebar-nav{display:flex;flex-direction:column;gap:3px;}
+.sidebar-nav .nav-item{width:100%;justify-content:flex-start;gap:12px;padding:11px 13px;border-radius:10px;border-bottom:none !important;font-size:13.5px;color:rgba(255,255,255,.6);}
+.sidebar-nav .nav-item:hover{background:rgba(255,255,255,.06);color:#fff;}
+.sidebar-nav .nav-item.active{background:linear-gradient(135deg,rgba(201,162,75,.22),rgba(201,162,75,.05));color:var(--gold-l);border:1px solid var(--border);}
+.sidebar-nav .nav-icon{font-size:15px;width:20px;text-align:center;}
+.sidebar-nav .nav-badge{margin-left:auto;}
+.sidebar-nav .toolbar-divider{width:auto;height:1px;background:rgba(255,255,255,.09);margin:9px 8px;}
+.app-main{display:flex;flex-direction:column;min-width:0;height:100vh;overflow:hidden;}
+@media(max-width:820px){
+  #appScreen.active{grid-template-columns:60px 1fr;}
+  .sb-brand,.sidebar-nav .nav-label{display:none;}
+  .sidebar-logo{justify-content:center;padding:4px 0 16px;}
+  .sb-logo-svg{width:38px;height:38px;}
+  .sidebar-nav .nav-item{justify-content:center;padding:11px 0;}
+  .sidebar-nav .nav-icon{width:auto;}
+  .sidebar-nav .nav-badge{position:absolute;top:5px;right:8px;margin:0;}
+  .sidebar-nav .nav-item{position:relative;}
+}
 
 /* Watermark */
 .watermark{
@@ -1562,11 +1589,43 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
 
 <!-- ══════════ LOGIN ══════════ -->
 <div id="loginScreen" class="screen active">
+  <div class="login-scene" aria-hidden="true">
+    <svg class="scene-svg" viewBox="0 0 1440 760" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="1090" cy="165" r="130" fill="url(#sunGlow)"/>
+      <circle cx="1090" cy="165" r="52" fill="#EBCB7E" opacity="0.85"/>
+      <path d="M0 600 Q 240 560 480 585 T 960 580 T 1440 605 L1440 760 L0 760Z" fill="#0A2418"/>
+      <g stroke="#071A0F" stroke-width="8" fill="none" stroke-linecap="round" transform="translate(215 470)">
+        <path d="M0 220 C -6 150 -2 80 10 36"/>
+        <path d="M10 36 C -34 14 -66 20 -92 44"/>
+        <path d="M10 36 C -26 -10 -50 -20 -82 -18"/>
+        <path d="M10 36 C 2 -22 12 -52 30 -74"/>
+        <path d="M10 36 C 44 -14 74 -8 100 16"/>
+        <path d="M10 36 C 40 8 64 22 80 50"/>
+      </g>
+      <g stroke="#071A0F" stroke-width="7" fill="none" stroke-linecap="round" transform="translate(1235 440) scale(0.78)">
+        <path d="M0 220 C 6 150 2 80 -10 36"/>
+        <path d="M-10 36 C 34 14 66 20 92 44"/>
+        <path d="M-10 36 C 26 -10 50 -20 82 -18"/>
+        <path d="M-10 36 C -2 -22 -12 -52 -30 -74"/>
+        <path d="M-10 36 C -44 -14 -74 -8 -100 16"/>
+      </g>
+      <path d="M0 660 Q 360 635 720 660 T 1440 660 L1440 760 L0 760Z" fill="#0C2A1C"/>
+      <path d="M0 702 Q 360 684 720 702 T 1440 702 L1440 760 L0 760Z" fill="#081E10"/>
+      <defs><radialGradient id="sunGlow"><stop stop-color="#F2D98E" stop-opacity="0.55"/><stop offset="1" stop-color="#C9A24B" stop-opacity="0"/></radialGradient></defs>
+    </svg>
+  </div>
   <div class="login-wrap">
     <div class="login-brand">
-      <div class="login-logo-mark">&#127965;</div>
-      <h1>Tobago Property <em>Finder</em></h1>
-      <p>Real Estate Agent Portal</p>
+      <div class="login-logo-mark">
+        <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="44" height="44" rx="12" fill="url(#bbLogin)"/>
+          <path d="M22 10L32 19H29V30C29 30.55 28.55 31 28 31H24V24H20V31H16C15.45 31 15 30.55 15 30V19H12L22 10Z" fill="#E2C079"/>
+          <circle cx="22" cy="22.6" r="2.1" fill="#0C2A1C"/>
+          <defs><linearGradient id="bbLogin" x1="0" y1="0" x2="44" y2="44" gradientUnits="userSpaceOnUse"><stop stop-color="#1A5C3E"/><stop offset="1" stop-color="#0C2A1C"/></linearGradient></defs>
+        </svg>
+      </div>
+      <h1>Broker<em>Buddy</em></h1>
+      <p>Tobago Real Estate &middot; Agent Portal</p>
     </div>
     <div class="login-card">
       <h2>Welcome back</h2>
@@ -1583,21 +1642,52 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
 <!-- ══════════ APP ══════════ -->
 <div id="appScreen" class="screen">
 
+  <!-- SIDEBAR -->
+  <aside class="app-sidebar">
+    <div class="sidebar-logo">
+      <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" class="sb-logo-svg">
+        <rect width="44" height="44" rx="12" fill="url(#bbSide)"/>
+        <path d="M22 10L32 19H29V30C29 30.55 28.55 31 28 31H24V24H20V31H16C15.45 31 15 30.55 15 30V19H12L22 10Z" fill="#E2C079"/>
+        <circle cx="22" cy="22.6" r="2.1" fill="#0C2A1C"/>
+        <defs><linearGradient id="bbSide" x1="0" y1="0" x2="44" y2="44" gradientUnits="userSpaceOnUse"><stop stop-color="#1A5C3E"/><stop offset="1" stop-color="#0C2A1C"/></linearGradient></defs>
+      </svg>
+      <div class="sb-brand"><b>BrokerBuddy</b><span>Tobago</span></div>
+    </div>
+    <nav class="sidebar-nav" id="topToolbar">
+      <button class="nav-item active" id="nav-dashboard" onclick="switchTab('dashboard')">
+        <span class="nav-icon">&#9638;</span><span class="nav-label">Dashboard</span>
+      </button>
+      <button class="nav-item" id="nav-search" onclick="switchTab('search')">
+        <span class="nav-icon">&#128269;</span><span class="nav-label">Search</span>
+      </button>
+      <button class="nav-item" id="nav-valuator" onclick="switchTab('valuator')">
+        <span class="nav-icon">&#128200;</span><span class="nav-label">Land Valuator</span>
+      </button>
+      <div class="toolbar-divider"></div>
+      <button class="nav-item" id="nav-tools" onclick="switchTab('tools')">
+        <span class="nav-icon">&#128295;</span><span class="nav-label">Tools</span>
+      </button>
+      <button class="nav-item" id="nav-shortlist" onclick="switchTab('shortlist')">
+        <span class="nav-icon">&#10084;</span><span class="nav-label">Shortlist</span>
+        <span class="nav-badge" id="badge-shortlist"></span>
+      </button>
+      <button class="nav-item" id="nav-cobroker" onclick="switchTab('cobroker')">
+        <span class="nav-icon">&#129309;</span><span class="nav-label">Co-Broker</span>
+        <span class="nav-badge" id="badge-cobroker"></span>
+      </button>
+      <div class="toolbar-divider"></div>
+      <button class="nav-item" id="nav-settings" onclick="switchTab('settings')">
+        <span class="nav-icon">&#9881;</span><span class="nav-label">Settings</span>
+      </button>
+    </nav>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="app-main">
+
   <!-- HEADER -->
   <div class="app-header">
-    <div class="hdr-left">
-      <div class="hdr-logo">
-        <svg viewBox="0 0 40 40" fill="none">
-          <path d="M20 4L28 12H24V22H16V12H12L20 4Z" fill="#c9a84c"/>
-          <path d="M10 24H30V32C30 33.1 29.1 34 28 34H12C10.9 34 10 33.1 10 32V24Z" fill="rgba(255,255,255,0.9)"/>
-          <rect x="17" y="26" width="6" height="8" rx="0.5" fill="#1a6b4a"/>
-        </svg>
-      </div>
-      <div class="hdr-text">
-        <h1>Tobago Property Finder</h1>
-        <div id="agentTag" style="display:none"></div>
-      </div>
-    </div>
+    <div class="hdr-left" id="hdrPageTitle"></div>
     <div class="hdr-right" style="display:flex;align-items:center;gap:8px;">
       <div class="offline-badge" id="offlineBadge">OFFLINE</div>
       <button class="dark-toggle" id="darkToggle" onclick="toggleDark()" title="Toggle dark mode">&#9790;</button>
@@ -1611,7 +1701,7 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
         <div class="agent-dropdown" id="agentDropdown">
           <div class="dd-header">
             <div class="dd-header-name" id="ddName">Agent</div>
-            <div class="dd-header-agency" id="ddAgency">Tobago Property Finder</div>
+            <div class="dd-header-agency" id="ddAgency">BrokerBuddy</div>
             <div class="dd-header-status"><div class="dd-status-dot"></div>Active</div>
           </div>
           <div class="dd-item" onclick="goSettings()"><span class="dd-icon">&#9881;</span>Settings &amp; Profile</div>
@@ -1626,37 +1716,8 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
     </div>
   </div>
 
-  <!-- TOP TOOLBAR -->
-  <div class="top-toolbar" id="topToolbar">
-    <button class="nav-item active" id="nav-dashboard" onclick="switchTab('dashboard')">
-      <span class="nav-icon">&#9638;</span><span class="nav-label">Dashboard</span>
-    </button>
-    <button class="nav-item" id="nav-search" onclick="switchTab('search')">
-      <span class="nav-icon">&#128269;</span><span class="nav-label">Search</span>
-    </button>
-    <button class="nav-item" id="nav-valuator" onclick="switchTab('valuator')">
-      <span class="nav-icon">&#128200;</span><span class="nav-label">Land Valuator</span>
-    </button>
-    <div class="toolbar-divider"></div>
-    <button class="nav-item" id="nav-tools" onclick="switchTab('tools')">
-      <span class="nav-icon">&#128295;</span><span class="nav-label">Tools</span>
-    </button>
-    <button class="nav-item" id="nav-shortlist" onclick="switchTab('shortlist')">
-      <span class="nav-icon">&#10084;</span><span class="nav-label">Shortlist</span>
-      <span class="nav-badge" id="badge-shortlist"></span>
-    </button>
-    <button class="nav-item" id="nav-cobroker" onclick="switchTab('cobroker')">
-      <span class="nav-icon">&#129309;</span><span class="nav-label">Co-Broker</span>
-      <span class="nav-badge" id="badge-cobroker"></span>
-    </button>
-    <div class="toolbar-divider"></div>
-    <button class="nav-item" id="nav-settings" onclick="switchTab('settings')">
-      <span class="nav-icon">&#9881;</span><span class="nav-label">Settings</span>
-    </button>
-  </div>
-
   <!-- WATERMARK -->
-  <div class="watermark">Tobago Property Finder &nbsp;&bull;&nbsp; Agent Portal &nbsp;&bull;&nbsp; v4.0</div>
+  <div class="watermark">BrokerBuddy &nbsp;&bull;&nbsp; Agent Portal &nbsp;&bull;&nbsp; v4.0</div>
 
   <!-- SCROLL AREA -->
   <div class="app-scroll" id="appScroll">
@@ -2222,7 +2283,7 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
 
   </div><!-- end app-scroll -->
 
-
+  </div><!-- end app-main -->
 
 </div><!-- end appScreen -->
 
@@ -3289,9 +3350,9 @@ function removeFromShortlist(id) {
 }
 function shareShortlist() {
   if (!shortlist.length) return;
-  var lines=['\uD83C\uDFE0 PROPERTY SHORTLIST','Tobago Property Finder',''];
+  var lines=['\uD83C\uDFE0 PROPERTY SHORTLIST','BrokerBuddy',''];
   shortlist.forEach(function(s,i){lines.push((i+1)+'. '+s.title);lines.push('   '+s.price);if(s.loc)lines.push('   '+s.loc);if(s.url)lines.push('   '+s.url);lines.push('');});
-  lines.push('Tobago Property Finder \u2014 '+new Date().toLocaleDateString());
+  lines.push('BrokerBuddy \u2014 '+new Date().toLocaleDateString());
   window.open('https://wa.me/?text='+encodeURIComponent(lines.join('\n')),'_blank');
 }
 function renderShortlist() {
@@ -3426,7 +3487,7 @@ function runValuator() {
   var confDotsHtml = [1,2,3,4,5].map(function(i){ return '<div class="conf-dot'+(i<=confFilled?' filled':'')+'"></div>'; }).join('');
 
   // WA message
-  var waLines = ['\uD83C\uDFE0 TOBAGO LAND VALUATION ESTIMATE','Tobago Property Finder','','\uD83D\uDCCD '+loc.replace('|',' — ')+', Tobago','\uD83D\uDCCF Size: '+Number(size).toLocaleString()+' sq ft','Tenure: '+(tenure==='leasehold'?'Leasehold':'Freehold'),'','\uD83D\uDCB0 ESTIMATED VALUE RANGE','Min:  '+fmtPrice(minVal)+'  (USD$'+Math.round(minVal/USD).toLocaleString()+')', 'Avg:  '+fmtPrice(avgVal)+'  (USD$'+Math.round(avgVal/USD).toLocaleString()+')', 'Max:  '+fmtPrice(maxVal)+'  (USD$'+Math.round(maxVal/USD).toLocaleString()+')','','\uD83D\uDCCA Avg TT$'+avgPSF+'/sqft  (USD$'+Math.round(avgPSF/USD)+'/sqft)',confText,'Based on '+d.pts+' comparable listing'+(d.pts!==1?'s':''),'','\u26A0\uFE0F Asking price benchmark only. Actual sales 5-15% lower.'];
+  var waLines = ['\uD83C\uDFE0 TOBAGO LAND VALUATION ESTIMATE','BrokerBuddy','','\uD83D\uDCCD '+loc.replace('|',' — ')+', Tobago','\uD83D\uDCCF Size: '+Number(size).toLocaleString()+' sq ft','Tenure: '+(tenure==='leasehold'?'Leasehold':'Freehold'),'','\uD83D\uDCB0 ESTIMATED VALUE RANGE','Min:  '+fmtPrice(minVal)+'  (USD$'+Math.round(minVal/USD).toLocaleString()+')', 'Avg:  '+fmtPrice(avgVal)+'  (USD$'+Math.round(avgVal/USD).toLocaleString()+')', 'Max:  '+fmtPrice(maxVal)+'  (USD$'+Math.round(maxVal/USD).toLocaleString()+')','','\uD83D\uDCCA Avg TT$'+avgPSF+'/sqft  (USD$'+Math.round(avgPSF/USD)+'/sqft)',confText,'Based on '+d.pts+' comparable listing'+(d.pts!==1?'s':''),'','\u26A0\uFE0F Asking price benchmark only. Actual sales 5-15% lower.'];
   var waMsg = encodeURIComponent(waLines.join('\n'));
 
   area.innerHTML =
@@ -3723,7 +3784,7 @@ function updateDropdownProfile() {
   if (avatarEl)  avatarEl.textContent  = initial;
   if (nameEl)    nameEl.textContent    = name;
   if (ddNameEl)  ddNameEl.textContent  = name + (profile.name && profile.name !== name ? ' (' + profile.name + ')' : '');
-  if (ddAgency)  ddAgency.textContent  = profile.agency || 'Tobago Property Finder';
+  if (ddAgency)  ddAgency.textContent  = profile.agency || 'BrokerBuddy';
 }
 
 /* saveSettings updated inline */
@@ -4247,7 +4308,7 @@ function renderValResult(res, calPct) {
 
   var waLines = [
     '\uD83C\uDFE0 TOBAGO LAND VALUATION',
-    'Tobago Property Finder \u2014 Agent Estimate',
+    'BrokerBuddy \u2014 Agent Estimate',
     '',
     '\uD83D\uDCCD ' + res.locLabel + ', Tobago',
     '\uD83D\uDCCF ' + Number(res.size).toLocaleString() + ' sq ft \u00B7 ' + res.tenure,
@@ -4530,7 +4591,7 @@ function shareClientSl(contactId) {
   var lines = [
     '\uD83C\uDFE0 PROPERTY SHORTLIST',
     'Prepared for: ' + clientName,
-    'By: Tobago Property Finder',
+    'By: BrokerBuddy',
     ''
   ];
   props.forEach(function(p, i) {
@@ -4540,7 +4601,7 @@ function shareClientSl(contactId) {
     if (p.url) lines.push('   \uD83D\uDD17 ' + p.url);
     lines.push('');
   });
-  lines.push('Tobago Property Finder \u2014 ' + new Date().toLocaleDateString('en-TT', {day:'numeric',month:'short',year:'numeric'}));
+  lines.push('BrokerBuddy \u2014 ' + new Date().toLocaleDateString('en-TT', {day:'numeric',month:'short',year:'numeric'}));
 
   var msg = encodeURIComponent(lines.join('\n'));
   var phone = client ? client.phone : '';
