@@ -1784,12 +1784,9 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
           <div class="repo-bar-top"><span class="repo-title">&#128230; Repository</span><span class="repo-status empty" id="repoStatus">No data</span></div>
           <div class="repo-meta" id="repoMeta">Searches 9 sites — refresh weekly</div>
           <div class="repo-btns">
-            <button class="repo-refresh-btn" id="repoRefreshBtn" onclick="repoRefresh()">&#8635; Refresh all listings</button>
-            <button class="repo-clear-btn" onclick="repoClear()">&#128465;</button>
+            <button class="repo-refresh-btn" id="syncBtn" onclick="sharedRepoSync(true)">&#127760; Sync shared repository</button>
+            <button class="repo-clear-btn" onclick="repoClear()" title="Clear cached listings">&#128465;</button>
           </div>
-          <button class="repo-clear-btn" id="syncBtn" onclick="sharedRepoSync(true)" style="width:100%;margin-top:7px;background:rgba(30,122,82,.08);color:var(--forest-l);border-color:rgba(30,122,82,.2);">&#127760; Sync shared repository</button>
-          <button class="repo-clear-btn" id="diagBtn" onclick="runDiagnostic()" style="width:100%;margin-top:7px;background:var(--gold-pale);color:#7A5010;border-color:rgba(196,154,60,.3);">&#129514; Test sites (diagnostic)</button>
-          <div id="diagResults"></div>
         </div>
         <div id="searchHistoryBar"></div>
         <div class="filters-card">
