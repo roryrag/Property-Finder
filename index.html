@@ -387,6 +387,14 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
 .dash-repo-row{display:flex;justify-content:space-between;font-size:12.5px;padding:7px 0;border-bottom:1px solid var(--border-l)}
 .dash-repo-row:last-child{border-bottom:none}
 .dash-repo-row span{color:var(--ink-l)}.dash-repo-row b{color:var(--ink);font-weight:600}
+.dash-deal{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--border-l);cursor:pointer;}
+.dash-deal:last-child{border-bottom:none;}
+.dash-deal:hover .dash-deal-tx b{color:var(--gold-l);}
+.dash-deal-tx{min-width:0;}
+.dash-deal-tx b{font-size:13px;color:var(--ink);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dash-deal-tx span{font-size:11px;color:var(--ink-l);}
+.dash-deal-r{text-align:right;flex-shrink:0;}
+.dash-deal-pr{font-family:'Playfair Display',serif;font-size:15px;font-weight:600;color:var(--ink);margin-bottom:3px;}
 @media(max-width:900px){.dash{padding:16px}.dash-kpis{grid-template-columns:repeat(2,1fr)}.dash-cols{grid-template-columns:1fr}.dash-lst{grid-template-columns:1fr}}
 
 /* ════════════════════════════════
@@ -726,6 +734,12 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
 .rstat b{display:block;font-family:'Playfair Display',serif;font-size:19px;font-weight:600;color:var(--ink);line-height:1.1;}
 .rstat span{font-size:11px;color:var(--ink-l);text-transform:uppercase;letter-spacing:.06em;}
 @media(max-width:680px){.result-stats{grid-template-columns:repeat(2,1fr);}}
+/* Results sort bar */
+.result-sort{display:flex;align-items:center;gap:7px;margin-bottom:16px;flex-wrap:wrap;}
+.result-sort>span{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-l);margin-right:2px;}
+.result-sort button{font-family:inherit;font-size:12px;font-weight:600;color:var(--ink-l);background:var(--white);border:1px solid var(--border);border-radius:20px;padding:6px 13px;cursor:pointer;transition:var(--t);}
+.result-sort button:hover{border-color:var(--gold);color:var(--ink);}
+.result-sort button.active{background:linear-gradient(135deg,rgba(201,162,75,.18),rgba(201,162,75,.05));border-color:var(--gold);color:var(--gold-l);}
 /* Deal context badge on cards */
 .deal-badge{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.03em;padding:4px 9px;border-radius:20px;backdrop-filter:blur(6px);}
 .deal-badge.below{background:rgba(46,157,103,.9);color:#fff;}
@@ -1658,6 +1672,10 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
               <div class="dash-ph"><h3>Latest listings</h3><a onclick="switchTab('search')">Open search &rarr;</a></div>
               <div class="dash-lst" id="dashLatest"></div>
             </section>
+            <section class="dash-panel">
+              <div class="dash-ph"><h3>&#11088; Best value finds</h3><a onclick="switchTab('search')">Open search &rarr;</a></div>
+              <div id="dashDeals"></div>
+            </section>
           </div>
           <div class="dash-rail">
             <section class="dash-panel">
@@ -2398,6 +2416,7 @@ function renderDashboard() {
   var priced = repo.filter(function(p){ return Number(p.price) > 0; });
   var total = repo.length, withPrice = priced.length;
   var avg = withPrice ? priced.reduce(function(a,p){ return a + Number(p.price); }, 0) / withPrice : 0;
+  computeTypeAvg(repo);  // powers deal badges + best-value finds below
 
   var kpis = document.getElementById('dashKpis');
   if (kpis) kpis.innerHTML =
@@ -2420,8 +2439,18 @@ function renderDashboard() {
   var lEl = document.getElementById('dashLatest');
   if (lEl) lEl.innerHTML = latest.length ? latest.map(function(p){
     var ic = ICON[(p.type||'').toLowerCase()] || '🏠';
-    return '<div class="dash-lcard" onclick="switchTab(\'search\')"><div class="im">'+ic+'<span class="tg">'+(p.type||'property')+'</span></div><div class="bd"><div class="pr">'+fmtPrice(p.price)+'</div><div class="ti">'+(p.title||'Property')+'</div><div class="lo">📍 '+(p.location||'Tobago')+'</div></div></div>';
+    return '<div class="dash-lcard" onclick="switchTab(\'search\')"><div class="im">'+ic+'<span class="tg">'+(p.type||'property')+'</span></div><div class="bd"><div class="pr">'+fmtPrice(p.price)+'</div><div class="ti">'+(p.title||'Property')+'</div><div class="lo">📍 '+(p.location||'Tobago')+'</div><div style="margin-top:6px">'+dealBadge(p)+'</div></div></div>';
   }).join('') : '<div class="dash-ok">No listings yet — sync the repository to populate.</div>';
+
+  // Best value finds — priced listings furthest below their type average
+  var deals = priced.map(function(p){ var a=_typeAvg[(p.type||'').toLowerCase()]; return a ? {p:p, r:Number(p.price)/a} : null; })
+    .filter(function(d){ return d && d.r <= 0.9; })
+    .sort(function(a,b){ return a.r - b.r; }).slice(0, 5);
+  var dEl = document.getElementById('dashDeals');
+  if (dEl) dEl.innerHTML = deals.length ? deals.map(function(d){
+    var p = d.p, pct = Math.round((1-d.r)*100);
+    return '<div class="dash-deal" onclick="switchTab(\'search\')"><div class="dash-deal-tx"><b>'+(p.title||'Property')+'</b><span>📍 '+(p.location||'Tobago')+' · '+(p.type||'')+'</span></div><div class="dash-deal-r"><div class="dash-deal-pr">'+fmtPrice(p.price)+'</div><span class="deal-badge below">▼ '+pct+'% below avg</span></div></div>';
+  }).join('') : '<div class="dash-ok">No standout deals right now — listings are near market average.</div>';
 
   try { contactsLoad(); } catch(e){} try { clientSlLoad(); } catch(e){} try { cbLoad(); } catch(e){}
   var clientSaved = 0; var csl = (typeof clientShortlists !== 'undefined' && clientShortlists) || {};
@@ -2939,7 +2968,7 @@ startSearch = async function() {
     allResults = filtered;
     saveToHistory(filters); trackUsage('search');
     var area = document.getElementById('resultsArea');
-    area.innerHTML = '<div class="mode-badge local">\u26A1 Local repository &mdash; instant &amp; free</div><div id="resultCount" class="results-count"></div><div id="resultStats"></div><div id="cardList"></div>';
+    area.innerHTML = '<div class="mode-badge local">\u26A1 Local repository &mdash; instant &amp; free</div><div id="resultCount" class="results-count"></div><div id="resultStats"></div><div id="resultSort"></div><div id="cardList"></div>';
     renderResults(filtered);
     return;
   }
@@ -2957,7 +2986,7 @@ startSearch = async function() {
     '<div class="mode-badge live">\u26A1 Live API search &mdash; uses credits</div>' +
     '<div class="skeleton-wrap">' + [1,2,3].map(function(){ return '<div class="skel-card"><div class="skel-img"></div><div class="skel-body"><div class="skel-line w80"></div><div class="skel-line w60"></div><div class="skel-line w40"></div></div></div>'; }).join('') + '</div>' +
     '<div class="status-card"><div class="status-top"><div class="spinner"></div><span>Searching 6 sites in parallel...</span></div><div class="site-dots">'+dotsHtml+'</div></div>' +
-    '<div id="resultCount" class="results-count" style="display:none"></div><div id="resultStats"></div><div id="cardList"></div>';
+    '<div id="resultCount" class="results-count" style="display:none"></div><div id="resultStats"></div><div id="resultSort"></div><div id="cardList"></div>';
 
   function searchTask(site) {
     return searchOneSite(apiKey, filters, site).then(function(listings) {
@@ -2989,7 +3018,7 @@ startSearch = async function() {
 
 function showCachedResults(listings) {
   var area=document.getElementById('resultsArea');
-  area.innerHTML='<div class="mode-badge cached">\u26A1 Cached results &mdash; <span style="cursor:pointer;text-decoration:underline" onclick="clearCacheSearch()">Refresh</span></div><div id="resultCount" class="results-count"></div><div id="resultStats"></div><div id="cardList"></div>';
+  area.innerHTML='<div class="mode-badge cached">\u26A1 Cached results &mdash; <span style="cursor:pointer;text-decoration:underline" onclick="clearCacheSearch()">Refresh</span></div><div id="resultCount" class="results-count"></div><div id="resultStats"></div><div id="resultSort"></div><div id="cardList"></div>';
   renderResults(listings);
 }
 function clearCacheSearch() { var f=getFilters(); delete searchCache[cacheKey(f)]; startSearch(); }
@@ -3024,14 +3053,19 @@ function computeTypeAvg(listings) {
   listings.forEach(function(p){ var pr = Number(p.price); if (pr > 0) { var t=(p.type||'other').toLowerCase(); (g[t]=g[t]||{s:0,n:0}); g[t].s+=pr; g[t].n++; } });
   Object.keys(g).forEach(function(t){ if (g[t].n >= 3) _typeAvg[t] = g[t].s / g[t].n; }); // need 3+ for a meaningful avg
 }
-function dealBadge(p) {
-  var avg = _typeAvg[(p.type||'').toLowerCase()];
-  if (!avg || !(Number(p.price) > 0)) return '';
-  var r = p.price / avg;
-  if (r <= 0.9)  return '<span class="deal-badge below">▼ Below '+(p.type||'type')+' avg</span>';
-  if (r >= 1.12) return '<span class="deal-badge above">▲ Above '+(p.type||'type')+' avg</span>';
+function dealRatioBadge(value, avg, lowLabel, highLabel) {
+  if (!avg || !(value > 0)) return '';
+  var r = value / avg;
+  if (r <= 0.9)  return '<span class="deal-badge below">▼ '+lowLabel+'</span>';
+  if (r >= 1.12) return '<span class="deal-badge above">▲ '+highLabel+'</span>';
   return '<span class="deal-badge near">≈ Around avg</span>';
 }
+function dealBadge(p) {
+  var t = (p.type||'').toLowerCase();
+  return dealRatioBadge(Number(p.price), _typeAvg[t], 'Below '+(p.type||'type')+' avg', 'Above '+(p.type||'type')+' avg');
+}
+// Ensure _typeAvg is populated from the repo for non-search contexts (shortlist).
+function ensureTypeAvg() { if (!Object.keys(_typeAvg).length) computeTypeAvg(repoLoad() || []); }
 function _rstat(v,l){ return '<div class="rstat"><b>'+v+'</b><span>'+l+'</span></div>'; }
 function buildResultStats(listings) {
   var priced = listings.filter(function(p){ return Number(p.price) > 0; });
@@ -3045,12 +3079,33 @@ function buildResultStats(listings) {
     _rstat(priced.length, 'priced') +
   '</div>';
 }
+var _lastResults = [];
+function sortBarHtml() {
+  return '<div class="result-sort"><span>Sort</span>' +
+    '<button class="active" onclick="sortResults(\'relevance\',this)">Relevance</button>' +
+    '<button onclick="sortResults(\'value\',this)">★ Best value</button>' +
+    '<button onclick="sortResults(\'plow\',this)">Price ↑</button>' +
+    '<button onclick="sortResults(\'phigh\',this)">Price ↓</button></div>';
+}
 function paintResults(listings) {
+  _lastResults = listings;
   computeTypeAvg(listings);
   var list = document.getElementById('cardList');
   if (list) list.innerHTML = listings.map(makeCard).join('');
   var rs = document.getElementById('resultStats');
   if (rs) rs.innerHTML = buildResultStats(listings);
+  var so = document.getElementById('resultSort');
+  if (so) so.innerHTML = (listings.length > 1) ? sortBarHtml() : '';
+}
+function _dealScore(p){ var a=_typeAvg[(p.type||'').toLowerCase()]; return (a && Number(p.price)>0) ? Number(p.price)/a : 9; }
+function sortResults(mode, btn) {
+  var arr = _lastResults.slice();  // _lastResults stays in relevance order
+  if (mode==='value')      arr.sort(function(a,b){ return _dealScore(a)-_dealScore(b); });
+  else if (mode==='plow')  arr.sort(function(a,b){ return (Number(a.price)||9e15)-(Number(b.price)||9e15); });
+  else if (mode==='phigh') arr.sort(function(a,b){ return (Number(b.price)||0)-(Number(a.price)||0); });
+  var list = document.getElementById('cardList');
+  if (list) list.innerHTML = arr.map(makeCard).join('');
+  if (btn) { var bar=btn.parentNode; if(bar) bar.querySelectorAll('button').forEach(function(b){ b.classList.remove('active'); }); btn.classList.add('active'); }
 }
 
 function renderResults(listings) {
@@ -3147,11 +3202,11 @@ function makeCard(p) {
   c += '<button class="prop-action-btn similar" onclick="searchSimilar('+"'"+((p.location||'Tobago').replace(/'/g,''))+"','"+((p.type||'').replace(/'/g,''))+"'"+')">\uD83D\uDD0D Similar</button>';
   c += '</div>';
   c += '<div class="prop-actions">';
-  c += '<button class="prop-action-btn shortlist" onclick="openSlPicker(this)" data-title="'+(p.title||'Property').replace(/"/g,'&quot;')+'" data-price="'+price+'" data-loc="'+loc+'" data-url="'+(p.url||'').replace(/"/g,'&quot;')+'" data-wa="'+waMsg+'">\u2764 Add</button>';
+  c += '<button class="prop-action-btn shortlist" onclick="openSlPicker(this)" data-title="'+(p.title||'Property').replace(/"/g,'&quot;')+'" data-price="'+price+'" data-loc="'+loc+'" data-url="'+(p.url||'').replace(/"/g,'&quot;')+'" data-type="'+(propType||'').replace(/"/g,'&quot;')+'" data-pricen="'+(Number(p.price)||0)+'" data-wa="'+waMsg+'">\u2764 Add</button>';
   c += '<button class="prop-action-btn cobroker" onclick="addCoBrokerRequest(this,\''+cbData+'\')" data-prop="'+cbData+'">\uD83E\uDD1D Co-Broker</button>';
   c += '</div>';
   c += '<div class="prop-actions" style="grid-template-columns:1fr;">';
-  c += '<button class="prop-action-btn shortlist" onclick="openSlPicker(this)" data-clientonly="1" data-title="'+(p.title||'Property').replace(/"/g,'&quot;')+'" data-price="'+price+'" data-loc="'+loc+'" data-url="'+(p.url||'').replace(/"/g,'&quot;')+'" data-wa="'+waMsg+'">\uD83D\uDC64 Add to client</button>';
+  c += '<button class="prop-action-btn shortlist" onclick="openSlPicker(this)" data-clientonly="1" data-title="'+(p.title||'Property').replace(/"/g,'&quot;')+'" data-price="'+price+'" data-loc="'+loc+'" data-url="'+(p.url||'').replace(/"/g,'&quot;')+'" data-type="'+(propType||'').replace(/"/g,'&quot;')+'" data-pricen="'+(Number(p.price)||0)+'" data-wa="'+waMsg+'">\uD83D\uDC64 Add to client</button>';
   c += '</div>';
   var _vfData = JSON.stringify({title:p.title||'',site:p.site||'',url:p.url||''}).replace(/"/g,'&quot;');
   c += '<button class="prop-action-btn visit" style="width:100%;margin-bottom:8px;" onclick="verifyListing(this,\''+_vfData+'\')">\uD83D\uDD0E Verify \u2014 still available?</button>';
@@ -3177,9 +3232,11 @@ function addToShortlist(btn, waMsg) {
   var price = btn.getAttribute('data-price') || '';
   var loc   = btn.getAttribute('data-loc')   || '';
   var url   = btn.getAttribute('data-url')   || '';
+  var type  = btn.getAttribute('data-type')  || '';
+  var priceN= Number(btn.getAttribute('data-pricen')) || 0;
   var dup = shortlist.some(function(s){ return s.title===title && s.price===price; });
   if (dup) { switchTab('shortlist'); return; }
-  shortlist.push({ id:Date.now(), title:title, price:price, loc:loc, url:url, wa:waMsg });
+  shortlist.push({ id:Date.now(), title:title, price:price, loc:loc, url:url, type:type, priceN:priceN, wa:waMsg });
   btn.textContent = '\u2665 Saved'; btn.classList.add('done');
   renderShortlist();
   var badge=document.getElementById('badge-shortlist');
@@ -3201,13 +3258,14 @@ function shareShortlist() {
 function renderShortlist() {
   var area=document.getElementById('shortlistArea');
   if (!area) return;
+  ensureTypeAvg();
   if (!shortlist.length) {
     area.innerHTML='<div class="empty-state"><div class="empty-icon">\u2764</div><div class="empty-text">Your shortlist is empty.<br>Add listings from Search.</div></div>';
     return;
   }
   var h='<div class="section-hdr">'+shortlist.length+' saved <span style="font-size:12px;color:var(--muted)">'+shortlist.length+' propert'+(shortlist.length===1?'y':'ies')+'</span></div>';
   shortlist.forEach(function(s){
-    h+='<div class="sl-card"><div class="sl-card-body"><div class="sl-card-title">'+s.title+'</div><div class="sl-card-price">'+s.price+'</div><div class="sl-card-meta">'+s.loc+'</div>'+listingLink(s.url)+'<div><button class="sl-add-client" onclick="openSlPicker(this)" data-clientonly="1" data-title="'+(s.title||'').replace(/"/g,'&quot;')+'" data-price="'+(s.price||'').replace(/"/g,'&quot;')+'" data-loc="'+(s.loc||'').replace(/"/g,'&quot;')+'" data-url="'+(s.url||'').replace(/"/g,'&quot;')+'" data-wa="'+(s.wa||'')+'">👤 Add to client</button></div></div><button class="sl-remove" onclick="removeFromShortlist('+s.id+')">&#10005;</button></div>';
+    h+='<div class="sl-card"><div class="sl-card-body"><div class="sl-card-title">'+s.title+'</div><div class="sl-card-price">'+s.price+' '+dealBadge({price:s.priceN,type:s.type})+'</div><div class="sl-card-meta">'+s.loc+'</div>'+listingLink(s.url)+'<div><button class="sl-add-client" onclick="openSlPicker(this)" data-clientonly="1" data-title="'+(s.title||'').replace(/"/g,'&quot;')+'" data-price="'+(s.price||'').replace(/"/g,'&quot;')+'" data-loc="'+(s.loc||'').replace(/"/g,'&quot;')+'" data-url="'+(s.url||'').replace(/"/g,'&quot;')+'" data-type="'+(s.type||'').replace(/"/g,'&quot;')+'" data-pricen="'+(s.priceN||0)+'" data-wa="'+(s.wa||'')+'">👤 Add to client</button></div></div><button class="sl-remove" onclick="removeFromShortlist('+s.id+')">&#10005;</button></div>';
   });
   h+='<div class="sl-actions"><button class="sl-clear-btn" onclick="shortlist=[];renderShortlist();document.getElementById(\'badge-shortlist\').classList.remove(\'show\');">\uD83D\uDDD1 Clear all</button><button class="btn-wa" onclick="shareShortlist()"><svg class="wa-icon" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Share All</button></div>';
   area.innerHTML = h;
@@ -4221,12 +4279,14 @@ async function fetchLiveComps(location, size) {
       }
     }
     if (!compsData.length) { liveArea.innerHTML = ''; return; }
+    var _psfs = compsData.map(function(c){ return c.psf_ttd || (c.price && c.size ? Math.round(c.price / parseSizeSqft(c.size)) : 0); }).filter(function(v){ return v > 0; });
+    var _avgPsf = _psfs.length ? _psfs.reduce(function(a,b){ return a+b; },0)/_psfs.length : 0;
     var html = '<div class="live-comps"><div class="live-comps-title">Current listings — ' + locBase + '<span style="font-size:11px;color:var(--ink-xl);">' + compsData.length + ' found</span></div>';
     compsData.forEach(function(c) {
       var psf = c.psf_ttd || (c.price && c.size ? Math.round(c.price / parseSizeSqft(c.size)) : 0);
       html +=
         '<div class="live-comp-item">' +
-          '<div class="live-comp-name">' + (c.title || 'Land listing') + '</div>' +
+          '<div class="live-comp-name">' + (c.title || 'Land listing') + ' ' + dealRatioBadge(psf, _avgPsf, 'Below avg PSF', 'Above avg PSF') + '</div>' +
           '<div class="live-comp-meta">' +
             (c.size ? '<span>' + c.size + '</span>' : '') +
             '<span>' + fmtPrice(c.price) + '</span>' +
@@ -4456,6 +4516,7 @@ function toggleClientSl(cardEl) {
 function renderClientShortlists() {
   clientSlLoad();
   contactsLoad();
+  ensureTypeAvg();
   var area = document.getElementById('clientShortlistArea');
   if (!area) return;
 
@@ -4492,7 +4553,7 @@ function renderClientShortlists() {
           '<div class="client-sl-prop">' +
             '<div class="client-sl-prop-body">' +
               '<div class="client-sl-prop-title">' + (p.title || 'Property') + '</div>' +
-              '<div class="client-sl-prop-price">' + (p.price || '') + '</div>' +
+              '<div class="client-sl-prop-price">' + (p.price || '') + ' ' + dealBadge({price:p.priceN, type:p.type}) + '</div>' +
               '<div class="client-sl-prop-loc">' + (p.loc || '') + '</div>' +
               listingLink(p.url) +
             '</div>' +
@@ -4523,6 +4584,8 @@ function openSlPicker(btn) {
     price : btn.getAttribute('data-price') || '',
     loc   : btn.getAttribute('data-loc')   || '',
     url   : btn.getAttribute('data-url')   || '',
+    type  : btn.getAttribute('data-type')  || '',
+    priceN: Number(btn.getAttribute('data-pricen')) || 0,
     wa    : btn.getAttribute('data-wa')    || ''
   };
   _slPickerProp = { prop: prop, btn: btn, clientOnly: btn.getAttribute('data-clientonly') === '1' };
@@ -4602,7 +4665,7 @@ function slPickerAddGeneral() {
 
   var dup = shortlist.some(function(s) { return s.title === p.title && s.price === p.price; });
   if (!dup) {
-    shortlist.push({ id: Date.now(), title: p.title, price: p.price, loc: p.loc, url: p.url || '', wa: p.wa });
+    shortlist.push({ id: Date.now(), title: p.title, price: p.price, loc: p.loc, url: p.url || '', type: p.type || '', priceN: p.priceN || 0, wa: p.wa });
     renderShortlist();
     var badge = document.getElementById('badge-shortlist');
     if (badge) { badge.textContent = shortlist.length; badge.classList.add('show'); }
