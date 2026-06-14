@@ -758,9 +758,18 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
 }
 .prop-card:hover{box-shadow:var(--shadow-md),0 0 0 1px var(--gold);transform:translateY(-5px);border-color:var(--gold);}
 @keyframes cardIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-/* Results fill the page as a responsive grid */
-#cardList{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:18px;align-items:start;}
-#cardList .prop-card{margin-bottom:0;}
+/* Property-type multi-select chips */
+.type-chips{display:flex;flex-wrap:wrap;gap:7px;}
+.type-chip{font-family:inherit;font-size:12.5px;font-weight:600;color:var(--ink-l);background:var(--white);border:1px solid var(--border);border-radius:20px;padding:7px 14px;cursor:pointer;transition:var(--t);}
+.type-chip:hover{border-color:var(--gold);color:var(--ink);}
+.type-chip.active{background:linear-gradient(135deg,rgba(201,162,75,.2),rgba(201,162,75,.05));border-color:var(--gold);color:var(--gold-l);}
+
+/* Results: one per line, full-width horizontal cards */
+#cardList{display:flex;flex-direction:column;gap:16px;}
+#cardList .prop-card{margin-bottom:0;flex-direction:row;align-items:stretch;}
+#cardList .prop-card-img{width:300px;height:auto;min-height:170px;flex-shrink:0;}
+#cardList .prop-card-body{flex:1;display:flex;flex-direction:column;}
+@media(max-width:680px){#cardList .prop-card{flex-direction:column;}#cardList .prop-card-img{width:100%;height:170px;}}
 .results-count{font-size:15px;margin-bottom:8px;}
 /* Data-rich results stats strip */
 .result-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;}
@@ -848,9 +857,15 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
   text-shadow:0 1px 6px rgba(0,0,0,.4);
 }
 .prop-card-loc{
-  font-size:11px;color:rgba(255,255,255,.65);
+  font-size:13px;color:rgba(255,255,255,.8);font-weight:600;
   margin-top:3px;display:flex;align-items:center;gap:3px;
 }
+/* Price — clearly shown, bold, prominent on the card header */
+.prop-card-price-tag{position:absolute;bottom:12px;left:14px;z-index:3;display:flex;align-items:baseline;gap:5px;}
+.prop-card-price-tag span{font-family:'Playfair Display',serif;font-size:25px;font-weight:700;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.55);line-height:1;letter-spacing:-.5px;}
+.prop-card-price-tag small{font-size:12px;font-weight:700;color:var(--gold-l);}
+#cardList .prop-card-title{padding:14px 14px 0;}
+#cardList .prop-card-loc{padding:2px 14px 0;}
 
 /* Card body */
 .prop-card-body{padding:14px 16px 16px;}
@@ -1761,8 +1776,21 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
               <div id="dashAttention"></div>
             </section>
             <section class="dash-panel">
-              <div class="dash-ph"><h3>Repository</h3><a onclick="sharedRepoSync(true)">Sync &rarr;</a></div>
+              <div class="dash-ph"><h3>Repository</h3><span class="repo-status empty" id="repoStatus" style="font-size:11px;">No data</span></div>
               <div id="dashRepo"></div>
+              <div class="repo-meta" id="repoMeta" style="display:none"></div>
+              <div class="repo-btns" style="margin-top:12px;">
+                <button class="repo-refresh-btn" id="syncBtn" onclick="sharedRepoSync(true)">&#127760; Sync shared repository</button>
+                <button class="repo-clear-btn" onclick="repoClear()" title="Clear cached listings">&#128465;</button>
+              </div>
+              <div class="api-setup" id="apiSetup" style="margin-top:14px;">
+                <p>&#128273; <strong>Optional:</strong> Add your Anthropic API key for live comps &amp; listing verification.</p>
+                <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-...">
+                <button class="btn-save-api" onclick="saveApiKey()">Save API Key &rarr;</button>
+              </div>
+              <div class="api-saved" id="apiSaved" style="display:none;margin-top:14px;">&#9989;&nbsp; API key active
+                <span style="margin-left:auto;font-size:11px;cursor:pointer;text-decoration:underline;color:var(--forest-l)" onclick="resetApiKey()">Change</span>
+              </div>
             </section>
           </div>
         </div>
@@ -1772,22 +1800,6 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
     <!-- SEARCH PANEL -->
     <div class="tab-content" id="panel-search">
       <div class="tab-inner">
-        <div class="api-setup" id="apiSetup">
-          <p>&#128273; <strong>One-time setup:</strong> Enter your Anthropic API key. Stored securely on this device.</p>
-          <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-...">
-          <button class="btn-save-api" onclick="saveApiKey()">Save API Key &rarr;</button>
-        </div>
-        <div class="api-saved" id="apiSaved" style="display:none">&#9989;&nbsp; API key active
-          <span style="margin-left:auto;font-size:11px;cursor:pointer;text-decoration:underline;color:var(--forest-m)" onclick="resetApiKey()">Change</span>
-        </div>
-        <div class="repo-bar" id="repoBar">
-          <div class="repo-bar-top"><span class="repo-title">&#128230; Repository</span><span class="repo-status empty" id="repoStatus">No data</span></div>
-          <div class="repo-meta" id="repoMeta">Searches 9 sites — refresh weekly</div>
-          <div class="repo-btns">
-            <button class="repo-refresh-btn" id="syncBtn" onclick="sharedRepoSync(true)">&#127760; Sync shared repository</button>
-            <button class="repo-clear-btn" onclick="repoClear()" title="Clear cached listings">&#128465;</button>
-          </div>
-        </div>
         <div id="searchHistoryBar"></div>
         <div class="filters-card">
           <div class="filters-hdr">
@@ -1798,11 +1810,15 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
             <div class="filter-group"><label>Max Price</label>
               <select id="maxPrice">
                 <option value="">Any price</option>
-                <option value="250000">TT$250k</option>
                 <option value="500000">TT$500k</option>
-                <option value="750000">TT$750k</option>
                 <option value="1000000">TT$1M</option>
+                <option value="1500000">TT$1.5M</option>
                 <option value="2000000">TT$2M</option>
+                <option value="2500000">TT$2.5M</option>
+                <option value="3000000">TT$3M</option>
+                <option value="3500000">TT$3.5M</option>
+                <option value="4000000">TT$4M</option>
+                <option value="4500000">TT$4.5M</option>
                 <option value="5000000">TT$5M+</option>
               </select>
             </div>
@@ -1816,16 +1832,15 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
                 <option value="5">5+</option>
               </select>
             </div>
-            <div class="filter-group"><label>Property Type</label>
-              <select id="propType">
-                <option value="">All types</option>
-                <option value="house">House</option>
-                <option value="villa">Villa</option>
-                <option value="apartment">Apartment</option>
-                <option value="condo">Condo</option>
-                <option value="land">Land</option>
-                <option value="commercial">Commercial</option>
-              </select>
+            <div class="filter-group" style="grid-column:1/-1;"><label>Property Type <span style="color:var(--ink-l);font-weight:400;text-transform:none;letter-spacing:0;">(select one or more)</span></label>
+              <div class="type-chips" id="typeChips">
+                <button type="button" class="type-chip" data-type="house" onclick="toggleTypeChip(this)">House</button>
+                <button type="button" class="type-chip" data-type="villa" onclick="toggleTypeChip(this)">Villa</button>
+                <button type="button" class="type-chip" data-type="apartment" onclick="toggleTypeChip(this)">Apartment</button>
+                <button type="button" class="type-chip" data-type="condo" onclick="toggleTypeChip(this)">Condo</button>
+                <button type="button" class="type-chip" data-type="land" onclick="toggleTypeChip(this)">Land</button>
+                <button type="button" class="type-chip" data-type="commercial" onclick="toggleTypeChip(this)">Commercial</button>
+              </div>
             </div>
             <div class="filter-group"><label>Location</label>
               <select id="location">
@@ -2477,7 +2492,7 @@ function _dashKpi(lbl,val,desc,cls){ return '<div class="dash-kpi"><div class="l
 function _dashPipe(ic,title,sub,n){ return '<div class="dash-pipe-i"><div class="ic">'+ic+'</div><div class="tx"><b>'+title+'</b><span>'+sub+'</span></div><div class="n">'+n+'</div></div>'; }
 function _dashRow(l,v){ return '<div class="dash-repo-row"><span>'+l+'</span><b>'+v+'</b></div>'; }
 function renderDashboard() {
-  var repo = repoLoad() || [];
+  var repo = excludeInvalid(repoLoad() || []);
   var agent = sessionStorage.getItem('agentName') || 'Agent';
   var hr = new Date().getHours();
   var greet = hr < 12 ? 'Good morning' : (hr < 18 ? 'Good afternoon' : 'Good evening');
@@ -2635,7 +2650,7 @@ function getHistory() {
 function saveToHistory(filters) {
   var label = [];
   if (filters.location) label.push(filters.location);
-  if (filters.type) label.push(filters.type);
+  if (filters.types && filters.types.length) label.push(filters.types.join('/'));
   if (filters.beds) label.push(filters.beds + '+bed');
   if (filters.pool) label.push('pool');
   if (!label.length) label.push('All properties');
@@ -2668,7 +2683,7 @@ function applyHistory(i) {
   var setVal = function(id, val) { var el = document.getElementById(id); if (el) el.value = val || ''; };
   setVal('maxPrice', f.maxPrice);
   setVal('beds', f.beds);
-  setVal('propType', f.type);
+  setSelectedTypes(f.types || (f.type ? [f.type] : []));
   setVal('location', f.location);
   setVal('baths', f.baths);
   setVal('keywordDesc', f.keywordDesc);
@@ -2687,12 +2702,15 @@ function removeHistory(e, i) {
 /* ══════════════════════════════════════
    FILTERS
 ══════════════════════════════════════ */
+function toggleTypeChip(btn){ btn.classList.toggle('active'); }
+function getSelectedTypes(){ return Array.prototype.slice.call(document.querySelectorAll('#typeChips .type-chip.active')).map(function(c){ return c.getAttribute('data-type'); }); }
+function setSelectedTypes(types){ types = types || []; document.querySelectorAll('#typeChips .type-chip').forEach(function(c){ c.classList.toggle('active', types.indexOf(c.getAttribute('data-type'))!==-1); }); }
 function getFilters() {
   return {
     maxPrice    : document.getElementById('maxPrice').value,
     beds        : document.getElementById('beds').value,
     baths       : document.getElementById('baths').value,
-    type        : document.getElementById('propType').value,
+    types       : getSelectedTypes(),
     location    : document.getElementById('location').value,
     pool        : document.getElementById('poolFilter').checked,
     propAge     : (document.getElementById('propAge') ? document.getElementById('propAge').value : ''),
@@ -2750,7 +2768,7 @@ function buildPromptForSite(f, site) {
   var terms = [];
   if (f.beds) terms.push(f.beds+' bedroom');
   if (f.pool) terms.push('pool');
-  if (f.type) terms.push(f.type);
+  if (f.types && f.types.length) terms.push(f.types.join(' '));
   if (f.location) terms.push(f.location);
   if (f.keywordDesc) terms.push(f.keywordDesc);
   if (f.propAge === 'new') terms.push('new construction');
@@ -2760,7 +2778,7 @@ function buildPromptForSite(f, site) {
   if (f.maxPrice)    criteria.push('max TT$'+Number(f.maxPrice).toLocaleString());
   if (f.beds)        criteria.push(f.beds+'+bed');
   if (f.baths)       criteria.push(f.baths+'+bath');
-  if (f.type)        criteria.push(f.type);
+  if (f.types && f.types.length) criteria.push(f.types.join(', '));
   if (f.location)    criteria.push(f.location+' Tobago');
   if (f.pool)        criteria.push('pool required');
   if (f.keywordDesc) criteria.push(f.keywordDesc);
@@ -2838,7 +2856,7 @@ function scoreAndSort(listings, filters) {
     var score = p.relevance_score || 5;
     var hay = ((p.title||'')+' '+(p.description||'')+' '+(p.features||[]).join(' ')).toLowerCase();
     if (filters.keywordDesc) { filters.keywordDesc.toLowerCase().split(/[\s,]+/).forEach(function(k){ if(k && hay.indexOf(k)!==-1) score+=1; }); }
-    if (filters.type && (p.type||'').toLowerCase()===filters.type) score+=1;
+    if (filters.types && filters.types.length && filters.types.indexOf((p.type||'').toLowerCase())!==-1) score+=1;
     if (filters.location && (p.location||'').toLowerCase().includes(filters.location.toLowerCase())) score+=1;
     if (filters.pool && p.pool) score+=2;
     p._score = Math.min(10, score);
@@ -2847,7 +2865,7 @@ function scoreAndSort(listings, filters) {
 }
 
 var searchCache = {};
-function cacheKey(f) { return [f.maxPrice,f.beds,f.baths,f.type,f.location,f.pool,f.keywordDesc,f.mustInclude].join('|'); }
+function cacheKey(f) { return [f.maxPrice,f.beds,f.baths,(f.types||[]).join(','),f.location,f.pool,f.keywordDesc,f.mustInclude].join('|'); }
 
 startSearch = async function() {
   var apiKey = localStorage.getItem('anthropic_key');
@@ -2856,13 +2874,13 @@ startSearch = async function() {
   var ck = cacheKey(filters);
 
   // Repo search
-  var repo = repoLoad();
+  var repo = excludeInvalid(repoLoad());
   if (repo && repo.length > 0) {
     var filtered = repo.filter(function(p) {
       if (filters.maxPrice && p.price > Number(filters.maxPrice)) return false;
       if (filters.beds && (p.beds||0) < Number(filters.beds)) return false;
       if (filters.baths && (p.baths||0) < Number(filters.baths)) return false;
-      if (filters.type && (p.type||'').toLowerCase()!==filters.type) return false;
+      if (filters.types && filters.types.length && filters.types.indexOf((p.type||'').toLowerCase())===-1) return false;
       if (filters.location && !(p.location||'').toLowerCase().includes(filters.location.toLowerCase())) return false;
       if (filters.pool && !p.pool) return false;
       if (filters.mustInclude) { var h=((p.title||'')+' '+(p.description||'')+' '+(p.features||[]).join(' ')).toLowerCase(); if(h.indexOf(filters.mustInclude)===-1) return false; }
@@ -2873,7 +2891,7 @@ startSearch = async function() {
     allResults = filtered;
     saveToHistory(filters); trackUsage('search');
     var area = document.getElementById('resultsArea');
-    area.innerHTML = '<div class="mode-badge local">\u26A1 Local repository &mdash; instant &amp; free</div><div id="resultCount" class="results-count"></div><div id="resultStats"></div><div id="resultSort"></div><div id="cardList"></div>';
+    area.innerHTML = '<div id="resultCount" class="results-count"></div><div id="resultStats"></div><div id="resultSort"></div><div id="cardList"></div>';
     renderResults(filtered);
     return;
   }
@@ -2943,6 +2961,22 @@ function listingLink(url) {
   if (!url || String(url).indexOf('http') !== 0) return '';
   return '<a href="' + String(url).replace(/"/g,'&quot;') + '" target="_blank" rel="noopener" ' +
     'style="display:inline-block;margin-top:4px;font-size:11px;font-weight:600;color:var(--forest-l);text-decoration:none;">🔗 View listing</a>';
+}
+
+/* ── Invalid-listing flagging: agents can mark a listing bad; it's hidden
+      from search results and the dashboard everywhere. ── */
+var INVALID_KEY = 'tpf_invalid';
+function invKey(p){ return ((p.title||'')+'|'+(p.site||'')).toLowerCase().replace(/\s+/g,' ').trim(); }
+function loadInvalid(){ try { return JSON.parse(localStorage.getItem(INVALID_KEY)) || []; } catch(e){ return []; } }
+function excludeInvalid(list){ if(!Array.isArray(list)) return list; var inv = loadInvalid(); if(!inv.length) return list; return list.filter(function(p){ return inv.indexOf(invKey(p))===-1; }); }
+function flagInvalid(btn){
+  var key = btn.getAttribute('data-key'); if(!key) return;
+  if(!confirm('Flag this listing as invalid and remove it from your available listings?')) return;
+  var inv = loadInvalid(); if(inv.indexOf(key)===-1){ inv.push(key); localStorage.setItem(INVALID_KEY, JSON.stringify(inv)); }
+  _lastResults = _lastResults.filter(function(p){ return invKey(p)!==key; });
+  var card = btn.closest('.prop-card'); if(card) card.remove();
+  var ce=document.getElementById('resultCount'); if(ce) ce.textContent=_lastResults.length+' listing'+(_lastResults.length!==1?'s':'')+' found';
+  var rs=document.getElementById('resultStats'); if(rs) rs.innerHTML=buildResultStats(_lastResults);
 }
 
 /* ── Data-rich helpers: per-type averages, PSF, deal context, stats strip ── */
@@ -3132,6 +3166,7 @@ function makeCard(p) {
   c += '<div class="prop-actions" style="grid-template-columns:1fr;">';
   c += '<button class="prop-action-btn shortlist" onclick="openSlPicker(this)" data-clientonly="1" data-title="'+(p.title||'Property').replace(/"/g,'&quot;')+'" data-price="'+price+'" data-loc="'+loc+'" data-url="'+(p.url||'').replace(/"/g,'&quot;')+'" data-type="'+(propType||'').replace(/"/g,'&quot;')+'" data-pricen="'+(Number(p.price)||0)+'" data-wa="'+waMsg+'">\uD83D\uDC64 Add to client</button>';
   c += '</div>';
+  c += '<button class="prop-action-btn" style="width:100%;margin-bottom:8px;color:var(--danger);border-color:rgba(184,58,46,.3);" onclick="flagInvalid(this)" data-key="'+invKey(p).replace(/"/g,'&quot;')+'">\u2691 Flag invalid &amp; remove</button>';
   var _vfData = JSON.stringify({title:p.title||'',site:p.site||'',url:p.url||''}).replace(/"/g,'&quot;');
   c += '<button class="prop-action-btn visit" style="width:100%;margin-bottom:8px;" onclick="verifyListing(this,\''+_vfData+'\')">\uD83D\uDD0E Verify \u2014 still available?</button>';
   c += '<button class="btn-wa" data-wa="'+waMsg+'" onclick="shareWA(this)"><svg class="wa-icon" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Share via WhatsApp</button>';
@@ -3141,9 +3176,8 @@ function makeCard(p) {
 
 function searchSimilar(location, type) {
   var locEl = document.getElementById('location');
-  var typeEl = document.getElementById('propType');
   if (locEl && location) locEl.value = location;
-  if (typeEl && type)    typeEl.value = type;
+  setSelectedTypes(type ? [String(type).toLowerCase()] : []);
   switchTab('search');
   startSearch();
 }
@@ -3405,14 +3439,14 @@ function runRentalFull() {
   var payback   = purchase > 0 ? Math.round(purchase/netIncome) : null;
   var TLBLS = { studio:'Studio/1-bed','2bed':'2-bedroom','3bed':'3-bedroom','4bed':'4-bedroom','5bed':'5+ bedroom' };
   area.innerHTML =
-    '<div class="result-highlight"><div class="rh-label">Est. Annual Income</div><div class="rh-val">USD$'+annualUSD.toLocaleString()+'</div><div class="rh-sub">TT$'+annualTTD.toLocaleString()+' &middot; USD$'+monthlyUSD.toLocaleString()+'/mo</div></div>' +
+    '<div class="result-highlight"><div class="rh-label">Est. Annual Income</div><div class="rh-val">TT$'+annualTTD.toLocaleString()+'</div><div class="rh-sub">TT$'+monthlyTTD.toLocaleString()+'/mo &middot; USD$'+annualUSD.toLocaleString()+'</div></div>' +
     '<div class="result-grid">' +
       '<div class="result-box accent"><div class="result-box-label">Peak Season (5mo)</div><div class="result-box-val">~'+peakDays+'d</div><div class="result-box-sub">'+Math.round(d.occ[0]*100)+'% occ</div></div>' +
       '<div class="result-box"><div class="result-box-label">Off Season (7mo)</div><div class="result-box-val">~'+offDays+'d</div><div class="result-box-sub">'+Math.round(d.occ[1]*100)+'% occ</div></div>' +
       (grossYield ? '<div class="result-box accent"><div class="result-box-label">Gross Yield</div><div class="result-box-val">'+grossYield+'%</div></div>' : '') +
       (netYield ? '<div class="result-box"><div class="result-box-label">Net Yield</div><div class="result-box-val">'+netYield+'%</div><div class="result-box-sub">after expenses</div></div>' : '') +
       (payback ? '<div class="result-box"><div class="result-box-label">Payback Period</div><div class="result-box-val">'+payback+' yrs</div></div>' : '') +
-      '<div class="result-box"><div class="result-box-label">Avg Nightly</div><div class="result-box-val">USD$'+Math.round(avg)+'</div></div>' +
+      '<div class="result-box"><div class="result-box-label">Avg Nightly</div><div class="result-box-val">TT$'+Math.round(avg*USD).toLocaleString()+'</div><div class="result-box-sub">USD$'+Math.round(avg)+'</div></div>' +
     '</div>' +
     '<div style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:12px;line-height:1.6;">Peak months: '+PEAK_MONTHS.join(' \u00B7 ')+'<br>Off-peak: '+OFF_MONTHS.join(' \u00B7 ')+'</div>' +
     '<div class="val-disclaimer">\u2139\uFE0F Indicative estimate based on Tobago vacation rental data 2024\u20132025. Actual results vary.</div>';
@@ -3493,7 +3527,7 @@ function addCoBrokerRequest(btn, propDataStr) {
 function cbUpdateStatus(id,status){ cbLoad(); var r=cbRequests.find(function(x){return x.id===id;}); if(r){r.status=status;cbSave();renderCoBrokerList();} }
 function cbSaveNotes(id){ cbLoad(); var r=cbRequests.find(function(x){return x.id===id;}); var el=document.getElementById('cbn-'+id); if(r&&el){r.notes=el.value;cbSave();} }
 function cbDelete(id){ if(!confirm('Remove this request?')) return; cbLoad(); cbRequests=cbRequests.filter(function(r){return r.id!==id;}); cbSave(); renderCoBrokerList(); var badge=document.getElementById('badge-cobroker'); if(badge){if(cbRequests.length>0){badge.textContent=cbRequests.length;}else{badge.classList.remove('show');}} }
-function cbSendWhatsApp(id){ cbLoad(); var req=cbRequests.find(function(r){return r.id===id;}); if(!req) return; var msg=encodeURIComponent('\uD83E\uDD1D *CO-BROKER REQUEST*\n\nHi'+(req.agentName?' '+req.agentName:'')+',\n\nI am '+( req.myName||'Agent')+(req.myAgency?', '+req.myAgency:'')+'. My client is interested in your listing and I would like to explore a co-broker arrangement:\n\n\uD83C\uDFE0 *'+req.title+'*\n\uD83D\uDCB0 '+req.price+'\n\uD83D\uDCCD '+req.location+', Tobago\n\uD83C\uDF10 '+req.site+(req.url?'\n🔗 '+req.url:'')+'\n'+(req.myPhone?'\n\uD83D\uDCDE '+req.myPhone:'')+( req.myEmail?'\n\uD83D\uDCE7 '+req.myEmail:'')+'\n\nWould you be open to a co-broker arrangement? Thank you!'); var phone=req.agentPhone?req.agentPhone.replace(/\D/g,''):''; window.open((phone?'https://wa.me/'+phone:' https://wa.me/')+'?text='+msg,'_blank'); }
+function cbSendWhatsApp(id){ cbLoad(); var req=cbRequests.find(function(r){return r.id===id;}); if(!req) return; var pf=loadProfile(); var myName=pf.name||req.myName||'Agent'; var myAgency=pf.agency||req.myAgency||''; var myPhone=pf.phone||req.myPhone||''; var myEmail=pf.email||req.myEmail||''; var msg=encodeURIComponent('\uD83E\uDD1D *CO-BROKER REQUEST*\n\nHi'+(req.agentName?' '+req.agentName:'')+',\n\nI am '+myName+(myAgency?', '+myAgency:'')+'. My client is interested in your listing and I would like to explore a co-broker arrangement:\n\n\uD83C\uDFE0 *'+req.title+'*\n\uD83D\uDCB0 '+req.price+'\n\uD83D\uDCCD '+req.location+', Tobago\n\uD83C\uDF10 '+req.site+(req.url?'\n🔗 '+req.url:'')+'\n\n*From:*\n\uD83D\uDC64 '+myName+(myAgency?'\n\uD83C\uDFE2 '+myAgency:'')+(myPhone?'\n\uD83D\uDCDE '+myPhone:'')+(myEmail?'\n\uD83D\uDCE7 '+myEmail:'')+'\n\nWould you be open to a co-broker arrangement? Thank you!'); var phone=req.agentPhone?req.agentPhone.replace(/\D/g,''):''; window.open((phone?'https://wa.me/'+phone:' https://wa.me/')+'?text='+msg,'_blank'); }
 function cbSendEmail(id){ cbLoad(); var req=cbRequests.find(function(r){return r.id===id;}); if(!req) return; var subj=encodeURIComponent('Co-Broker Request: '+req.title); var body=encodeURIComponent('Dear '+(req.agentName||'Agent')+',\n\nI am '+(req.myName||'Agent')+(req.myAgency?', '+req.myAgency:'')+' and I have a client interested in your property:\n\n'+req.title+'\nPrice: '+req.price+'\nLocation: '+req.location+', Tobago\nSite: '+req.site+(req.url?'\nListing: '+req.url:'')+'\n\nI would like to explore a co-broker arrangement.\n\n'+(req.myPhone?'Phone: '+req.myPhone+'\n':'')+(req.myEmail?'Email: '+req.myEmail+'\n':'')+'Kind regards,\n'+(req.myName||'Agent')); window.open('mailto:?subject='+subj+'&body='+body,'_blank'); }
 function renderCoBrokerList() {
   cbLoad();
@@ -4411,11 +4445,8 @@ function shareClientSl(contactId) {
   var props  = clientShortlists[contactId] || [];
   if (!props.length) { alert('No properties in this client\'s shortlist yet.'); return; }
 
-  var clientName = client ? client.name : 'Client';
   var lines = [
     '\uD83C\uDFE0 PROPERTY SHORTLIST',
-    'Prepared for: ' + clientName,
-    'By: BrokerBuddy',
     ''
   ];
   props.forEach(function(p, i) {
@@ -4425,7 +4456,7 @@ function shareClientSl(contactId) {
     if (p.url) lines.push('   \uD83D\uDD17 ' + p.url);
     lines.push('');
   });
-  lines.push('BrokerBuddy \u2014 ' + new Date().toLocaleDateString('en-TT', {day:'numeric',month:'short',year:'numeric'}));
+  lines.push('Please let me know if you are interested in any of the above properties.');
 
   var msg = encodeURIComponent(lines.join('\n'));
   var phone = client ? client.phone : '';
