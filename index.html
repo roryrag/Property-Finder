@@ -764,19 +764,40 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
 .type-chip:hover{border-color:var(--gold);color:var(--ink);}
 .type-chip.active{background:linear-gradient(135deg,rgba(201,162,75,.2),rgba(201,162,75,.05));border-color:var(--gold);color:var(--gold-l);}
 
-/* Results: one per line, full-width horizontal cards */
-#cardList{display:flex;flex-direction:column;gap:14px;}
-#cardList .prop-card{margin-bottom:0;flex-direction:row;align-items:stretch;}
-#cardList .prop-card-img{width:230px;height:auto;min-height:150px;flex-shrink:0;}
-#cardList .prop-card-body{flex:1;display:flex;flex-direction:column;padding:13px 16px;}
-#cardList .prop-desc{margin:6px 0;}
-/* Compact action bar — small wrapping pills that fill the right-hand space */
-.prop-actions-bar{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 10px;}
+/* Results: dense, scannable list rows */
+#cardList{display:flex;flex-direction:column;gap:8px;}
+.prop-row{display:flex;flex-wrap:wrap;align-items:center;gap:12px;background:var(--white);border:1px solid var(--border);border-radius:12px;padding:10px 14px;transition:var(--t);animation:cardIn .25s both;}
+.prop-row:hover{border-color:var(--gold);box-shadow:var(--shadow-sm);}
+.prop-row.open{border-color:var(--gold);}
+.pr-click{flex:1;display:flex;align-items:center;gap:13px;cursor:pointer;min-width:0;}
+.pr-tile{width:62px;height:62px;flex-shrink:0;border-radius:10px;background:linear-gradient(135deg,var(--forest),var(--forest-m));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}
+.pr-ico{font-size:23px;}
+.pr-type{font-size:8px;font-weight:700;letter-spacing:.08em;color:var(--gold-l);}
+.pr-main{flex:1;min-width:0;}
+.pr-l1{display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+.pr-price{font-family:'Playfair Display',serif;font-size:21px;font-weight:700;color:var(--ink);line-height:1.05;letter-spacing:-.3px;}
+.pr-l2{font-size:13px;color:var(--ink);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pr-l2 b{font-weight:600;}
+.pr-loc{color:var(--ink-l);font-weight:400;}
+.pr-l3{font-size:12px;color:var(--ink-l);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pr-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.pr-ibtn{width:36px;height:36px;border-radius:9px;border:1px solid var(--border);background:var(--bg);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(--t);color:var(--ink);}
+.pr-ibtn:hover{border-color:var(--gold);}
+.pr-ibtn.add{color:var(--danger);}
+.pr-ibtn.wa{background:#25D366;border-color:#25D366;}
+.pr-ibtn.more{font-weight:700;color:var(--ink-l);}
+.pr-src{font-size:10px;color:var(--ink-xl);margin-left:2px;max-width:84px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pr-detail{flex-basis:100%;display:none;border-top:1px solid var(--border-l);margin-top:2px;padding-top:10px;}
+.prop-row.open .pr-detail{display:block;}
+.pr-desc{font-size:13px;color:var(--ink-m);margin-bottom:8px;line-height:1.5;}
+.pr-agent{font-size:12px;color:var(--ink-l);margin-bottom:8px;}
+.pr-agent a{color:var(--forest-l);}
+/* Compact action bar (inside expanded detail) */
+.prop-actions-bar{display:flex;flex-wrap:wrap;gap:6px;}
 .pa-btn{font-family:inherit;font-size:12px;font-weight:600;color:var(--ink);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:7px 11px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:4px;transition:var(--t);white-space:nowrap;line-height:1;}
 .pa-btn:hover{border-color:var(--gold);}
 .pa-btn.danger{color:var(--danger);border-color:rgba(184,58,46,.3);}
-#cardList .btn-wa{margin-top:auto;}
-@media(max-width:680px){#cardList .prop-card{flex-direction:column;}#cardList .prop-card-img{width:100%;height:160px;}}
+@media(max-width:680px){.pr-l2,.pr-l3{white-space:normal;}.pr-src{display:none;}}
 .results-count{font-size:15px;margin-bottom:8px;}
 /* Data-rich results stats strip */
 .result-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;}
@@ -2972,7 +2993,7 @@ function flagInvalid(btn){
   if(!confirm('Flag this listing as invalid and remove it from your available listings?')) return;
   var inv = loadInvalid(); if(inv.indexOf(key)===-1){ inv.push(key); localStorage.setItem(INVALID_KEY, JSON.stringify(inv)); }
   _lastResults = _lastResults.filter(function(p){ return invKey(p)!==key; });
-  var card = btn.closest('.prop-card'); if(card) card.remove();
+  var card = btn.closest('.prop-row, .prop-card'); if(card) card.remove();
   var ce=document.getElementById('resultCount'); if(ce) ce.textContent=_lastResults.length+' listing'+(_lastResults.length!==1?'s':'')+' found';
   var rs=document.getElementById('resultStats'); if(rs) rs.innerHTML=buildResultStats(_lastResults);
 }
@@ -3038,6 +3059,7 @@ function applyResultView() {
   var list = document.getElementById('cardList');
   if (list) list.innerHTML = arr.length ? arr.map(makeCard).join('') : '<div class="dash-ok" style="grid-column:1/-1;padding:20px 0">No below-average deals in this result set.</div>';
 }
+function toggleRow(el){ var row = el.closest('.prop-row'); if(row) row.classList.toggle('open'); }
 function paintResults(listings) {
   _lastResults = listings; _resultSort = 'relevance'; _dealsOnly = false;
   computeTypeAvg(listings);
@@ -3075,10 +3097,11 @@ function renderResults(listings) {
 
 function shareWA(btn) {
   var waMsg   = btn.getAttribute('data-wa');
-  // Try to get title/price from nearest card
-  var card    = btn.closest('.prop-card');
-  var title   = card ? (card.querySelector('.prop-card-title') ? card.querySelector('.prop-card-title').textContent.trim() : 'Property') : 'Property';
-  var price   = card ? (card.querySelector('.prop-price-val') ? card.querySelector('.prop-price-val').textContent.trim() : '') : '';
+  // Try to get title/price from nearest row/card
+  var card    = btn.closest('.prop-row, .prop-card');
+  var q = function(sel){ return card && card.querySelector(sel) ? card.querySelector(sel).textContent.trim() : ''; };
+  var title   = q('.pr-l2 b') || q('.prop-card-title') || 'Property';
+  var price   = q('.pr-price') || q('.prop-price-val') || '';
   openContactPicker(waMsg, title, price);
 }
 function shareValuation(btn) { window.open('https://wa.me/?text='+btn.getAttribute('data-wa'),'_blank'); }
@@ -3091,80 +3114,67 @@ function makeCard(p) {
   var loc   = p.address ? p.address : ((p.location||'Tobago')+', Tobago');
   var feats = Array.isArray(p.features) ? p.features : [];
   var propType = p.type || '';
-  var typeIcon = {house:'\uD83C\uDFE0',villa:'\uD83C\uDFD8',apartment:'\uD83C\uDFE2',condo:'\uD83C\uDFE2',land:'\uD83C\uDF3F',commercial:'\uD83C\uDFEA'}[propType.toLowerCase()] || '\uD83C\uDFE0';
+  var typeIcon = {house:'🏠',villa:'🏘',apartment:'🏢',condo:'🏢',land:'🌿',commercial:'🏪'}[propType.toLowerCase()] || '🏠';
+  var _psf = parsePsf(p.size, p.price);
 
-  var waLines = ['\uD83C\uDFE0 '+(p.title||'Property'),'','\uD83D\uDCB0 Price: '+price];
-  if(p.beds>0) waLines.push('\uD83D\uDECC Beds: '+p.beds);
-  if(p.baths>0) waLines.push('\uD83D\uDEC3 Baths: '+p.baths);
-  if(p.size) waLines.push('\uD83D\uDCCF Size: '+p.size);
-  if(p.pool) waLines.push('\uD83C\uDFCA Pool: Yes');
-  if(p.type) waLines.push('\uD83C\uDFD8 Type: '+p.type);
-  waLines.push('\uD83D\uDCCD '+loc); waLines.push('');
+  var waLines = ['🏠 '+(p.title||'Property'),'','💰 Price: '+price];
+  if(p.beds>0) waLines.push('🛌 Beds: '+p.beds);
+  if(p.baths>0) waLines.push('🚿 Baths: '+p.baths);
+  if(p.size) waLines.push('📏 Size: '+p.size);
+  if(p.pool) waLines.push('🏊 Pool: Yes');
+  if(p.type) waLines.push('🏘 Type: '+p.type);
+  waLines.push('📍 '+loc); waLines.push('');
   if(p.description){waLines.push(p.description);waLines.push('');}
-  feats.forEach(function(f){waLines.push('\u2705 '+f);});
+  feats.forEach(function(f){waLines.push('✅ '+f);});
   if(feats.length) waLines.push('');
-  if(p.agent_name) waLines.push('\uD83D\uDC64 Agent: '+p.agent_name);
-  if(p.agent_phone) waLines.push('\uD83D\uDCDE Phone: '+p.agent_phone);
+  if(p.agent_name) waLines.push('👤 Agent: '+p.agent_name);
+  if(p.agent_phone) waLines.push('📞 Phone: '+p.agent_phone);
   if(p.url) waLines.push('🔗 '+p.url);
   waLines.push('Listed on: '+(p.site||''));
   var waMsg = encodeURIComponent(waLines.join('\n'));
-
   var cbData = JSON.stringify({title:p.title||'Property',price:price,location:p.location||'Tobago',site:p.site||'',agentName:p.agent_name||'',agentPhone:p.agent_phone||'',url:p.url||''}).replace(/"/g,'&quot;');
-
-  var c = '<div class="prop-card">';
-  // Image area with price tag
-  c += '<div class="prop-card-img">';
-  c += '<div class="prop-img-placeholder">'+typeIcon+'</div>';
-  c += '<div class="prop-card-badges">';
-  if (propType) c += '<span class="prop-badge type">'+propType.toUpperCase()+'</span>';
-  if (p.pool)   c += '<span class="prop-badge pool">\uD83C\uDFCA POOL</span>';
-  if (p.status === 'stale') c += '<span class="prop-badge" style="background:rgba(217,119,6,.35);color:#fff;border:1px solid rgba(217,119,6,.5);">\u26A0 POSSIBLY SOLD</span>';
-  c += dealBadge(p);
-  c += '</div>';
-  c += '<div class="prop-card-price-tag"><span>'+price+'</span><small>'+(p.price?'TTD':'')+'</small></div>';
-  c += '<div class="prop-card-title">'+(p.title||'Property listing')+'</div>';
-  c += '<div class="prop-card-loc">\uD83D\uDCCD '+(p.location||'Tobago')+', Tobago</div>';
-  c += '</div>';
-  // Card body
-  c += '<div class="prop-card-body">';
-  // Specs row
-  var _psf = parsePsf(p.size, p.price);
-  if (p.beds>0 || p.baths>0 || p.size || _psf) {
-    c += '<div class="prop-specs">';
-    if (p.beds>0)  c += '<div class="spec-item"><span class="spec-icon">\uD83D\uDECC</span><div class="spec-val">'+p.beds+'</div><div class="spec-label">Beds</div></div>';
-    if (p.baths>0) c += '<div class="spec-item"><span class="spec-icon">\uD83D\uDEC3</span><div class="spec-val">'+p.baths+'</div><div class="spec-label">Baths</div></div>';
-    if (p.size)    c += '<div class="spec-item"><span class="spec-icon">\uD83D\uDCCF</span><div class="spec-val">'+String(p.size).replace(' sq ft','')+'</div><div class="spec-label">Sq Ft</div></div>';
-    if (_psf)      c += '<div class="spec-item"><span class="spec-icon">💵</span><div class="spec-val">'+_psf+'</div><div class="spec-label">$/sqft</div></div>';
-    c += '</div>';
-  }
-  if (p.description) c += '<div class="prop-desc">'+p.description+'</div>';
-  if (feats.length) {
-    c += '<div class="prop-feats">';
-    feats.forEach(function(f){ c += '<span class="prop-feat">'+f+'</span>'; });
-    c += '</div>';
-  }
-  if (p.agent_name || p.agent_phone) {
-    c += '<div class="prop-agent"><div class="agent-avi">\uD83D\uDC64</div><div>';
-    if (p.agent_name)  c += '<div class="agent-info-name">'+p.agent_name+'</div>';
-    if (p.agent_phone) c += '<div class="agent-info-phone"><a href="tel:'+p.agent_phone+'">\uD83D\uDCDE '+p.agent_phone+'</a></div>';
-    c += '</div></div>';
-  }
-  c += '<div class="prop-source">\uD83C\uDF10 '+(p.site||'')+'</div>';
-  // Action buttons \u2014 compact wrapping bar (fills the right-hand space)
   var _vu=(p.url&&p.url.length>15&&p.url.indexOf('http')===0)?p.url:p.site?'https://'+p.site:null;
-  var _vl=(p.url&&p.url.length>15&&p.url.indexOf('http')===0)?'\uD83D\uDD17 View':'\uD83C\uDF10 Visit';
+  var _vl=(p.url&&p.url.length>15&&p.url.indexOf('http')===0)?'🔗 View':'🌐 Visit';
   var _vfData = JSON.stringify({title:p.title||'',site:p.site||'',url:p.url||''}).replace(/"/g,'&quot;');
+
+  var chips=[];
+  if(p.beds>0) chips.push('🛌 '+p.beds);
+  if(p.baths>0) chips.push('🚿 '+p.baths);
+  if(p.size) chips.push('📐 '+String(p.size).replace(' sq ft','')+' sqft');
+  if(_psf) chips.push('💵 TT$'+_psf+'/sqft');
+  if(p.pool) chips.push('🏊 pool');
+  var specRow = chips.length ? chips.join('  ·  ') : '<span style="opacity:.5">No specs listed</span>';
+  var staleBadge = (p.status==='stale') ? '<span class="deal-badge" style="background:rgba(217,119,6,.85);color:#fff">⚠ Possibly sold</span>' : '';
+  var dataAttrs = 'data-title="'+(p.title||'Property').replace(/"/g,'&quot;')+'" data-price="'+price+'" data-loc="'+loc+'" data-url="'+(p.url||'').replace(/"/g,'&quot;')+'" data-type="'+(propType||'').replace(/"/g,'&quot;')+'" data-pricen="'+(Number(p.price)||0)+'" data-wa="'+waMsg+'"';
+
+  var c = '<div class="prop-row">';
+  c += '<div class="pr-click" onclick="toggleRow(this)">';
+  c +=   '<div class="pr-tile"><span class="pr-ico">'+typeIcon+'</span><span class="pr-type">'+(propType?propType.toUpperCase():'PROPERTY')+'</span></div>';
+  c +=   '<div class="pr-main">';
+  c +=     '<div class="pr-l1"><span class="pr-price">'+price+'</span>'+dealBadge(p)+staleBadge+'</div>';
+  c +=     '<div class="pr-l2"><b>'+(p.title||'Property listing')+'</b> <span class="pr-loc">📍 '+(p.location||'Tobago')+'</span></div>';
+  c +=     '<div class="pr-l3">'+specRow+'</div>';
+  c +=   '</div>';
+  c += '</div>';
+  c += '<div class="pr-actions">';
+  c +=   '<button class="pr-ibtn add" title="Add to shortlist" onclick="openSlPicker(this)" '+dataAttrs+'>❤</button>';
+  c +=   '<button class="pr-ibtn wa" title="Share via WhatsApp" data-wa="'+waMsg+'" onclick="shareWA(this)">💬</button>';
+  c +=   '<button class="pr-ibtn more" title="More options" onclick="toggleRow(this)">⋯</button>';
+  c +=   '<div class="pr-src">'+(p.site||'').replace(/^www\./,'')+'</div>';
+  c += '</div>';
+  c += '<div class="pr-detail">';
+  if(p.description) c += '<div class="pr-desc">'+p.description+'</div>';
+  if(p.agent_name || p.agent_phone) c += '<div class="pr-agent">👤 '+(p.agent_name||'')+(p.agent_phone?'  ·  <a href="tel:'+p.agent_phone+'">'+p.agent_phone+'</a>':'')+'</div>';
   c += '<div class="prop-actions-bar">';
   if(_vu) c += '<a href="'+_vu+'" target="_blank" rel="noopener" class="pa-btn">'+_vl+'</a>';
-  c += '<button class="pa-btn" onclick="searchSimilar('+"'"+((p.location||'Tobago').replace(/'/g,''))+"','"+((p.type||'').replace(/'/g,''))+"'"+')">\uD83D\uDD0D Similar</button>';
-  c += '<button class="pa-btn" onclick="openSlPicker(this)" data-title="'+(p.title||'Property').replace(/"/g,'&quot;')+'" data-price="'+price+'" data-loc="'+loc+'" data-url="'+(p.url||'').replace(/"/g,'&quot;')+'" data-type="'+(propType||'').replace(/"/g,'&quot;')+'" data-pricen="'+(Number(p.price)||0)+'" data-wa="'+waMsg+'">\u2764 Add</button>';
-  c += '<button class="pa-btn" onclick="openSlPicker(this)" data-clientonly="1" data-title="'+(p.title||'Property').replace(/"/g,'&quot;')+'" data-price="'+price+'" data-loc="'+loc+'" data-url="'+(p.url||'').replace(/"/g,'&quot;')+'" data-type="'+(propType||'').replace(/"/g,'&quot;')+'" data-pricen="'+(Number(p.price)||0)+'" data-wa="'+waMsg+'">\uD83D\uDC64 Client</button>';
-  c += '<button class="pa-btn" onclick="addCoBrokerRequest(this,\''+cbData+'\')" data-prop="'+cbData+'">\uD83E\uDD1D Co-Broker</button>';
-  c += '<button class="pa-btn" onclick="verifyListing(this,\''+_vfData+'\')">\uD83D\uDD0E Verify</button>';
-  c += '<button class="pa-btn danger" onclick="flagInvalid(this)" data-key="'+invKey(p).replace(/"/g,'&quot;')+'">\u2691 Flag</button>';
+  c += '<button class="pa-btn" onclick="searchSimilar('+"'"+((p.location||'Tobago').replace(/'/g,''))+"','"+((p.type||'').replace(/'/g,''))+"'"+')">🔍 Similar</button>';
+  c += '<button class="pa-btn" onclick="openSlPicker(this)" data-clientonly="1" '+dataAttrs+'>👤 Client</button>';
+  c += '<button class="pa-btn" onclick="addCoBrokerRequest(this,\''+cbData+'\')" data-prop="'+cbData+'">🤝 Co-Broker</button>';
+  c += '<button class="pa-btn" onclick="verifyListing(this,\''+_vfData+'\')">🔎 Verify</button>';
+  c += '<button class="pa-btn danger" onclick="flagInvalid(this)" data-key="'+invKey(p).replace(/"/g,'&quot;')+'">⚑ Flag</button>';
   c += '</div>';
-  c += '<button class="btn-wa" data-wa="'+waMsg+'" onclick="shareWA(this)"><svg class="wa-icon" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Share via WhatsApp</button>';
-  c += '</div></div>';
+  c += '</div>';
+  c += '</div>';
   return c;
 }
 
