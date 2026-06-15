@@ -429,6 +429,16 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
 .dash-area-row .nm{flex:1;font-size:13px;color:var(--ink);font-weight:500;}
 .dash-area-row .ct{font-size:11px;color:var(--ink-l);}
 .dash-area-row .amt{width:78px;text-align:right;font-family:'Playfair Display',serif;font-weight:600;color:var(--gold-l);font-size:14px;}
+/* Confirm-sale (flywheel) cards */
+.confirm-card{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--border-l);flex-wrap:wrap;}
+.confirm-card:last-child{border-bottom:none;}
+.confirm-info{min-width:0;flex:1;}
+.confirm-info b{font-size:13px;display:block;color:var(--ink);}
+.confirm-info span{font-size:11px;color:var(--ink-l);}
+.confirm-act{display:flex;gap:6px;align-items:center;}
+.confirm-input{width:110px;padding:6px 9px;border:1px solid var(--border);border-radius:7px;font-size:12px;background:var(--white);color:var(--ink);font-family:inherit;}
+.confirm-yes{background:var(--forest-l);color:#fff;border:none;border-radius:7px;padding:7px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;}
+.confirm-no{background:var(--bg);color:var(--ink-l);border:1px solid var(--border);border-radius:7px;padding:7px 11px;font-size:12px;cursor:pointer;}
 @media(max-width:900px){.dash{padding:16px}.dash-kpis{grid-template-columns:repeat(2,1fr)}.dash-cols{grid-template-columns:1fr}.dash-lst{grid-template-columns:1fr}}
 
 /* ════════════════════════════════
@@ -1804,6 +1814,10 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
               <div id="dashAttention"></div>
             </section>
             <section class="dash-panel">
+              <div class="dash-ph"><h3>Valuation model</h3><a onclick="switchTab('valuator')">Open &rarr;</a></div>
+              <div id="dashModel"></div>
+            </section>
+            <section class="dash-panel">
               <div class="dash-ph"><h3>Repository</h3><span class="repo-status empty" id="repoStatus" style="font-size:11px;">No data</span></div>
               <div id="dashRepo"></div>
               <div class="repo-meta" id="repoMeta" style="display:none"></div>
@@ -2021,6 +2035,14 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
         <div id="liveCompsSection"></div>
 
         <!-- SOLD COMPARABLES DATABASE -->
+        <div class="comp-section">
+          <div class="clients-hdr" style="margin-top:8px;">
+            <span class="clients-hdr-title">&#128260; Confirm recent sales</span>
+          </div>
+          <div style="font-size:11px;color:var(--ink-l);margin:2px 0 8px;line-height:1.5;">Listings that vanished from the repository &mdash; likely sold. Confirm the sold price to turn each into a real comp that sharpens every valuation.</div>
+          <div id="confirmQueue"></div>
+        </div>
+
         <div class="comp-section">
           <div class="clients-hdr" style="margin-top:8px;">
             <span class="clients-hdr-title">&#128202; Sold Comparables</span>
@@ -2467,6 +2489,7 @@ function onAppLoad() {
   updateOnlineStatus();
   renderSearchHistory();
   try { renderDashboard(); } catch(e) {}
+  try { renderConfirmQueue(); } catch(e) {}
   try { updateDropdownProfile(); } catch(e) {}
   var _t = document.getElementById('hdrPageTitle'); if (_t) _t.textContent = 'Dashboard';
 }
@@ -2504,6 +2527,7 @@ function switchTab(tab) {
   if (nav)   nav.classList.add('active');
   document.getElementById('appScroll').scrollTop = 0;
   if (tab === 'dashboard') { try { renderDashboard(); } catch(e) {} }
+  if (tab === 'valuator') { try { renderConfirmQueue(); } catch(e) {} }
   var titleEl = document.getElementById('hdrPageTitle');
   if (titleEl) titleEl.textContent = TAB_TITLES[tab] || '';
 }
@@ -2593,6 +2617,26 @@ function renderDashboard() {
 
   var rEl = document.getElementById('dashRepo');
   if (rEl) rEl.innerHTML = _dashRow('Total listings', total) + _dashRow('With price', withPrice) + _dashRow('Last refreshed', ageTxt);
+
+  // Valuation model: auto-backtest accuracy + pending sale confirmations (flywheel)
+  var mdEl = document.getElementById('dashModel');
+  if (mdEl) {
+    var bt = backtestValuator();
+    try { compsLoad(); } catch(e){}
+    var soldN = (typeof soldComps!=='undefined'?soldComps:[]).filter(function(c){ return c.source==='agent'; }).length;
+    var pend = 0; try { pend = pendingCandidates().length; } catch(e){}
+    var rows = '';
+    if (bt.error) {
+      rows = '<div class="dash-ok">'+(soldN<3 ? ('Add '+(3-soldN)+' more sold comp'+((3-soldN)!==1?'s':'')+' to measure accuracy.') : 'Backtest unavailable.')+'</div>';
+    } else {
+      var col = bt.mdape<0.1 ? '#2F9D67' : (bt.mdape<0.2 ? '#C9A24B' : '#D9755A');
+      rows = '<div class="dash-repo-row"><span>Median error (MdAPE)</span><b style="color:'+col+'">'+(bt.mdape*100).toFixed(1)+'%</b></div>'+
+             '<div class="dash-repo-row"><span>Band coverage</span><b>'+(bt.coverage*100).toFixed(0)+'%</b></div>'+
+             '<div class="dash-repo-row"><span>Sold comps</span><b>'+soldN+'</b></div>';
+    }
+    if (pend > 0) rows += '<div class="dash-alert" style="margin-top:10px;cursor:pointer" onclick="switchTab(\'valuator\')">🔁 <div><b>'+pend+' sale'+(pend!==1?'s':'')+' to confirm</b><br><span style="opacity:.85">Confirm sold prices to sharpen valuations.</span></div></div>';
+    mdEl.innerHTML = rows;
+  }
 }
 
 /* ══════════════════════════════════════
@@ -4139,7 +4183,7 @@ function knnPSF(subject, opts){
 
   var cands=[];
   compsLoad();
-  soldComps.concat(sharedSoldLoad()).forEach(function(c){
+  soldComps.concat(activeSharedSold()).forEach(function(c){
     if(opts.excludeId && c.id===opts.excludeId) return;
     var psf=Number(c.psf) || (c.price&&c.size? Number(c.price)/parseSizeSqft(c.size):0);
     if(!(psf>5 && psf<2000)) return;
@@ -4224,6 +4268,53 @@ function runBacktest(){
     '<div class="result-box"><div class="result-box-label">Band coverage</div><div class="result-box-val">'+pct(r.coverage)+'</div><div class="result-box-sub">true PSF in P25–P75</div></div>'+
     '<div class="result-box"><div class="result-box-label">Tested on</div><div class="result-box-val">'+r.n+'</div><div class="result-box-sub">leave-one-out</div></div>'+
   '</div><div class="val-disclaimer" style="margin-top:10px">ℹ️ Leave-one-out over your confirmed sold comps. MdAPE = typical % gap between predicted and actual PSF; coverage near 50% means the P25–P75 band is honest.</div>';
+}
+
+/* ════════════════════════════════════════════════
+   THE FLYWHEEL (#3) — delisting → confirmed sold
+   The crawler turns listings unseen 30 days into
+   "candidate sold" comps. Here the agent confirms the
+   sold price (or dismisses), converting unverified
+   candidates into real ground-truth comps that train
+   every future valuation. Handled candidates are
+   excluded from the kNN pool to avoid double-counting.
+════════════════════════════════════════════════ */
+var CONFIRM_KEY = 'tpf_sold_confirmed';
+function loadConfirmed(){ try{ return JSON.parse(localStorage.getItem(CONFIRM_KEY)) || {}; }catch(e){ return {}; } }
+function saveConfirmed(m){ try{ localStorage.setItem(CONFIRM_KEY, JSON.stringify(m)); }catch(e){} }
+function activeSharedSold(){ var h=loadConfirmed(); return sharedSoldLoad().filter(function(c){ return !h[c.id]; }); }
+function pendingCandidates(){ var h=loadConfirmed(); return sharedSoldLoad().filter(function(c){ return c.source==='candidate' && !h[c.id]; }); }
+function confirmCandidateSold(id){
+  var list=sharedSoldLoad(), cand=null;
+  for(var i=0;i<list.length;i++){ if(list[i].id===id){ cand=list[i]; break; } }
+  if(!cand) return;
+  var inp=document.getElementById('cf-'+id);
+  var price=inp ? (parseFloat(inp.value)||Number(cand.price)||0) : (Number(cand.price)||0);
+  if(!(price>0)){ alert('Enter the sold price.'); return; }
+  var size=parseSizeSqft(cand.size)||Number(cand.size)||0;
+  compsLoad();
+  soldComps.push({ id:Date.now(), loc:cand.loc||'', size:size, price:price, psf:(size>0?Math.round(price/size):(Number(cand.psf)||0)), tenure:cand.tenure||'freehold', date:(cand.date||new Date().toISOString().slice(0,10)), notes:'Confirmed sold (delisted): '+(cand.title||cand.notes||''), source:'agent' });
+  compsSave();
+  var h=loadConfirmed(); h[id]='sold'; saveConfirmed(h);
+  renderConfirmQueue(); try{ renderCompList(); }catch(e){} try{ renderDashboard(); }catch(e){}
+}
+function dismissCandidate(id){ var h=loadConfirmed(); h[id]='dismissed'; saveConfirmed(h); renderConfirmQueue(); try{ renderDashboard(); }catch(e){} }
+function renderConfirmQueue(){
+  var el=document.getElementById('confirmQueue'); if(!el) return;
+  var pend=pendingCandidates();
+  if(!pend.length){ el.innerHTML='<div style="font-size:12px;color:var(--ink-l);padding:8px 0;">Nothing to confirm right now. When a listing disappears from the repository (likely sold), it appears here to confirm — turning it into a real comp.</div>'; return; }
+  var html='';
+  pend.slice(0,15).forEach(function(c){
+    var ask=c.price ? 'TT$'+Number(c.price).toLocaleString() : '—';
+    var idArg="'"+String(c.id).replace(/'/g,"")+"'";
+    html+='<div class="confirm-card">'+
+      '<div class="confirm-info"><b>'+(c.title||'Listing')+'</b><span>'+(c.loc||'Tobago')+' · last asking '+ask+(c.site?' · '+c.site:'')+'</span></div>'+
+      '<div class="confirm-act"><input type="number" id="cf-'+c.id+'" value="'+(c.price||'')+'" placeholder="Sold TT$" class="confirm-input">'+
+      '<button class="confirm-yes" onclick="confirmCandidateSold('+idArg+')">✓ Sold</button>'+
+      '<button class="confirm-no" title="Did not sell / withdrawn" onclick="dismissCandidate('+idArg+')">✗</button></div>'+
+    '</div>';
+  });
+  el.innerHTML=html;
 }
 
 /* ── OPTION 5: Calibration ── */
