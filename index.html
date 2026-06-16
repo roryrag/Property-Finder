@@ -1884,31 +1884,14 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
                 <button type="button" class="type-chip" data-type="commercial" onclick="toggleTypeChip(this)">Commercial</button>
               </div>
             </div>
-            <div class="filter-group"><label>Location</label>
-              <select id="location">
-                <option value="">All areas</option>
-                <option value="Crown Point">Crown Point</option>
-                <option value="Bon Accord">Bon Accord</option>
-                <option value="Canaan">Canaan</option>
-                <option value="Lowlands">Lowlands</option>
-                <option value="Buccoo">Buccoo</option>
-                <option value="Mt Irvine">Mt Irvine</option>
-                <option value="Black Rock">Black Rock</option>
-                <option value="Grafton">Grafton</option>
-                <option value="Scarborough">Scarborough</option>
-                <option value="Bacolet">Bacolet</option>
-                <option value="Carnbee">Carnbee</option>
-                <option value="Patience Hill">Patience Hill</option>
-                <option value="Signal Hill">Signal Hill</option>
-                <option value="Plymouth">Plymouth</option>
-                <option value="Les Coteaux">Les Coteaux</option>
-                <option value="Hope Estate">Hope Estate</option>
-                <option value="Speyside">Speyside</option>
-                <option value="Charlotteville">Charlotteville</option>
-                <option value="Orange Hill">Orange Hill</option>
-                <option value="Mason Hall">Mason Hall</option>
-                <option value="Castara">Castara</option>
-                <option value="Roxborough">Roxborough</option>
+            <div class="filter-group" style="grid-column:1/-1;"><label>Location <span style="color:var(--ink-l);font-weight:400;text-transform:none;letter-spacing:0;">(tap any number — areas from live data)</span></label>
+              <div class="type-chips" id="locationChips"><span style="font-size:12px;color:var(--ink-l)">Sync the repository to load areas.</span></div>
+            </div>
+            <div class="filter-group" id="tenureGroup" style="display:none;"><label>Tenure (land)</label>
+              <select id="tenure">
+                <option value="">Any tenure</option>
+                <option value="freehold">Freehold only</option>
+                <option value="lease">Leasehold only</option>
               </select>
             </div>
             <div class="filter-group"><label>Bathrooms</label>
@@ -2490,6 +2473,8 @@ function onAppLoad() {
   renderSearchHistory();
   try { renderDashboard(); } catch(e) {}
   try { renderConfirmQueue(); } catch(e) {}
+  try { buildLocationChips(); } catch(e) {}
+  try { syncTenureVisibility(); } catch(e) {}
   try { updateDropdownProfile(); } catch(e) {}
   var _t = document.getElementById('hdrPageTitle'); if (_t) _t.textContent = 'Dashboard';
 }
@@ -2717,7 +2702,8 @@ function getHistory() {
 }
 function saveToHistory(filters) {
   var label = [];
-  if (filters.location) label.push(filters.location);
+  if (filters.locations && filters.locations.length) label.push(filters.locations.join('/'));
+  if (filters.tenure) label.push(filters.tenure==='lease'?'leasehold':'freehold');
   if (filters.types && filters.types.length) label.push(filters.types.join('/'));
   if (filters.beds) label.push(filters.beds + '+bed');
   if (filters.pool) label.push('pool');
@@ -2752,7 +2738,8 @@ function applyHistory(i) {
   setVal('maxPrice', f.maxPrice);
   setVal('beds', f.beds);
   setSelectedTypes(f.types || (f.type ? [f.type] : []));
-  setVal('location', f.location);
+  setSelectedLocations(f.locations || (f.location ? [f.location] : []));
+  if (document.getElementById('tenure')) document.getElementById('tenure').value = f.tenure || '';
   setVal('baths', f.baths);
   setVal('keywordDesc', f.keywordDesc);
   setVal('mustInclude', f.mustInclude);
@@ -2770,18 +2757,35 @@ function removeHistory(e, i) {
 /* ══════════════════════════════════════
    FILTERS
 ══════════════════════════════════════ */
-function toggleTypeChip(btn){ btn.classList.toggle('active'); }
+function toggleTypeChip(btn){ btn.classList.toggle('active'); syncTenureVisibility(); }
 function getSelectedTypes(){ return Array.prototype.slice.call(document.querySelectorAll('#typeChips .type-chip.active')).map(function(c){ return c.getAttribute('data-type'); }); }
-function setSelectedTypes(types){ types = types || []; document.querySelectorAll('#typeChips .type-chip').forEach(function(c){ c.classList.toggle('active', types.indexOf(c.getAttribute('data-type'))!==-1); }); }
+function setSelectedTypes(types){ types = types || []; document.querySelectorAll('#typeChips .type-chip').forEach(function(c){ c.classList.toggle('active', types.indexOf(c.getAttribute('data-type'))!==-1); }); syncTenureVisibility(); }
+// Tenure filter only makes sense for land — show it when 'land' is selected (or nothing is, so it's discoverable)
+function syncTenureVisibility(){ var g=document.getElementById('tenureGroup'); if(!g) return; var t=getSelectedTypes(); g.style.display=(t.length===0||t.indexOf('land')!==-1)?'':'none'; }
+// Location multi-select chips — built from the live repo so spellings always match the data
+function getSelectedLocations(){ return Array.prototype.slice.call(document.querySelectorAll('#locationChips .type-chip.active')).map(function(c){ return c.getAttribute('data-loc'); }); }
+function setSelectedLocations(locs){ locs = locs || []; document.querySelectorAll('#locationChips .type-chip').forEach(function(c){ c.classList.toggle('active', locs.indexOf(c.getAttribute('data-loc'))!==-1); }); }
+function buildLocationChips(){
+  var el=document.getElementById('locationChips'); if(!el) return;
+  var repo=repoLoad()||[]; var counts={};
+  repo.forEach(function(p){ var a=((p.location||'').split(',')[0]||'').trim(); if(!a || /^tobago$/i.test(a)) return; counts[a]=(counts[a]||0)+1; });
+  var areas=Object.keys(counts).sort(function(a,b){ return counts[b]-counts[a]; });
+  if(!areas.length){ el.innerHTML='<span style="font-size:12px;color:var(--ink-l)">Sync the repository to load areas.</span>'; return; }
+  var sel=getSelectedLocations();
+  el.innerHTML=areas.map(function(a){
+    var act=sel.indexOf(a)!==-1?' active':'';
+    return '<button type="button" class="type-chip'+act+'" data-loc="'+a.replace(/"/g,'&quot;')+'" onclick="toggleTypeChip(this)">'+a+' <span style="opacity:.5;font-weight:400">'+counts[a]+'</span></button>';
+  }).join('');
+}
 function getFilters() {
   return {
     maxPrice    : document.getElementById('maxPrice').value,
     beds        : document.getElementById('beds').value,
     baths       : document.getElementById('baths').value,
     types       : getSelectedTypes(),
-    location    : document.getElementById('location').value,
+    locations   : getSelectedLocations(),
+    tenure      : (document.getElementById('tenure') ? document.getElementById('tenure').value : ''),
     pool        : document.getElementById('poolFilter').checked,
-    propAge     : (document.getElementById('propAge') ? document.getElementById('propAge').value : ''),
     keywordDesc : (document.getElementById('keywordDesc') ? document.getElementById('keywordDesc').value.trim() : ''),
     mustInclude : (document.getElementById('mustInclude') ? document.getElementById('mustInclude').value.trim().toLowerCase() : '')
   };
@@ -2827,6 +2831,7 @@ function repoUpdateUI() {
     if (labelEl)  labelEl.textContent='Search Local ('+listings.length+')';
   }
   try { renderDashboard(); } catch(e) {}
+  try { buildLocationChips(); } catch(e) {}
 }
 
 /* ══════════════════════════════════════
@@ -2837,9 +2842,9 @@ function buildPromptForSite(f, site) {
   if (f.beds) terms.push(f.beds+' bedroom');
   if (f.pool) terms.push('pool');
   if (f.types && f.types.length) terms.push(f.types.join(' '));
-  if (f.location) terms.push(f.location);
+  if (f.locations && f.locations.length) terms.push(f.locations.join(' '));
   if (f.keywordDesc) terms.push(f.keywordDesc);
-  if (f.propAge === 'new') terms.push('new construction');
+  if (f.tenure === 'lease') terms.push('leasehold'); else if (f.tenure === 'freehold') terms.push('freehold');
   terms.push('Tobago for sale');
   var q = terms.join(' ') + ' site:' + (site.sitePath || site.name);
   var criteria = [];
@@ -2847,7 +2852,7 @@ function buildPromptForSite(f, site) {
   if (f.beds)        criteria.push(f.beds+'+bed');
   if (f.baths)       criteria.push(f.baths+'+bath');
   if (f.types && f.types.length) criteria.push(f.types.join(', '));
-  if (f.location)    criteria.push(f.location+' Tobago');
+  if (f.locations && f.locations.length) criteria.push(f.locations.join(', ')+' Tobago');
   if (f.pool)        criteria.push('pool required');
   if (f.keywordDesc) criteria.push(f.keywordDesc);
   if (f.mustInclude) criteria.push('MUST contain: "'+f.mustInclude+'"');
@@ -2925,7 +2930,7 @@ function scoreAndSort(listings, filters) {
     var hay = ((p.title||'')+' '+(p.description||'')+' '+(p.features||[]).join(' ')).toLowerCase();
     if (filters.keywordDesc) { filters.keywordDesc.toLowerCase().split(/[\s,]+/).forEach(function(k){ if(k && hay.indexOf(k)!==-1) score+=1; }); }
     if (filters.types && filters.types.length && filters.types.indexOf((p.type||'').toLowerCase())!==-1) score+=1;
-    if (filters.location && (p.location||'').toLowerCase().includes(filters.location.toLowerCase())) score+=1;
+    if (filters.locations && filters.locations.length && filters.locations.some(function(L){ return (p.location||'').toLowerCase().indexOf(L.toLowerCase())!==-1; })) score+=1;
     if (filters.pool && p.pool) score+=2;
     p._score = Math.min(10, score);
     return p;
@@ -2933,7 +2938,7 @@ function scoreAndSort(listings, filters) {
 }
 
 var searchCache = {};
-function cacheKey(f) { return [f.maxPrice,f.beds,f.baths,(f.types||[]).join(','),f.location,f.pool,f.keywordDesc,f.mustInclude].join('|'); }
+function cacheKey(f) { return [f.maxPrice,f.beds,f.baths,(f.types||[]).join(','),(f.locations||[]).join(','),f.tenure,f.pool,f.keywordDesc,f.mustInclude].join('|'); }
 
 startSearch = async function() {
   var apiKey = localStorage.getItem('anthropic_key');
@@ -2949,7 +2954,8 @@ startSearch = async function() {
       if (filters.beds && (p.beds||0) < Number(filters.beds)) return false;
       if (filters.baths && (p.baths||0) < Number(filters.baths)) return false;
       if (filters.types && filters.types.length && filters.types.indexOf((p.type||'').toLowerCase())===-1) return false;
-      if (filters.location && !(p.location||'').toLowerCase().includes(filters.location.toLowerCase())) return false;
+      if (filters.locations && filters.locations.length && !filters.locations.some(function(L){ return (p.location||'').toLowerCase().indexOf(L.toLowerCase())!==-1; })) return false;
+      if (filters.tenure) { var _isLease=/leasehold|\blease\b/i.test((p.title||'')+' '+(p.description||'')+' '+((p.features||[]).join(' '))); if (filters.tenure==='lease' && !_isLease) return false; if (filters.tenure==='freehold' && _isLease) return false; }
       if (filters.pool && !p.pool) return false;
       if (filters.mustInclude) { var h=((p.title||'')+' '+(p.description||'')+' '+(p.features||[]).join(' ')).toLowerCase(); if(h.indexOf(filters.mustInclude)===-1) return false; }
       if (filters.keywordDesc) { var kw=filters.keywordDesc.toLowerCase().split(/[\s,]+/).filter(Boolean); var h2=((p.title||'')+' '+(p.description||'')+' '+(p.features||[]).join(' ')).toLowerCase(); if(!kw.some(function(k){return h2.indexOf(k)!==-1;})) return false; }
@@ -3022,6 +3028,17 @@ function fmtPrice(p) {
   if (p>=1000000) return 'TT$'+(p/1000000).toFixed(2).replace(/\.?0+$/,'')+'M';
   if (p>=1000) return 'TT$'+Math.round(p/1000)+'k';
   return 'TT$'+Number(p).toLocaleString();
+}
+// Best direct URL for a listing. Rewrites the dead seajadeinvestments.com
+// domain to the current seajaderealty.com/properties/<id>, and returns '' when
+// there's no usable deep link (e.g. pin.tt search results carry no URL).
+function bestUrl(p) {
+  var u = (p && p.url) || '';
+  if (/seajadeinvestments\.com/i.test(u)) {
+    var m = u.match(/\b(rs|tl)\d+\b/i);
+    if (m) return 'https://www.seajaderealty.com/properties/' + m[0].toLowerCase();
+  }
+  return (u && u.length > 15 && u.indexOf('http') === 0) ? u : '';
 }
 // Small "View listing" link for Shortlist / Co-Broker entries. Returns '' for
 // missing/invalid URLs so entries without a link render cleanly.
@@ -3182,8 +3199,10 @@ function makeCard(p) {
   waLines.push('Listed on: '+(p.site||''));
   var waMsg = encodeURIComponent(waLines.join('\n'));
   var cbData = JSON.stringify({title:p.title||'Property',price:price,location:p.location||'Tobago',site:p.site||'',agentName:p.agent_name||'',agentPhone:p.agent_phone||'',url:p.url||''}).replace(/"/g,'&quot;');
-  var _vu=(p.url&&p.url.length>15&&p.url.indexOf('http')===0)?p.url:p.site?'https://'+p.site:null;
-  var _vl=(p.url&&p.url.length>15&&p.url.indexOf('http')===0)?'🔗 View':'🌐 Visit';
+  var _bu = bestUrl(p);
+  var _viewBtn = _bu
+    ? '<a href="'+_bu+'" target="_blank" rel="noopener" class="pa-btn">🔗 View listing</a>'
+    : (p.site ? '<a href="https://www.google.com/search?q='+encodeURIComponent('site:'+p.site+' '+(p.title||''))+'" target="_blank" rel="noopener" class="pa-btn">🔎 Find on '+String(p.site).replace(/^www\./,'')+'</a>' : '');
   var _vfData = JSON.stringify({title:p.title||'',site:p.site||'',url:p.url||''}).replace(/"/g,'&quot;');
 
   var chips=[];
@@ -3215,7 +3234,7 @@ function makeCard(p) {
   if(p.description) c += '<div class="pr-desc">'+p.description+'</div>';
   if(p.agent_name || p.agent_phone) c += '<div class="pr-agent">👤 '+(p.agent_name||'')+(p.agent_phone?'  ·  <a href="tel:'+p.agent_phone+'">'+p.agent_phone+'</a>':'')+'</div>';
   c += '<div class="prop-actions-bar">';
-  if(_vu) c += '<a href="'+_vu+'" target="_blank" rel="noopener" class="pa-btn">'+_vl+'</a>';
+  c += _viewBtn;
   c += '<button class="pa-btn" onclick="searchSimilar('+"'"+((p.location||'Tobago').replace(/'/g,''))+"','"+((p.type||'').replace(/'/g,''))+"'"+')">🔍 Similar</button>';
   c += '<button class="pa-btn" onclick="openSlPicker(this)" data-clientonly="1" '+dataAttrs+'>👤 Client</button>';
   c += '<button class="pa-btn" onclick="addCoBrokerRequest(this,\''+cbData+'\')" data-prop="'+cbData+'">🤝 Co-Broker</button>';
@@ -3228,9 +3247,9 @@ function makeCard(p) {
 }
 
 function searchSimilar(location, type) {
-  var locEl = document.getElementById('location');
-  if (locEl && location) locEl.value = location;
   setSelectedTypes(type ? [String(type).toLowerCase()] : []);
+  buildLocationChips();
+  setSelectedLocations(location ? [String(location).split(',')[0].trim()] : []);
   switchTab('search');
   startSearch();
 }
