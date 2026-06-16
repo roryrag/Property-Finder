@@ -1,0 +1,16 @@
+#!/bin/sh
+# Block any commit where the STAGED index.html has broken inline JS.
+# Mirrors the PostToolUse hook so a syntax error can never land in history.
+# Enable once per clone:  git config core.hooksPath .githooks
+git diff --cached --name-only | grep -qx 'index.html' || exit 0
+git show :index.html | node -e '
+let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{
+  const re=/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi;let m,js="";
+  while((m=re.exec(s)))js+="\n;(function(){\n"+m[1]+"\n})();\n";
+  const os=require("os"),fs=require("fs"),p=require("path");
+  const t=p.join(os.tmpdir(),"_pc_"+process.pid+".js");fs.writeFileSync(t,js);
+  try{require("child_process").execFileSync(process.execPath,["--check",t],{stdio:"pipe"});fs.unlinkSync(t);process.exit(0);}
+  catch(e){try{fs.unlinkSync(t);}catch(_){}
+    process.stderr.write("\n✗ Commit blocked: index.html inline JS has a syntax error:\n"+(e.stderr?e.stderr.toString():e.message)+"\n");
+    process.exit(1);}
+});'
