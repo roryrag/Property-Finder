@@ -3085,6 +3085,10 @@ function bestUrl(p) {
     var m = u.match(/\b(rs|tl)\d+\b/i);
     if (m) return 'https://www.seajaderealty.com/properties/' + m[0].toLowerCase();
   }
+  // Untrusted deep links: search-extracted paths that 404 after a bot
+  // challenge (terracaribbean is Cloudflare-walled). Force the site-search
+  // fallback in viewLink()/the card so the user still reaches the listing.
+  if (/terracaribbean\.com|pin\.tt/i.test(u)) return '';
   return (u && u.length > 15 && u.indexOf('http') === 0) ? u : '';
 }
 // Inline "View / Find" link to a listing's actual page (used on the dashboard).
