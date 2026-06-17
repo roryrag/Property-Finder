@@ -406,6 +406,9 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
 .dash-lcard .pr{font-family:'Playfair Display',serif;color:var(--gold-l);font-size:17px;font-weight:600}
 .dash-lcard .ti{font-size:12.5px;font-weight:600;margin:2px 0;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dash-lcard .lo{font-size:11px;color:var(--ink-l);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dash-lcard-foot{margin-top:6px;display:flex;align-items:center;justify-content:space-between;gap:6px;}
+.dash-view{font-size:11px;font-weight:700;color:var(--gold-l);text-decoration:none;white-space:nowrap;}
+.dash-view:hover{text-decoration:underline;}
 .dash-pipe{display:flex;flex-direction:column;gap:10px}
 .dash-pipe-i{display:flex;align-items:center;gap:12px;padding:11px;border:1px solid var(--border);border-radius:12px;background:var(--bg)}
 .dash-pipe-i .ic{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-size:15px;background:var(--gold-pale);color:var(--gold-l)}
@@ -774,6 +777,9 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
 .type-chip:hover{border-color:var(--gold);color:var(--ink);}
 .type-chip.active{background:linear-gradient(135deg,rgba(201,162,75,.2),rgba(201,162,75,.05));border-color:var(--gold);color:var(--gold-l);}
 /* Location region accordion */
+.loc-allbtn{font-family:inherit;font-size:11px;font-weight:600;color:var(--forest-l);background:rgba(30,122,82,.08);border:1px solid rgba(30,122,82,.2);border-radius:14px;padding:5px 13px;cursor:pointer;}
+.loc-allbtn:hover{background:rgba(30,122,82,.16);}
+.loc-allbtn.clear{color:var(--ink-l);background:var(--bg);border-color:var(--border);}
 #locationChips{display:block;}
 .loc-region{border:1px solid var(--border);border-radius:10px;margin-bottom:7px;overflow:hidden;}
 .loc-region-hd{width:100%;display:flex;align-items:center;gap:8px;background:var(--bg);border:none;padding:9px 12px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--ink);text-align:left;}
@@ -1895,6 +1901,10 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
               </div>
             </div>
             <div class="filter-group" style="grid-column:1/-1;"><label>Location <span style="color:var(--ink-l);font-weight:400;text-transform:none;letter-spacing:0;">(tap any number — areas from live data)</span></label>
+              <div style="display:flex;gap:8px;margin-bottom:9px;">
+                <button type="button" class="loc-allbtn" onclick="selectAllLocations()">Select all</button>
+                <button type="button" class="loc-allbtn clear" onclick="clearLocations()">Clear</button>
+              </div>
               <div id="locationChips"><span style="font-size:12px;color:var(--ink-l)">Sync the repository to load areas.</span></div>
             </div>
             <div class="filter-group" id="tenureGroup" style="display:none;"><label>Tenure (land)</label>
@@ -2581,7 +2591,7 @@ function renderDashboard() {
   var lEl = document.getElementById('dashLatest');
   if (lEl) lEl.innerHTML = latest.length ? latest.map(function(p){
     var ic = ICON[(p.type||'').toLowerCase()] || '🏠';
-    return '<div class="dash-lcard" onclick="switchTab(\'search\')"><div class="im">'+ic+'<span class="tg">'+(p.type||'property')+'</span></div><div class="bd"><div class="pr">'+fmtPrice(p.price)+'</div><div class="ti">'+(p.title||'Property')+'</div><div class="lo">📍 '+(p.location||'Tobago')+'</div><div style="margin-top:6px">'+dealBadge(p)+'</div></div></div>';
+    return '<div class="dash-lcard" onclick="switchTab(\'search\')"><div class="im">'+ic+'<span class="tg">'+(p.type||'property')+'</span></div><div class="bd"><div class="pr">'+fmtPrice(p.price)+'</div><div class="ti">'+(p.title||'Property')+'</div><div class="lo">📍 '+(p.location||'Tobago')+'</div><div class="dash-lcard-foot">'+dealBadge(p)+viewLink(p,'dash-view')+'</div></div></div>';
   }).join('') : '<div class="dash-ok">No listings yet — sync the repository to populate.</div>';
 
   // Best value finds — priced listings furthest below their type average
@@ -2775,6 +2785,8 @@ function syncTenureVisibility(){ var g=document.getElementById('tenureGroup'); i
 // Location multi-select chips — built from the live repo so spellings always match the data
 function getSelectedLocations(){ return Array.prototype.slice.call(document.querySelectorAll('#locationChips .type-chip.active')).map(function(c){ return c.getAttribute('data-loc'); }); }
 function setSelectedLocations(locs){ locs = locs || []; document.querySelectorAll('#locationChips .type-chip').forEach(function(c){ c.classList.toggle('active', locs.indexOf(c.getAttribute('data-loc'))!==-1); }); }
+function selectAllLocations(){ document.querySelectorAll('#locationChips .type-chip').forEach(function(c){ c.classList.add('active'); }); document.querySelectorAll('#locationChips .loc-region').forEach(function(r){ r.classList.add('open'); }); }
+function clearLocations(){ document.querySelectorAll('#locationChips .type-chip').forEach(function(c){ c.classList.remove('active'); }); }
 // Tobago regions (area names normalised: lowercase, "mount"→"mt", no apostrophes)
 var LOC_REGIONS = [
   { name:'Southwest · Crown Point', areas:['crown point','bon accord','canaan','store bay','milford','sandy point','lowlands','tobago plantations','friendship','bethel','carnbee','mt pleasant','shirvan','buccoo bay'] },
@@ -3074,6 +3086,14 @@ function bestUrl(p) {
     if (m) return 'https://www.seajaderealty.com/properties/' + m[0].toLowerCase();
   }
   return (u && u.length > 15 && u.indexOf('http') === 0) ? u : '';
+}
+// Inline "View / Find" link to a listing's actual page (used on the dashboard).
+// stopPropagation so it doesn't trigger a parent card's click handler.
+function viewLink(p, cls) {
+  var u = bestUrl(p);
+  if (u) return '<a href="' + u + '" target="_blank" rel="noopener" class="' + (cls||'') + '" onclick="event.stopPropagation()">🔗 View</a>';
+  if (p.site) return '<a href="https://www.google.com/search?q=' + encodeURIComponent('site:' + p.site + ' ' + (p.title||'')) + '" target="_blank" rel="noopener" class="' + (cls||'') + '" onclick="event.stopPropagation()">🔎 Find</a>';
+  return '';
 }
 // Small "View listing" link for Shortlist / Co-Broker entries. Returns '' for
 // missing/invalid URLs so entries without a link render cleanly.
