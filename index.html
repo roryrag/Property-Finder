@@ -2545,7 +2545,7 @@ function _dashKpi(lbl,val,desc,cls){ return '<div class="dash-kpi"><div class="l
 function _dashPipe(ic,title,sub,n){ return '<div class="dash-pipe-i"><div class="ic">'+ic+'</div><div class="tx"><b>'+title+'</b><span>'+sub+'</span></div><div class="n">'+n+'</div></div>'; }
 function _dashRow(l,v){ return '<div class="dash-repo-row"><span>'+l+'</span><b>'+v+'</b></div>'; }
 function renderDashboard() {
-  var repo = excludeInvalid(repoLoad() || []);
+  var repo = activeRepo();
   var agent = sessionStorage.getItem('agentName') || 'Agent';
   var hr = new Date().getHours();
   var greet = hr < 12 ? 'Good morning' : (hr < 18 ? 'Good afternoon' : 'Good evening');
@@ -2798,7 +2798,7 @@ function _normArea(a){ return (a||'').toLowerCase().replace(/\bmount\b/g,'mt').r
 function toggleLocRegion(btn){ var r=btn.closest('.loc-region'); if(r) r.classList.toggle('open'); }
 function buildLocationChips(){
   var el=document.getElementById('locationChips'); if(!el) return;
-  var repo=repoLoad()||[]; var counts={};
+  var repo=activeRepo(); var counts={};
   repo.forEach(function(p){ var a=((p.location||'').split(',')[0]||'').trim(); if(!a || /^tobago$/i.test(a)) return; counts[a]=(counts[a]||0)+1; });
   var areaNames=Object.keys(counts);
   if(!areaNames.length){ el.innerHTML='<span style="font-size:12px;color:var(--ink-l)">Sync the repository to load areas.</span>'; return; }
@@ -2994,7 +2994,7 @@ startSearch = async function() {
   var ck = cacheKey(filters);
 
   // Repo search
-  var repo = excludeInvalid(repoLoad());
+  var repo = activeRepo();
   if (repo && repo.length > 0) {
     var filtered = repo.filter(function(p) {
       if (filters.maxPrice && p.price > Number(filters.maxPrice)) return false;
@@ -3113,6 +3113,20 @@ var INVALID_KEY = 'tpf_invalid';
 function invKey(p){ return ((p.title||'')+'|'+(p.site||'')).toLowerCase().replace(/\s+/g,' ').trim(); }
 function loadInvalid(){ try { return JSON.parse(localStorage.getItem(INVALID_KEY)) || []; } catch(e){ return []; } }
 function excludeInvalid(list){ if(!Array.isArray(list)) return list; var inv = loadInvalid(); if(!inv.length) return list; return list.filter(function(p){ return inv.indexOf(invKey(p))===-1; }); }
+// Collapse duplicate listings (e.g. the same property under the dead
+// seajadeinvestments.com and the live seajaderealty.com). Key on normalised
+// title; keep the best copy (live domain > has-URL > priced > fresh > recent).
+function dedupeListings(list){
+  if(!Array.isArray(list)) return list;
+  var norm=function(t){ return (t||'').toLowerCase().replace(/[^a-z0-9 ]/g,'').replace(/\s+/g,' ').trim(); };
+  function score(p){ var s=0; if(!/seajadeinvestments\.com/i.test(p.site||'')) s+=4; if(p.url && p.url.indexOf('http')===0 && p.url.length>15) s+=2; if(Number(p.price)>0) s+=2; if(p.status!=='stale') s+=1; s+=(Number(p.lastSeen)||0)/1e15; return s; }
+  var best={}, out=[];
+  list.forEach(function(p){ var k=norm(p.title); if(!k){ out.push(p); return; } if(!best[k] || score(p)>score(best[k])) best[k]=p; });
+  Object.keys(best).forEach(function(k){ out.push(best[k]); });
+  return out;
+}
+// The repo as the app should show it: invalid-flagged removed + de-duplicated.
+function activeRepo(){ return dedupeListings(excludeInvalid(repoLoad()||[])); }
 function flagInvalid(btn){
   var key = btn.getAttribute('data-key'); if(!key) return;
   if(!confirm('Flag this listing as invalid and remove it from your available listings?')) return;
@@ -3121,6 +3135,33 @@ function flagInvalid(btn){
   var card = btn.closest('.prop-row, .prop-card'); if(card) card.remove();
   var ce=document.getElementById('resultCount'); if(ce) ce.textContent=_lastResults.length+' listing'+(_lastResults.length!==1?'s':'')+' found';
   var rs=document.getElementById('resultStats'); if(rs) rs.innerHTML=buildResultStats(_lastResults);
+}
+// Mark a search result SOLD: capture it as an agent sold comp (ground truth
+// for the valuator) at the confirmed sold price, then remove it from the
+// available listings (same hide mechanism as invalid).
+function flagSold(btn){
+  var d; try { d = JSON.parse((btn.getAttribute('data-sold')||'{}').replace(/&quot;/g,'"').replace(/&#39;/g,"'")); } catch(e){ return; }
+  var ask = Number(d.price)||0;
+  var input = prompt('Mark "'+(d.title||'this listing')+'" as SOLD.\n\nEnter the SOLD price in TT$ (leave blank to just remove it as bad data):', ask?String(ask):'');
+  if (input===null) return;                      // cancelled
+  var price = parseFloat(String(input).replace(/[^0-9.]/g,'')) || 0;
+  var key = d.key;
+  // Always remove it from available listings
+  var inv = loadInvalid(); if (key && inv.indexOf(key)===-1){ inv.push(key); localStorage.setItem(INVALID_KEY, JSON.stringify(inv)); }
+  // If a sold price was given, record it as a real (agent) sold comp
+  if (price > 0){
+    var size = parseSizeSqft(d.size) || 0;
+    compsLoad();
+    soldComps.push({ id:Date.now(), loc:d.location||'', size:size, price:price, psf:(size>0?Math.round(price/size):0), tenure:d.tenure||'freehold', date:new Date().toISOString().slice(0,10), notes:'Sold — flagged from search: '+(d.title||''), type:(d.type||''), source:'agent' });
+    compsSave();
+  }
+  if (key) _lastResults = _lastResults.filter(function(p){ return invKey(p)!==key; });
+  var card = btn.closest('.prop-row, .prop-card'); if(card) card.remove();
+  var ce=document.getElementById('resultCount'); if(ce) ce.textContent=_lastResults.length+' listing'+(_lastResults.length!==1?'s':'')+' found';
+  var rs=document.getElementById('resultStats'); if(rs) rs.innerHTML=buildResultStats(_lastResults);
+  try { renderCompList(); } catch(e){}
+  try { renderDashboard(); } catch(e){}
+  if (price>0) alert('✅ Recorded as a sold comp (TT$'+price.toLocaleString()+') — it now feeds the valuator.');
 }
 
 /* ── Data-rich helpers: per-type averages, PSF, deal context, stats strip ── */
@@ -3263,6 +3304,7 @@ function makeCard(p) {
     ? '<a href="'+_bu+'" target="_blank" rel="noopener" class="pa-btn">🔗 View listing</a>'
     : (p.site ? '<a href="https://www.google.com/search?q='+encodeURIComponent('site:'+p.site+' '+(p.title||''))+'" target="_blank" rel="noopener" class="pa-btn">🔎 Find on '+String(p.site).replace(/^www\./,'')+'</a>' : '');
   var _vfData = JSON.stringify({title:p.title||'',site:p.site||'',url:p.url||''}).replace(/"/g,'&quot;');
+  var _soldData = JSON.stringify({key:invKey(p),title:p.title||'',price:Number(p.price)||0,location:p.location||'',size:p.size||'',type:(p.type||'').toLowerCase(),tenure:(/leasehold|\blease\b/i.test((p.title||'')+' '+(p.description||''))?'leasehold':'freehold')}).replace(/"/g,'&quot;');
 
   var chips=[];
   if(p.beds>0) chips.push('🛌 '+p.beds);
@@ -3298,7 +3340,8 @@ function makeCard(p) {
   c += '<button class="pa-btn" onclick="openSlPicker(this)" data-clientonly="1" '+dataAttrs+'>👤 Client</button>';
   c += '<button class="pa-btn" onclick="addCoBrokerRequest(this,\''+cbData+'\')" data-prop="'+cbData+'">🤝 Co-Broker</button>';
   c += '<button class="pa-btn" onclick="verifyListing(this,\''+_vfData+'\')">🔎 Verify</button>';
-  c += '<button class="pa-btn danger" onclick="flagInvalid(this)" data-key="'+invKey(p).replace(/"/g,'&quot;')+'">⚑ Flag</button>';
+  c += '<button class="pa-btn" onclick="flagSold(this)" data-sold="'+_soldData+'">🏷️ Mark sold</button>';
+  c += '<button class="pa-btn danger" onclick="flagInvalid(this)" data-key="'+invKey(p).replace(/"/g,'&quot;')+'">⚑ Bad data</button>';
   c += '</div>';
   c += '</div>';
   c += '</div>';
@@ -4263,6 +4306,7 @@ function knnPSF(subject, opts){
   compsLoad();
   soldComps.concat(activeSharedSold()).forEach(function(c){
     if(opts.excludeId && c.id===opts.excludeId) return;
+    if(c.type && c.type.toLowerCase()!=='land') return;   // land valuator → ignore non-land sold comps
     var psf=Number(c.psf) || (c.price&&c.size? Number(c.price)/parseSizeSqft(c.size):0);
     if(!(psf>5 && psf<2000)) return;
     cands.push({ psf:psf, loc:c.loc, size:(parseSizeSqft(c.size)||size), dateMs:_parseDateMs(c.date), srcKind:(c.source==='candidate'?'candidate':'sold') });
@@ -4319,7 +4363,7 @@ function knnPSF(subject, opts){
       measured, not guessed. ── */
 function backtestValuator(){
   compsLoad();
-  var truth=soldComps.filter(function(c){ return c.source==='agent' && Number(c.psf)>5 && Number(c.psf)<2000 && parseSizeSqft(c.size)>=100; });
+  var truth=soldComps.filter(function(c){ return c.source==='agent' && (!c.type || c.type.toLowerCase()==='land') && Number(c.psf)>5 && Number(c.psf)<2000 && parseSizeSqft(c.size)>=100; });
   if(truth.length<3) return { error:'Need at least 3 confirmed (agent-entered) sold comps to backtest — you have '+truth.length+'. Add sold comparables to enable this.' };
   var errs=[], covered=0, used=0;
   truth.forEach(function(c){

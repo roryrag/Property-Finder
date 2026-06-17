@@ -619,22 +619,32 @@ function parseSizeSqft(sizeStr) {
   };
   fs.writeFileSync(SOLD_FILE, JSON.stringify(sold, null, 1));
 
+  /* Dedup: collapse the same property appearing twice (e.g. the dead
+     seajadeinvestments.com vs the live seajaderealty.com). Key on normalised
+     title; keep the best copy (live domain > has-URL > priced > fresh > recent). */
+  const _dnorm = t => (t||'').toLowerCase().replace(/[^a-z0-9 ]/g,'').replace(/\s+/g,' ').trim();
+  const _dscore = p => { let s=0; if(!/seajadeinvestments\.com/i.test(p.site||'')) s+=4; if(p.url && p.url.indexOf('http')===0 && p.url.length>15) s+=2; if(Number(p.price)>0) s+=2; if(p.status!=='stale') s+=1; s+=(Number(p.lastSeen)||0)/1e15; return s; };
+  const _best = {}, _untitled = []; let dupDropped = 0;
+  merged.forEach(p => { const k=_dnorm(p.title); if(!k){ _untitled.push(p); return; } if(!_best[k]){ _best[k]=p; } else { dupDropped++; if(_dscore(p)>_dscore(_best[k])) _best[k]=p; } });
+  const deduped = Object.keys(_best).map(k=>_best[k]).concat(_untitled);
+
   const sources = {};
-  merged.forEach(p => { const s = p.site || 'unknown'; sources[s] = (sources[s] || 0) + 1; });
+  deduped.forEach(p => { const s = p.site || 'unknown'; sources[s] = (sources[s] || 0) + 1; });
 
   const out = {
     meta: {
       lastRefresh: new Date(now).toISOString(),
-      totalListings: merged.length,
-      activeCount: merged.filter(p => p.status === 'active').length,
-      staleCount, withPrice: merged.filter(p => p.price > 0).length,
+      totalListings: deduped.length,
+      activeCount: deduped.filter(p => p.status === 'active').length,
+      staleCount, withPrice: deduped.filter(p => p.price > 0).length,
       newThisRun: newCount, updatedThisRun: updatedCount, droppedThisRun: droppedCount,
+      duplicatesMergedThisRun: dupDropped,
       rejectedRentalThisRun: rejRental, rejectedNonTobagoThisRun: rejTrinidad,
       purgedFromRepoThisRun: purgedCount,
       extractCallsUsed,
       sources, siteReports
     },
-    listings: merged
+    listings: deduped
   };
 
   fs.mkdirSync(path.dirname(DATA_FILE), { recursive: true });
