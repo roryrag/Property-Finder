@@ -773,6 +773,16 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
 .type-chip{font-family:inherit;font-size:12.5px;font-weight:600;color:var(--ink-l);background:var(--white);border:1px solid var(--border);border-radius:20px;padding:7px 14px;cursor:pointer;transition:var(--t);}
 .type-chip:hover{border-color:var(--gold);color:var(--ink);}
 .type-chip.active{background:linear-gradient(135deg,rgba(201,162,75,.2),rgba(201,162,75,.05));border-color:var(--gold);color:var(--gold-l);}
+/* Location region accordion */
+#locationChips{display:block;}
+.loc-region{border:1px solid var(--border);border-radius:10px;margin-bottom:7px;overflow:hidden;}
+.loc-region-hd{width:100%;display:flex;align-items:center;gap:8px;background:var(--bg);border:none;padding:9px 12px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--ink);text-align:left;}
+.loc-region-hd:hover{background:var(--gold-pale);}
+.loc-chev{display:inline-block;transition:transform .15s;color:var(--gold-l);font-size:11px;}
+.loc-region.open .loc-chev{transform:rotate(90deg);}
+.loc-region-ct{margin-left:auto;font-size:11px;color:var(--ink-l);font-weight:400;background:var(--white);border:1px solid var(--border);border-radius:12px;padding:1px 9px;}
+.loc-region-body{display:none;padding:10px 12px;gap:7px;}
+.loc-region.open .loc-region-body{display:flex;flex-wrap:wrap;}
 
 /* Results: dense, scannable list rows */
 #cardList{display:flex;flex-direction:column;gap:8px;}
@@ -1885,7 +1895,7 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
               </div>
             </div>
             <div class="filter-group" style="grid-column:1/-1;"><label>Location <span style="color:var(--ink-l);font-weight:400;text-transform:none;letter-spacing:0;">(tap any number — areas from live data)</span></label>
-              <div class="type-chips" id="locationChips"><span style="font-size:12px;color:var(--ink-l)">Sync the repository to load areas.</span></div>
+              <div id="locationChips"><span style="font-size:12px;color:var(--ink-l)">Sync the repository to load areas.</span></div>
             </div>
             <div class="filter-group" id="tenureGroup" style="display:none;"><label>Tenure (land)</label>
               <select id="tenure">
@@ -2765,17 +2775,43 @@ function syncTenureVisibility(){ var g=document.getElementById('tenureGroup'); i
 // Location multi-select chips — built from the live repo so spellings always match the data
 function getSelectedLocations(){ return Array.prototype.slice.call(document.querySelectorAll('#locationChips .type-chip.active')).map(function(c){ return c.getAttribute('data-loc'); }); }
 function setSelectedLocations(locs){ locs = locs || []; document.querySelectorAll('#locationChips .type-chip').forEach(function(c){ c.classList.toggle('active', locs.indexOf(c.getAttribute('data-loc'))!==-1); }); }
+// Tobago regions (area names normalised: lowercase, "mount"→"mt", no apostrophes)
+var LOC_REGIONS = [
+  { name:'Southwest · Crown Point', areas:['crown point','bon accord','canaan','store bay','milford','sandy point','lowlands','tobago plantations','friendship','bethel','carnbee','mt pleasant','shirvan','buccoo bay'] },
+  { name:'Leeward · North coast', areas:['buccoo','mt irvine','black rock','grafton','plymouth','arnos vale','arnosvale','les coteaux','mason hall','moriah','castara','englishman','parlatuvier','bloody bay','golden lane','culloden','great courland','cuffie river'] },
+  { name:'Scarborough & East', areas:['scarborough','bacolet','calder hall','lambeau','signal hill','patience hill','hope','whim','glamorgan','mt grace','mt st george','studley park','goodwood','pembroke','belle garden','sherwood park','orange hill','mt marie','shaw park','john dial','gordon heights','pentlands'] },
+  { name:'Windward · Northeast', areas:['speyside','charlotteville','delaford','kings bay','louis dor','argyle','goldsborough','roxborough','betsys hope','king peters bay'] }
+];
+function _normArea(a){ return (a||'').toLowerCase().replace(/\bmount\b/g,'mt').replace(/[’'.]/g,'').replace(/\s+/g,' ').trim(); }
+function toggleLocRegion(btn){ var r=btn.closest('.loc-region'); if(r) r.classList.toggle('open'); }
 function buildLocationChips(){
   var el=document.getElementById('locationChips'); if(!el) return;
   var repo=repoLoad()||[]; var counts={};
   repo.forEach(function(p){ var a=((p.location||'').split(',')[0]||'').trim(); if(!a || /^tobago$/i.test(a)) return; counts[a]=(counts[a]||0)+1; });
-  var areas=Object.keys(counts).sort(function(a,b){ return counts[b]-counts[a]; });
-  if(!areas.length){ el.innerHTML='<span style="font-size:12px;color:var(--ink-l)">Sync the repository to load areas.</span>'; return; }
+  var areaNames=Object.keys(counts);
+  if(!areaNames.length){ el.innerHTML='<span style="font-size:12px;color:var(--ink-l)">Sync the repository to load areas.</span>'; return; }
   var sel=getSelectedLocations();
-  el.innerHTML=areas.map(function(a){
-    var act=sel.indexOf(a)!==-1?' active':'';
-    return '<button type="button" class="type-chip'+act+'" data-loc="'+a.replace(/"/g,'&quot;')+'" onclick="toggleTypeChip(this)">'+a+' <span style="opacity:.5;font-weight:400">'+counts[a]+'</span></button>';
-  }).join('');
+  var groups={}; LOC_REGIONS.forEach(function(r){ groups[r.name]=[]; }); groups['Other areas']=[];
+  areaNames.forEach(function(a){
+    var na=_normArea(a), placed=false;
+    for(var i=0;i<LOC_REGIONS.length;i++){ if(LOC_REGIONS[i].areas.some(function(k){ return na.indexOf(k)!==-1; })){ groups[LOC_REGIONS[i].name].push(a); placed=true; break; } }
+    if(!placed) groups['Other areas'].push(a);
+  });
+  var order=LOC_REGIONS.map(function(r){ return r.name; }).concat(['Other areas']);
+  var html='';
+  order.forEach(function(rn){
+    var areas=groups[rn]; if(!areas.length) return;
+    areas.sort(function(a,b){ return counts[b]-counts[a]; });
+    var total=areas.reduce(function(s,a){ return s+counts[a]; },0);
+    var open=areas.some(function(a){ return sel.indexOf(a)!==-1; });
+    html+='<div class="loc-region'+(open?' open':'')+'">'+
+      '<button type="button" class="loc-region-hd" onclick="toggleLocRegion(this)"><span class="loc-chev">▸</span> '+rn+' <span class="loc-region-ct">'+total+'</span></button>'+
+      '<div class="loc-region-body type-chips">'+
+        areas.map(function(a){ var act=sel.indexOf(a)!==-1?' active':''; return '<button type="button" class="type-chip'+act+'" data-loc="'+a.replace(/"/g,'&quot;')+'" onclick="toggleTypeChip(this)">'+a+' <span style="opacity:.5;font-weight:400">'+counts[a]+'</span></button>'; }).join('')+
+      '</div></div>';
+  });
+  el.innerHTML=html;
+  if(!el.querySelector('.loc-region.open')){ var f=el.querySelector('.loc-region'); if(f) f.classList.add('open'); }
 }
 function getFilters() {
   return {
