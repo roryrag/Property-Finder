@@ -1,16 +1,16 @@
 {
  "meta": {
-  "lastRefresh": "2026-06-22T15:25:35.954Z",
+  "lastRefresh": "2026-06-22T18:10:11.047Z",
   "totalListings": 273,
   "activeCount": 273,
   "staleCount": 0,
   "withPrice": 207,
-  "newThisRun": 7,
-  "updatedThisRun": 80,
+  "newThisRun": 0,
+  "updatedThisRun": 0,
   "droppedThisRun": 0,
-  "duplicatesMergedThisRun": 5,
-  "rejectedRentalThisRun": 9,
-  "rejectedNonTobagoThisRun": 20,
+  "duplicatesMergedThisRun": 0,
+  "rejectedRentalThisRun": 0,
+  "rejectedNonTobagoThisRun": 0,
   "purgedFromRepoThisRun": 0,
   "extractCallsUsed": 40,
   "sources": {
@@ -33,44 +33,48 @@
    },
    "charbonnerealty.com": {
     "method": "crawl",
-    "listings": 27,
+    "listings": 0,
     "urlsFound": 124,
     "jsonld": 0,
-    "claude": 27
+    "claude": 0
    },
    "rain-properties-tobago.com": {
     "method": "crawl",
-    "listings": 8,
+    "listings": 0,
     "urlsFound": 33,
     "jsonld": 0,
-    "claude": 8
+    "claude": 0
    },
    "mybunchofkeys.com": {
     "method": "crawl",
-    "listings": 18,
-    "urlsFound": 82,
+    "listings": 0,
+    "urlsFound": 77,
     "jsonld": 0,
-    "claude": 18
+    "claude": 0
    },
    "realestatetobago.com": {
     "method": "crawl",
-    "listings": 32,
+    "listings": 0,
     "urlsFound": 65,
     "jsonld": 0,
-    "claude": 32
+    "claude": 0
    },
    "www.seajaderealty.com": {
     "method": "crawl",
-    "listings": 32,
+    "listings": 0,
     "urlsFound": 33,
     "jsonld": 0,
-    "claude": 32
+    "claude": 0
    },
-   "caribbeanMLS": {
+   "pin.tt houses": {
     "method": "search",
     "listings": 0
    },
-   "villas": {
+   "pin.tt land": {
+    "method": "search",
+    "listings": 0
+   },
+   "terracaribbean": {
     "method": "search",
     "listings": 0
    }
