@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BrokerBuddy — Tobago Real Estate</title>
+<!-- Hard-coded preview card (WhatsApp/social read these static OG tags). -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BrokerBuddy">
+<meta property="og:title" content="BrokerBuddy — Tobago Real Estate">
+<meta property="og:description" content="Property shared via BrokerBuddy. Tap to view the listing.">
+<meta property="og:image" content="https://roryrag.github.io/Property-Finder/share-banner.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="BrokerBuddy — Tobago Real Estate">
+<meta name="twitter:image" content="https://roryrag.github.io/Property-Finder/share-banner.png">
+<link rel="icon" href="apple-touch-icon-180.png">
+<style>
+  body{font-family:'DM Sans',system-ui,sans-serif;background:#0B0F0D;color:#F3EEE3;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;margin:0;text-align:center;padding:24px}
+  .mark{width:64px;height:64px;margin-bottom:14px}
+  a{color:#E2C079;font-weight:600;text-decoration:none}
+  .muted{color:#9C968A;font-size:13px;margin-top:8px}
+</style>
+</head>
+<body>
+  <svg class="mark" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg"><rect width="44" height="44" rx="12" fill="#16513A"/><path d="M22 10L32 19H29V30C29 30.55 28.55 31 28 31H24V24H20V31H16C15.45 31 15 30.55 15 30V19H12L22 10Z" fill="#E2C079"/><circle cx="22" cy="22.6" r="2.1" fill="#0C2A1C"/></svg>
+  <div style="font-family:'Playfair Display',serif;font-size:22px;font-weight:600">Opening listing&hellip;</div>
+  <div class="muted" id="manual"></div>
+  <script>
+    (function(){
+      var to = new URLSearchParams(location.search).get('to') || '';
+      if (/^https?:\/\//i.test(to)) {
+        var safe = to.replace(/"/g,'%22');
+        document.getElementById('manual').innerHTML = 'If it does not open automatically, <a href="'+safe+'">tap here to view the listing</a>.';
+        location.replace(to);
+      } else {
+        document.getElementById('manual').innerHTML = '<a href="./">Open BrokerBuddy</a>';
+      }
+    })();
+  </script>
+</body>
+</html>
