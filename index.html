@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>BrokerBuddy</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'><rect width='44' height='44' rx='10' fill='%230E2E1F'/><path d='M22 10L32 19H29V30C29 30.55 28.55 31 28 31H24V24H20V31H16C15.45 31 15 30.55 15 30V19H12L22 10Z' fill='%23E2C079'/><circle cx='22' cy='22.6' r='2.1' fill='%230C2A1C'/></svg>">
+<!-- PWA: installable app -->
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0B0F0D">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BrokerBuddy">
+<link rel="apple-touch-icon" href="apple-touch-icon-180.png">
+<script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}</script>
 <style>
 /* ═══════════════════════════════════════
    TOBAGO PROPERTY FINDER v3.1
