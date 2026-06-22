@@ -3111,16 +3111,6 @@ function bestUrl(p) {
   if (/terracaribbean\.com|pin\.tt/i.test(u)) return '';
   return (u && u.length > 15 && u.indexOf('http') === 0) ? u : '';
 }
-// Wrap a listing URL through our redirect page so SHARED messages (WhatsApp)
-// show a branded BrokerBuddy preview card (go.html's hard-coded og:image)
-// instead of the destination site's random thumbnail. Tapping redirects to
-// the listing. Public host is hard-coded so recipients can reach it.
-var GO_BASE = 'https://roryrag.github.io/Property-Finder/go.html';
-function shareUrl(u){
-  if(!u || String(u).indexOf('http')!==0) return '';
-  if(/seajadeinvestments\.com/i.test(u)){ var m=u.match(/\b(rs|tl)\d+\b/i); if(m) u='https://www.seajaderealty.com/properties/'+m[0].toLowerCase(); }
-  return GO_BASE + '?to=' + encodeURIComponent(u);
-}
 // Inline "View / Find" link to a listing's actual page (used on the dashboard).
 // stopPropagation so it doesn't trigger a parent card's click handler.
 function viewLink(p, cls) {
@@ -3325,7 +3315,7 @@ function makeCard(p) {
   if(feats.length) waLines.push('');
   if(p.agent_name) waLines.push('👤 Agent: '+p.agent_name);
   if(p.agent_phone) waLines.push('📞 Phone: '+p.agent_phone);
-  var _su=shareUrl(bestUrl(p)); if(_su) waLines.push('🔗 '+_su);
+  if(p.url) waLines.push('🔗 '+p.url);
   waLines.push('Listed on: '+(p.site||''));
   var waMsg = encodeURIComponent(waLines.join('\n'));
   var cbData = JSON.stringify({title:p.title||'Property',price:price,location:p.location||'Tobago',site:p.site||'',agentName:p.agent_name||'',agentPhone:p.agent_phone||'',url:p.url||''}).replace(/"/g,'&quot;');
@@ -3413,7 +3403,7 @@ function removeFromShortlist(id) {
 function shareShortlist() {
   if (!shortlist.length) return;
   var lines=['\uD83C\uDFE0 PROPERTY SHORTLIST','BrokerBuddy',''];
-  shortlist.forEach(function(s,i){lines.push((i+1)+'. '+s.title);lines.push('   '+s.price);if(s.loc)lines.push('   '+s.loc);var _su=shareUrl(s.url);if(_su)lines.push('   '+_su);lines.push('');});
+  shortlist.forEach(function(s,i){lines.push((i+1)+'. '+s.title);lines.push('   '+s.price);if(s.loc)lines.push('   '+s.loc);if(s.url)lines.push('   '+s.url);lines.push('');});
   lines.push('BrokerBuddy \u2014 '+new Date().toLocaleDateString());
   window.open('https://wa.me/?text='+encodeURIComponent(lines.join('\n')),'_blank');
 }
@@ -3731,7 +3721,7 @@ function addCoBrokerRequest(btn, propDataStr) {
 function cbUpdateStatus(id,status){ cbLoad(); var r=cbRequests.find(function(x){return x.id===id;}); if(r){r.status=status;cbSave();renderCoBrokerList();} }
 function cbSaveNotes(id){ cbLoad(); var r=cbRequests.find(function(x){return x.id===id;}); var el=document.getElementById('cbn-'+id); if(r&&el){r.notes=el.value;cbSave();} }
 function cbDelete(id){ if(!confirm('Remove this request?')) return; cbLoad(); cbRequests=cbRequests.filter(function(r){return r.id!==id;}); cbSave(); renderCoBrokerList(); var badge=document.getElementById('badge-cobroker'); if(badge){if(cbRequests.length>0){badge.textContent=cbRequests.length;}else{badge.classList.remove('show');}} }
-function cbSendWhatsApp(id){ cbLoad(); var req=cbRequests.find(function(r){return r.id===id;}); if(!req) return; var pf=loadProfile(); var myName=pf.name||req.myName||'Agent'; var myAgency=pf.agency||req.myAgency||''; var myPhone=pf.phone||req.myPhone||''; var myEmail=pf.email||req.myEmail||''; var msg=encodeURIComponent('\uD83E\uDD1D *CO-BROKER REQUEST*\n\nHi'+(req.agentName?' '+req.agentName:'')+',\n\nI am '+myName+(myAgency?', '+myAgency:'')+'. My client is interested in your listing and I would like to explore a co-broker arrangement:\n\n\uD83C\uDFE0 *'+req.title+'*\n\uD83D\uDCB0 '+req.price+'\n\uD83D\uDCCD '+req.location+', Tobago\n\uD83C\uDF10 '+req.site+(req.url?'\n🔗 '+shareUrl(req.url):'')+'\n\n*From:*\n\uD83D\uDC64 '+myName+(myAgency?'\n\uD83C\uDFE2 '+myAgency:'')+(myPhone?'\n\uD83D\uDCDE '+myPhone:'')+(myEmail?'\n\uD83D\uDCE7 '+myEmail:'')+'\n\nWould you be open to a co-broker arrangement? Thank you!'); var phone=req.agentPhone?req.agentPhone.replace(/\D/g,''):''; window.open((phone?'https://wa.me/'+phone:' https://wa.me/')+'?text='+msg,'_blank'); }
+function cbSendWhatsApp(id){ cbLoad(); var req=cbRequests.find(function(r){return r.id===id;}); if(!req) return; var pf=loadProfile(); var myName=pf.name||req.myName||'Agent'; var myAgency=pf.agency||req.myAgency||''; var myPhone=pf.phone||req.myPhone||''; var myEmail=pf.email||req.myEmail||''; var msg=encodeURIComponent('\uD83E\uDD1D *CO-BROKER REQUEST*\n\nHi'+(req.agentName?' '+req.agentName:'')+',\n\nI am '+myName+(myAgency?', '+myAgency:'')+'. My client is interested in your listing and I would like to explore a co-broker arrangement:\n\n\uD83C\uDFE0 *'+req.title+'*\n\uD83D\uDCB0 '+req.price+'\n\uD83D\uDCCD '+req.location+', Tobago\n\uD83C\uDF10 '+req.site+(req.url?'\n🔗 '+req.url:'')+'\n\n*From:*\n\uD83D\uDC64 '+myName+(myAgency?'\n\uD83C\uDFE2 '+myAgency:'')+(myPhone?'\n\uD83D\uDCDE '+myPhone:'')+(myEmail?'\n\uD83D\uDCE7 '+myEmail:'')+'\n\nWould you be open to a co-broker arrangement? Thank you!'); var phone=req.agentPhone?req.agentPhone.replace(/\D/g,''):''; window.open((phone?'https://wa.me/'+phone:' https://wa.me/')+'?text='+msg,'_blank'); }
 function cbSendEmail(id){ cbLoad(); var req=cbRequests.find(function(r){return r.id===id;}); if(!req) return; var subj=encodeURIComponent('Co-Broker Request: '+req.title); var body=encodeURIComponent('Dear '+(req.agentName||'Agent')+',\n\nI am '+(req.myName||'Agent')+(req.myAgency?', '+req.myAgency:'')+' and I have a client interested in your property:\n\n'+req.title+'\nPrice: '+req.price+'\nLocation: '+req.location+', Tobago\nSite: '+req.site+(req.url?'\nListing: '+req.url:'')+'\n\nI would like to explore a co-broker arrangement.\n\n'+(req.myPhone?'Phone: '+req.myPhone+'\n':'')+(req.myEmail?'Email: '+req.myEmail+'\n':'')+'Kind regards,\n'+(req.myName||'Agent')); window.open('mailto:?subject='+subj+'&body='+body,'_blank'); }
 function renderCoBrokerList() {
   cbLoad();
@@ -4874,7 +4864,7 @@ function shareClientSl(contactId) {
     lines.push((i+1) + '. ' + (p.title || 'Property'));
     lines.push('   \uD83D\uDCB0 ' + (p.price || ''));
     if (p.loc) lines.push('   \uD83D\uDCCD ' + p.loc);
-    var _su = shareUrl(p.url); if (_su) lines.push('   \uD83D\uDD17 ' + _su);
+    if (p.url) lines.push('   \uD83D\uDD17 ' + p.url);
     lines.push('');
   });
   lines.push('Please let me know if you are interested in any of the above properties.');
