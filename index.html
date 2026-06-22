@@ -2341,6 +2341,17 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
         </div>
         <button class="settings-save-btn" onclick="saveSettings()">&#10003; Save Settings</button>
         <div class="settings-saved" id="settingsSavedMsg">&#9989; Saved successfully!</div>
+
+        <div class="card" style="margin-top:14px;">
+          <div class="card-title">&#128190; Backup &amp; restore</div>
+          <p style="font-size:12px;color:var(--ink-l);line-height:1.55;margin-bottom:12px;">Your sold comps, contacts, client shortlists and co-broker requests are stored only on this device. Export a backup regularly &mdash; and to move to a new phone or recover after clearing your browser.</p>
+          <button class="btn-primary" style="margin-bottom:8px;" onclick="exportWorkspace()">&#11015;&#65039; Export my data (.json)</button>
+          <label class="btn-primary" style="display:block;text-align:center;background:rgba(30,122,82,.08);color:var(--forest-l);border:1px solid rgba(30,122,82,.2);cursor:pointer;">
+            &#11014;&#65039; Restore from backup
+            <input type="file" accept="application/json,.json" style="display:none;" onchange="importWorkspace(this)">
+          </label>
+          <div style="font-size:11px;color:var(--ink-xl);margin-top:8px;">Restore merges into your current data (won&rsquo;t wipe it). Your API key is never included in the backup.</div>
+        </div>
       </div>
     </div>
 
@@ -3764,6 +3775,68 @@ function saveSettings() {
   var msg=document.getElementById('settingsSavedMsg');
   if(msg){msg.style.display='block';setTimeout(function(){msg.style.display='none';},3000);}
   try { updateDropdownProfile(); } catch(e) {}
+}
+
+/* ══════════════════════════════════════
+   WORKSPACE BACKUP / RESTORE
+   Exports all agent-created tpf_* data (NOT the re-syncable repo cache
+   or the API key) to a JSON file; restore merges it back in.
+══════════════════════════════════════ */
+var _BACKUP_SKIP = { 'tpf_repo':1, 'tpf_repo_date':1, 'tpf_repo_source':1, 'tpf_shared_sold_comps':1 };
+function exportWorkspace(){
+  var data={}, n=0;
+  for (var i=0;i<localStorage.length;i++){
+    var k=localStorage.key(i);
+    if (k && k.indexOf('tpf_')===0 && !_BACKUP_SKIP[k]) { data[k]=localStorage.getItem(k); n++; }
+  }
+  var payload={ app:'BrokerBuddy', version:1, exportedAt:new Date().toISOString(), agent:(sessionStorage.getItem('agentName')||''), data:data };
+  var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  var url=URL.createObjectURL(blob), a=document.createElement('a');
+  a.href=url; a.download='brokerbuddy-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){URL.revokeObjectURL(url);},2000);
+  alert('✅ Exported '+n+' data item(s). Keep this file safe.');
+}
+function importWorkspace(input){
+  var file=input.files&&input.files[0]; if(!file) return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var payload; try{ payload=JSON.parse(e.target.result); }catch(err){ alert('That is not a valid JSON file.'); input.value=''; return; }
+    if(!payload || payload.app!=='BrokerBuddy' || !payload.data){ alert('This does not look like a BrokerBuddy backup.'); input.value=''; return; }
+    var keys=Object.keys(payload.data);
+    if(!confirm('Restore '+keys.length+' data item(s) from a backup dated '+String(payload.exportedAt||'').slice(0,10)+'?\n\nThis MERGES into your current data (nothing is wiped).')){ input.value=''; return; }
+    var done=0;
+    keys.forEach(function(k){
+      var incoming=payload.data[k], cur=localStorage.getItem(k);
+      try{
+        var inVal=JSON.parse(incoming), curVal=cur?JSON.parse(cur):null;
+        if(Array.isArray(inVal)){
+          if(Array.isArray(curVal)){
+            if(inVal.length && typeof inVal[0]==='object'){
+              var seen={}; curVal.forEach(function(x){ if(x&&x.id!=null) seen[x.id]=1; });
+              inVal.forEach(function(x){ if(x&&x.id!=null){ if(!seen[x.id]){ curVal.push(x); seen[x.id]=1; } } else curVal.push(x); });
+              localStorage.setItem(k, JSON.stringify(curVal));
+            } else {
+              var set={}; curVal.forEach(function(v){set[v]=1;}); inVal.forEach(function(v){set[v]=1;});
+              localStorage.setItem(k, JSON.stringify(Object.keys(set)));
+            }
+          } else localStorage.setItem(k, incoming);
+        } else if(inVal && typeof inVal==='object'){
+          var base=(curVal && typeof curVal==='object' && !Array.isArray(curVal)) ? curVal : {};
+          Object.keys(inVal).forEach(function(kk){
+            if(Array.isArray(inVal[kk]) && Array.isArray(base[kk])){
+              var s={}; base[kk].forEach(function(x){ s[(x&&x.id!=null)?x.id:JSON.stringify(x)]=1; });
+              inVal[kk].forEach(function(x){ var id=(x&&x.id!=null)?x.id:JSON.stringify(x); if(!s[id]){ base[kk].push(x); s[id]=1; } });
+            } else base[kk]=inVal[kk];
+          });
+          localStorage.setItem(k, JSON.stringify(base));
+        } else { localStorage.setItem(k, incoming); }
+        done++;
+      }catch(_){ localStorage.setItem(k, incoming); done++; }
+    });
+    alert('✅ Restored '+done+' item(s). Reloading…');
+    location.reload();
+  };
+  reader.readAsText(file);
 }
 
 
