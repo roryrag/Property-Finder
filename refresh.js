@@ -96,6 +96,18 @@ const CRAWL_SITES = [
     listingHint: /seajaderealty\.com\/properties\/(rs|tl)[0-9]+/i,
     idPattern: /\b(rs|tl)[0-9]{2,}\b/gi,
     idBase: 'https://www.seajaderealty.com/properties/'
+  },
+  {
+    // Island Investments — Tobago for-sale + land. WordPress "Directorist"
+    // plugin: the index pages server-render /directory/{sale,land}/<slug>/
+    // detail links (27 sale + 68 land, all on one page, no pagination), and
+    // detail pages server-render the TT$ price. listingHint is limited to
+    // sale|land so /directory/rental/ never enters the queue (RENTAL_RE also
+    // catches stragglers). Tobago-only agency, so no Trinidad leakage.
+    id: 'islreal', name: 'islreal.com',
+    seeds: ['https://islreal.com/properties-for-sale/',
+            'https://islreal.com/?directory_type=land'],
+    listingHint: /islreal\.com\/directory\/(sale|land)\/[a-z0-9-]+/i
   }
 ];
 
