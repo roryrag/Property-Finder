@@ -108,6 +108,16 @@ const CRAWL_SITES = [
     seeds: ['https://islreal.com/properties-for-sale/',
             'https://islreal.com/?directory_type=land'],
     listingHint: /islreal\.com\/directory\/(sale|land)\/[a-z0-9-]+/i
+  },
+  {
+    // Royalty Tobago — WordPress real-estate theme. Index pages
+    // (/status/for-sale/ + /property-type/land/) server-render all
+    // /property/<slug>/ detail links (~17 for-sale + ~19 land), and detail
+    // pages server-render the price (<span class="price-prefix">TTD </span>$..).
+    id: 'royalty', name: 'royaltytobago.com',
+    seeds: ['https://royaltytobago.com/status/for-sale/',
+            'https://royaltytobago.com/property-type/land/'],
+    listingHint: /royaltytobago\.com\/property\/[a-z0-9-]+/i
   }
 ];
 
