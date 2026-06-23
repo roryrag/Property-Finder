@@ -798,6 +798,8 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
 .loc-region-ct{margin-left:auto;font-size:11px;color:var(--ink-l);font-weight:400;background:var(--white);border:1px solid var(--border);border-radius:12px;padding:1px 9px;}
 .loc-region-body{display:none;padding:10px 12px;gap:7px;}
 .loc-region.open .loc-region-body{display:flex;flex-wrap:wrap;}
+.loc-selall{flex:0 0 100%;text-align:left;background:none;border:none;padding:0 0 2px;margin:0;cursor:pointer;font-family:inherit;font-size:11.5px;font-weight:600;color:var(--gold);text-decoration:underline;text-underline-offset:2px;}
+.loc-selall:hover{color:var(--forest-xl);}
 
 /* Results: dense, scannable list rows */
 #cardList{display:flex;flex-direction:column;gap:8px;}
@@ -2807,10 +2809,11 @@ function getSelectedLocations(){ return Array.prototype.slice.call(document.quer
 function setSelectedLocations(locs){ locs = locs || []; document.querySelectorAll('#locationChips .type-chip').forEach(function(c){ c.classList.toggle('active', locs.indexOf(c.getAttribute('data-loc'))!==-1); }); }
 function selectAllLocations(){ document.querySelectorAll('#locationChips .type-chip').forEach(function(c){ c.classList.add('active'); }); document.querySelectorAll('#locationChips .loc-region').forEach(function(r){ r.classList.add('open'); }); }
 function clearLocations(){ document.querySelectorAll('#locationChips .type-chip').forEach(function(c){ c.classList.remove('active'); }); }
+function selectRegion(btn){ var body=btn.parentNode; var chips=body.querySelectorAll('.type-chip'); var allActive=Array.prototype.every.call(chips,function(c){return c.classList.contains('active');}); Array.prototype.forEach.call(chips,function(c){ c.classList.toggle('active', !allActive); }); btn.textContent=allActive?'Select all':'Clear'; }
 // Tobago regions (area names normalised: lowercase, "mount"→"mt", no apostrophes)
 var LOC_REGIONS = [
-  { name:'Southwest · Crown Point', areas:['crown point','bon accord','canaan','store bay','milford','sandy point','lowlands','tobago plantations','friendship','bethel','carnbee','mt pleasant','shirvan','buccoo bay'] },
-  { name:'Leeward · North coast', areas:['buccoo','mt irvine','black rock','grafton','plymouth','arnos vale','arnosvale','les coteaux','mason hall','moriah','castara','englishman','parlatuvier','bloody bay','golden lane','culloden','great courland','cuffie river'] },
+  { name:'Southwest · Crown Point', areas:['crown point','bon accord','canaan','store bay','milford','sandy point','lowlands','tobago plantations','friendship','bethel','carnbee','mt pleasant','shirvan','buccoo bay','buccoo','mt irvine','black rock','grafton','arnos vale','arnosvale'] },
+  { name:'Leeward · North coast', areas:['plymouth','les coteaux','mason hall','moriah','castara','englishman','parlatuvier','bloody bay','golden lane','culloden','great courland','cuffie river'] },
   { name:'Scarborough & East', areas:['scarborough','bacolet','calder hall','lambeau','signal hill','patience hill','hope','whim','glamorgan','mt grace','mt st george','studley park','goodwood','pembroke','belle garden','sherwood park','orange hill','mt marie','shaw park','john dial','gordon heights','pentlands'] },
   { name:'Windward · Northeast', areas:['speyside','charlotteville','delaford','kings bay','louis dor','argyle','goldsborough','roxborough','betsys hope','king peters bay'] }
 ];
@@ -2836,9 +2839,11 @@ function buildLocationChips(){
     areas.sort(function(a,b){ return counts[b]-counts[a]; });
     var total=areas.reduce(function(s,a){ return s+counts[a]; },0);
     var open=areas.some(function(a){ return sel.indexOf(a)!==-1; });
+    var allSel=areas.every(function(a){ return sel.indexOf(a)!==-1; });
     html+='<div class="loc-region'+(open?' open':'')+'">'+
       '<button type="button" class="loc-region-hd" onclick="toggleLocRegion(this)"><span class="loc-chev">▸</span> '+rn+' <span class="loc-region-ct">'+total+'</span></button>'+
       '<div class="loc-region-body type-chips">'+
+        '<button type="button" class="loc-selall" onclick="selectRegion(this)">'+(allSel?'Clear':'Select all')+'</button>'+
         areas.map(function(a){ var act=sel.indexOf(a)!==-1?' active':''; return '<button type="button" class="type-chip'+act+'" data-loc="'+a.replace(/"/g,'&quot;')+'" onclick="toggleTypeChip(this)">'+a+' <span style="opacity:.5;font-weight:400">'+counts[a]+'</span></button>'; }).join('')+
       '</div></div>';
   });
