@@ -1,6 +1,6 @@
 {
  "meta": {
-  "lastRefresh": "2026-06-22T18:10:11.047Z",
+  "lastRefresh": "2026-06-23T12:35:13.375Z",
   "totalListings": 273,
   "activeCount": 273,
   "staleCount": 0,
@@ -27,7 +27,7 @@
    "pin.tt": {
     "method": "crawl",
     "listings": 0,
-    "urlsFound": 50,
+    "urlsFound": 51,
     "jsonld": 0,
     "claude": 0
    },
@@ -48,7 +48,7 @@
    "mybunchofkeys.com": {
     "method": "crawl",
     "listings": 0,
-    "urlsFound": 77,
+    "urlsFound": 79,
     "jsonld": 0,
     "claude": 0
    },
@@ -66,15 +66,11 @@
     "jsonld": 0,
     "claude": 0
    },
-   "pin.tt houses": {
+   "caribbeanMLS": {
     "method": "search",
     "listings": 0
    },
-   "pin.tt land": {
-    "method": "search",
-    "listings": 0
-   },
-   "terracaribbean": {
+   "villas": {
     "method": "search",
     "listings": 0
    }
