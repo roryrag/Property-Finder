@@ -4652,7 +4652,7 @@ function _compConfText(R){
   return 'Confidence: <b>'+lvl+'</b> &mdash; '+(R.n||0)+' comparable'+((R.n||0)===1?'':'s')+' ('+srcTxt+')'+disp+(R.broadened?' &middot; widened island-wide (sparse area)':'');
 }
 /* ── Comparables UI ── */
-var _compMode='repo', _compRepoList=[], _compLastAsking=[], _compCurrentSubject=null;
+var _compMode='repo', _compRepoList=[], _compLastAsking=[], _compCurrentSubject=null, _compLastResult=null;
 function compSetMode(m){
   _compMode=m;
   document.getElementById('compModeRepo').classList.toggle('active',m==='repo');
@@ -4695,7 +4695,7 @@ function runComparables(){
 }
 function renderComparables(subject){
   _compCurrentSubject=subject;
-  var r=findComparables(subject);
+  var r=findComparables(subject); _compLastResult=r;
   var el=document.getElementById('compResults'); if(!el) return;
   var bits=[]; if(subject.loc) bits.push('📍 '+_compEsc(subject.loc)); if(subject.size>0) bits.push('📏 '+subject.size.toLocaleString()+' sqft'); bits.push(r.cls==='land'?'Land':'Residential'); if(subject.tenure==='leasehold') bits.push('Leasehold');
   var h='<div class="card"><div class="card-title" style="font-size:16px;">'+_compEsc(subject.label||subject.loc||'Subject')+'</div>'+
@@ -4711,6 +4711,7 @@ function renderComparables(subject){
   } else {
     h+='<div class="comp-empty">Not enough comparable data to estimate a range for this subject yet.</div>';
   }
+  if(r.range) h+='<button class="add-client-btn wa-share" style="width:100%;margin-top:10px;background:#25D366;border-color:#25D366;" onclick="shareCmaWhatsApp()">💬 Share CMA via WhatsApp</button>';
   h+='</div>';
   h+='<div class="card"><div class="comp-sec-title"><span class="pill comp-pill-sold">SOLD</span> Sold comparables <span style="color:var(--muted);font-weight:400;">'+r.sold.length+'</span></div>'+
      (r.sold.length?r.sold.map(function(c){ return _compRow(c,-1); }).join(''):'<div class="comp-empty">No sold comparables yet. Mark listings as sold to build this — sold data is the only ground truth.</div>')+'</div>';
@@ -4756,6 +4757,46 @@ function compsFor(listing){
   var subject={ loc:(listing.location||'').split(',')[0].trim(), size:parseSizeSqft(listing.size)||0, type:listing.type||'land', beds:Number(listing.beds)||0, tenure:/leasehold|\blease\b/.test(blob)?'leasehold':'freehold', label:(listing.title||listing.location) };
   compsTabInit();
   renderComparables(subject);
+}
+function _cmaCompLine(c){
+  var head=(String(c.loc||'').split('|')[0].split(',')[0].trim()||'Tobago');
+  if(c.size>0) head+=' '+Number(c.size).toLocaleString()+'sqft';
+  var pr=c.price>0?(' — '+fmtPrice(c.price)):'';
+  var psf=c.psf>0?(' (TT$'+Math.round(c.psf).toLocaleString()+'/sqft)'):'';
+  return head+pr+psf+' ['+c.match+'% match]';
+}
+function shareCmaWhatsApp(){
+  var s=_compCurrentSubject, r=_compLastResult;
+  if(!s||!r||!r.range) return;
+  var R=r.range, p=(typeof loadProfile==='function'?loadProfile():{});
+  var L=[];
+  L.push('⚖ COMPARATIVE MARKET ANALYSIS');
+  L.push(p.agency||'BrokerBuddy');
+  L.push('');
+  L.push('🏠 SUBJECT');
+  L.push('📍 '+(s.loc||'Tobago')+', Tobago');
+  if(s.size>0) L.push('📏 '+Number(s.size).toLocaleString()+' sq ft');
+  L.push('Type: '+(r.cls==='land'?'Land':'Residential')+(s.tenure==='leasehold'?' · Leasehold':''));
+  L.push('');
+  L.push('💰 ESTIMATED VALUE RANGE');
+  L.push('Low:    '+fmtPrice(R.min)+'  (US$'+Math.round(R.min/USD).toLocaleString()+')');
+  L.push('Likely: '+fmtPrice(R.avg)+'  (US$'+Math.round(R.avg/USD).toLocaleString()+')');
+  L.push('High:   '+fmtPrice(R.max)+'  (US$'+Math.round(R.max/USD).toLocaleString()+')');
+  if(R.mode==='psf' && R.psf50) L.push('≈ TT$'+R.psf50.toLocaleString()+'/sq ft');
+  L.push('');
+  if(r.sold.length){ L.push('🟢 SOLD COMPARABLES'); r.sold.slice(0,4).forEach(function(c){ L.push('• '+_cmaCompLine(c)); }); L.push(''); }
+  if(r.asking.length){ L.push('🟡 ACTIVE / ASKING'); r.asking.slice(0,4).forEach(function(c){ L.push('• '+_cmaCompLine(c)); }); L.push(''); }
+  var conf=_compConfText(R).replace(/<[^>]+>/g,'').replace(/&mdash;/g,'—').replace(/&middot;/g,'·').replace(/&plusmn;/g,'±').replace(/&amp;/g,'&');
+  L.push('📊 '+conf);
+  L.push('');
+  if(p.name) L.push('— '+p.name+(p.agency?', '+p.agency:''));
+  if(p.phone) L.push('📞 '+p.phone);
+  if(p.email) L.push('✉ '+p.email);
+  L.push('');
+  L.push('⚠️ Indicative estimate from available comparables — asking prices typically run ~5–15% above sold. Not a formal appraisal.');
+  var msg=encodeURIComponent(L.join('\n'));
+  if(typeof openContactPicker==='function') openContactPicker(msg, (s.label||s.loc||'CMA'), R.avg);
+  else window.open('https://wa.me/?text='+msg,'_blank');
 }
 function runBacktest(){
   var el=document.getElementById('backtestResult'); if(!el) return;
