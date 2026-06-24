@@ -4670,12 +4670,28 @@ function compsTabInit(){
       return '<option value="'+i+'">'+_compEsc(lbl.slice(0,80))+'</option>';
     }).join('');
   }
-  var loc=document.getElementById('compLocation');
-  if(loc && loc.options.length<=1){
-    var areas={}; (activeRepo()||[]).forEach(function(p){ var a=((p.location||'').split(',')[0]||'').trim(); if(a&&!/^tobago$/i.test(a)) areas[a]=1; });
-    loc.innerHTML='<option value="">Select&hellip;</option>'+Object.keys(areas).sort().map(function(a){ return '<option value="'+_compEsc(a)+'">'+_compEsc(a)+'</option>'; }).join('');
-  }
+  buildCompLocationOptions();
   compSyncBeds();
+}
+// Manual-entry location list: comprehensive Tobago areas grouped by region
+// (from LOC_REGIONS) merged with real repo spellings — never empty, and not
+// limited to areas that happen to have a current listing.
+function buildCompLocationOptions(){
+  var loc=document.getElementById('compLocation'); if(!loc) return;
+  var prev=loc.value;
+  var titleCase=function(s){ return String(s).replace(/\b\w/g,function(m){ return m.toUpperCase(); }); };
+  var key=function(s){ return (typeof _normArea==='function'?_normArea(s):String(s).toLowerCase()).replace(/\s+/g,''); };
+  var byRegion={}, seen={};
+  var add=function(region,name){ var k=key(name); if(!k||seen[k]) return; seen[k]=1; (byRegion[region]=byRegion[region]||[]).push(name); };
+  // repo spellings first (real-world names win on dedupe)
+  (activeRepo()||[]).forEach(function(p){ var a=((p.location||'').split(',')[0]||'').trim(); if(!a||/^tobago$/i.test(a)) return; var reg=(typeof _compRegionName==='function'?_compRegionName(a):'')||'Other areas'; add(reg,a); });
+  // then every known area so the list is comprehensive
+  if(typeof LOC_REGIONS!=='undefined') LOC_REGIONS.forEach(function(r){ r.areas.forEach(function(k){ add(r.name, titleCase(k)); }); });
+  var order=(typeof LOC_REGIONS!=='undefined'?LOC_REGIONS.map(function(r){ return r.name; }):[]).concat(['Other areas']);
+  var html='<option value="">Select an area&hellip;</option>';
+  order.forEach(function(reg){ var as=byRegion[reg]; if(!as||!as.length) return; as.sort(); html+='<optgroup label="'+_compEsc(reg)+'">'+as.map(function(a){ return '<option value="'+_compEsc(a)+'">'+_compEsc(a)+'</option>'; }).join('')+'</optgroup>'; });
+  loc.innerHTML=html;
+  if(prev){ loc.value=prev; }
 }
 function compOnSubjectPick(){ /* read on run */ }
 function runComparables(){
