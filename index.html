@@ -2969,17 +2969,7 @@ async function searchOneSite(apiKey, filters, site) {
     if (data.error) throw new Error(data.error.message);
     trackUsage('call');
     var text = (data.content||[]).filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('');
-    var listings = [];
-    var _s = text.indexOf('[');
-    if (_s !== -1) {
-      var _e = text.lastIndexOf(']');
-      var _str = (_e > _s) ? text.slice(_s, _e+1) : text.slice(_s);
-      try { listings = JSON.parse(_str); }
-      catch(e) {
-        try { var _lo = _str.lastIndexOf('}'); listings = JSON.parse(_str.slice(0, _lo+1) + ']'); } catch(e2) { listings = []; }
-      }
-    }
-    listings = Array.isArray(listings) ? listings : [];
+    var listings = parseClaudeJsonArray(text);
     setDot(site.id, listings.length>0?'done':'err');
     setLabel(site.id, site.name+(listings.length>0?' — '+listings.length+' found':' — none'));
     return listings;
@@ -3154,6 +3144,22 @@ function dedupeListings(list){
 }
 // The repo as the app should show it: invalid-flagged removed + de-duplicated.
 function activeRepo(){ return dedupeListings(excludeInvalid(repoLoad()||[])); }
+// Robust JSON-array extraction from a Claude text response. Strips code
+// fences, slices from the first '[' to the last ']' (or to the end if the
+// response was truncated by max_tokens with no closing ']'), and on parse
+// failure recovers the complete objects up to the last '}'. Always returns an
+// array. Consolidated from the per-call copies — keep this the single source.
+function parseClaudeJsonArray(text){
+  text = String(text||'').replace(/```json\s*/gi,'').replace(/```\s*/g,'');
+  var s = text.indexOf('['); if(s === -1) return [];
+  var e = text.lastIndexOf(']');
+  var str = (e > s) ? text.slice(s, e+1) : text.slice(s);
+  try { var v = JSON.parse(str); return Array.isArray(v) ? v : []; }
+  catch(err){
+    try { var lo = str.lastIndexOf('}'); var v2 = JSON.parse(str.slice(0, lo+1) + ']'); return Array.isArray(v2) ? v2 : []; }
+    catch(e2){ return []; }
+  }
+}
 function flagInvalid(btn){
   var key = btn.getAttribute('data-key'); if(!key) return;
   if(!confirm('Flag this listing as invalid and remove it from your available listings?')) return;
@@ -4651,17 +4657,7 @@ async function fetchLiveComps(location, size) {
     var data = await resp.json();
     trackUsage('call');
     var text = (data.content||[]).filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('');
-    text = text.replace(/```json\s*/gi,'').replace(/```\s*/g,'');
-    var start = text.indexOf('[');
-    var compsData = [];
-    if (start !== -1) {
-      var end = text.lastIndexOf(']');
-      var cstr = (end > start) ? text.slice(start, end+1) : text.slice(start);
-      try { compsData = JSON.parse(cstr); }
-      catch(e) {
-        try { var clo = cstr.lastIndexOf('}'); compsData = JSON.parse(cstr.slice(0, clo+1) + ']'); } catch(e2) { compsData = []; }
-      }
-    }
+    var compsData = parseClaudeJsonArray(text);
     if (!compsData.length) { liveArea.innerHTML = ''; return; }
     var _psfs = compsData.map(function(c){ return c.psf_ttd || (c.price && c.size ? Math.round(c.price / parseSizeSqft(c.size)) : 0); }).filter(function(v){ return v > 0; });
     var _avgPsf = _psfs.length ? _psfs.reduce(function(a,b){ return a+b; },0)/_psfs.length : 0;

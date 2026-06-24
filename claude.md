@@ -178,7 +178,9 @@ scratch — they were established empirically over many runs.**
 - **JSON truncation recovery**: when a Claude response is cut off by max_tokens
   (no closing `]`), slice from first `[` to end and recover complete objects up
   to the last `}`. This bug silently discarded whole batches before it was
-  fixed — preserve it in all 4 app extraction points + the crawler.
+  fixed. In the app this now lives in ONE helper, `parseClaudeJsonArray(text)`
+  (used by every array-extraction call site) — keep it the single source. The
+  crawler (separate Node process) has its own equivalent copy; preserve it.
 
 ### Known cleanup task
 The app's built-in live-search site list (index.html) and the crawler's tuned
