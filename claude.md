@@ -100,7 +100,16 @@ Change tokens at the variable blocks, not per-component.
   −35%, confidence dots, agent sold-comps DB, Excel import (SheetJS),
   per-area calibration slider, live-comps lookup. Data sources ranked:
   agent sold comps > repo-derived PSF > static research data (widened ±25%).
-- **Tools** — mortgage, rental-income estimator, ROI, currency converter.
+- **Comparables (CMA)** — `panel-comps`. Exposes the *evidence* behind a
+  valuation: pick a subject (from repo or manual entry), get a ranked comp set
+  split into 🟢 SOLD vs 🟡 ASKING with a per-comp **match %**, plus a suggested
+  Low/Likely/High range + confidence. Engine = `findComparables(subject)`, which
+  reuses the same scoring philosophy as `knnPSF` (location/size/recency/source
+  weighting, ~8% asking→sold haircut). For LAND the headline range is taken
+  straight from `knnPSF` so it always matches the Valuator; for RESIDENTIAL
+  (repo lacks clean building sqft) it falls back to a similarity-weighted price
+  band keyed on area+beds. "⚖ Comparables" button on every search card jumps in
+  with that listing as subject; "🏷️ Sold?" on an asking comp feeds the sold DB.
 - **Shortlist** — general + per-client shortlists, WhatsApp share.
 - **Co-Broker** — request tracker, status workflow, commission calculator,
   WhatsApp/email send.

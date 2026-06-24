@@ -800,6 +800,34 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
 .loc-region.open .loc-region-body{display:flex;flex-wrap:wrap;}
 .loc-selall{flex:0 0 100%;text-align:left;background:none;border:none;padding:0 0 2px;margin:0;cursor:pointer;font-family:inherit;font-size:11.5px;font-weight:600;color:var(--gold);text-decoration:underline;text-underline-offset:2px;}
 .loc-selall:hover{color:var(--forest-xl);}
+/* Comparables (CMA) tab */
+.comp-mode-toggle{display:flex;gap:6px;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:4px;}
+.comp-mode-btn{flex:1;padding:8px 10px;border:none;background:none;border-radius:7px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--ink-l);}
+.comp-mode-btn.active{background:var(--white);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.18);}
+.comp-range{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:10px 0 4px;}
+.comp-range-item{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center;}
+.comp-range-item.mid{background:linear-gradient(135deg,rgba(47,157,103,.16),rgba(47,157,103,.04));border-color:rgba(47,157,103,.3);}
+.comp-range-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;}
+.comp-range-price{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:var(--ink);margin-top:2px;}
+.comp-range-usd{font-size:10.5px;color:var(--ink-l);}
+.comp-conf{font-size:12px;color:var(--ink-l);margin:6px 0 2px;line-height:1.5;}
+.comp-sec-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin:16px 0 8px;display:flex;align-items:center;gap:7px;}
+.comp-sec-title .pill{font-size:10px;padding:1px 8px;border-radius:10px;font-weight:700;}
+.comp-pill-sold{background:rgba(47,157,103,.18);color:var(--forest-xl);}
+.comp-pill-ask{background:rgba(201,162,75,.18);color:var(--gold-l);}
+.comp-row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;background:var(--white);border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:7px;}
+.comp-match{min-width:42px;height:42px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg);border:1px solid var(--border);}
+.comp-match b{font-size:14px;font-weight:700;color:var(--ink);line-height:1;}
+.comp-match span{font-size:8px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);}
+.comp-main .t{font-size:13.5px;font-weight:600;color:var(--ink);margin-bottom:2px;}
+.comp-main .m{font-size:11.5px;color:var(--ink-l);display:flex;flex-wrap:wrap;gap:4px 10px;}
+.comp-right{text-align:right;}
+.comp-right .p{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--ink);}
+.comp-right .psf{font-size:10.5px;color:var(--ink-l);}
+.comp-right a,.comp-right button{font-size:10.5px;}
+.comp-addsold{margin-top:3px;background:none;border:1px solid var(--border);border-radius:7px;padding:3px 7px;cursor:pointer;font-family:inherit;font-size:10px;color:var(--forest-xl);font-weight:600;}
+.comp-addsold:hover{background:var(--gold-pale);}
+.comp-empty{font-size:12px;color:var(--ink-l);padding:6px 2px;}
 
 /* Results: dense, scannable list rows */
 #cardList{display:flex;flex-direction:column;gap:8px;}
@@ -1745,6 +1773,9 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
       <button class="nav-item" id="nav-valuator" onclick="switchTab('valuator')">
         <span class="nav-icon">&#128200;</span><span class="nav-label">Land Valuator</span>
       </button>
+      <button class="nav-item" id="nav-comps" onclick="switchTab('comps')">
+        <span class="nav-icon">&#9878;</span><span class="nav-label">Comparables</span>
+      </button>
       <div class="toolbar-divider"></div>
       <button class="nav-item" id="nav-tools" onclick="switchTab('tools')">
         <span class="nav-icon">&#128295;</span><span class="nav-label">Tools</span>
@@ -2119,6 +2150,44 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
             <div id="backtestResult"></div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- COMPARABLES PANEL -->
+    <div class="tab-content" id="panel-comps">
+      <div class="tab-inner">
+        <div class="card">
+          <div class="card-title">&#9878; Comparable Analysis (CMA)</div>
+          <div style="font-size:12px;color:var(--ink-l);line-height:1.5;margin:-4px 0 12px;">Find comparable properties for a subject and see a suggested value range &mdash; backed by the evidence, sold and asking kept separate.</div>
+          <div class="comp-mode-toggle">
+            <button type="button" class="comp-mode-btn active" id="compModeRepo" onclick="compSetMode('repo')">From repository</button>
+            <button type="button" class="comp-mode-btn" id="compModeManual" onclick="compSetMode('manual')">Enter manually</button>
+          </div>
+          <div id="compRepoPick" style="margin-top:12px;">
+            <div class="input-group"><label>Pick a listing as the subject</label>
+              <select id="compSubjectSelect" onchange="compOnSubjectPick()"><option value="">Select a property&hellip;</option></select>
+            </div>
+          </div>
+          <div id="compManualForm" style="display:none;margin-top:12px;">
+            <div class="grid-2">
+              <div class="input-group"><label>Type</label>
+                <select id="compType" onchange="compSyncBeds()"><option value="land">Land</option><option value="residential">Residential</option></select>
+              </div>
+              <div class="input-group"><label>Location (area)</label>
+                <select id="compLocation"><option value="">Select&hellip;</option></select>
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="input-group"><label>Size (sq ft)</label><input type="number" id="compSize" placeholder="e.g. 8000" min="100"></div>
+              <div class="input-group" id="compBedsGroup" style="display:none;"><label>Bedrooms</label><input type="number" id="compBeds" placeholder="e.g. 3" min="0" max="15"></div>
+            </div>
+            <div class="input-group"><label>Tenure</label>
+              <select id="compTenure"><option value="freehold">Freehold</option><option value="leasehold">Leasehold</option></select>
+            </div>
+          </div>
+          <button class="add-client-btn" style="width:100%;margin-top:6px;" onclick="runComparables()">&#9878; Find comparables</button>
+        </div>
+        <div id="compResults"></div>
       </div>
     </div>
 
@@ -2557,10 +2626,11 @@ function switchTab(tab) {
   document.getElementById('appScroll').scrollTop = 0;
   if (tab === 'dashboard') { try { renderDashboard(); } catch(e) {} }
   if (tab === 'valuator') { try { renderConfirmQueue(); } catch(e) {} }
+  if (tab === 'comps') { try { compsTabInit(); } catch(e) {} }
   var titleEl = document.getElementById('hdrPageTitle');
   if (titleEl) titleEl.textContent = TAB_TITLES[tab] || '';
 }
-var TAB_TITLES = { dashboard:'Dashboard', search:'Search', valuator:'Land Valuator', tools:'Tools', shortlist:'Shortlist', cobroker:'Co-Broker', settings:'Settings' };
+var TAB_TITLES = { dashboard:'Dashboard', search:'Search', valuator:'Land Valuator', comps:'Comparables', tools:'Tools', shortlist:'Shortlist', cobroker:'Co-Broker', settings:'Settings' };
 
 /* ══════════════════════════════════════
    DASHBOARD (landing) — real-data widgets
@@ -3338,6 +3408,7 @@ function makeCard(p) {
     : (p.site ? '<a href="https://www.google.com/search?q='+encodeURIComponent('site:'+p.site+' '+(p.title||''))+'" target="_blank" rel="noopener" class="pa-btn">🔎 Find on '+String(p.site).replace(/^www\./,'')+'</a>' : '');
   var _vfData = JSON.stringify({title:p.title||'',site:p.site||'',url:p.url||''}).replace(/"/g,'&quot;');
   var _soldData = JSON.stringify({key:invKey(p),title:p.title||'',price:Number(p.price)||0,location:p.location||'',size:p.size||'',type:(p.type||'').toLowerCase(),tenure:(/leasehold|\blease\b/i.test((p.title||'')+' '+(p.description||''))?'leasehold':'freehold')}).replace(/"/g,'&quot;');
+  var _compData = JSON.stringify({location:p.location||'',type:(p.type||'').toLowerCase(),size:p.size||'',beds:Number(p.beds)||0,title:p.title||'',features:(Array.isArray(p.features)?p.features.join(' '):'')}).replace(/"/g,'&quot;');
 
   var chips=[];
   if(p.beds>0) chips.push('🛌 '+p.beds);
@@ -3370,6 +3441,7 @@ function makeCard(p) {
   c += '<div class="prop-actions-bar">';
   c += _viewBtn;
   c += '<button class="pa-btn" onclick="searchSimilar('+"'"+((p.location||'Tobago').replace(/'/g,''))+"','"+((p.type||'').replace(/'/g,''))+"'"+')">🔍 Similar</button>';
+  c += '<button class="pa-btn" onclick="compsFromBtn(this)" data-comp="'+_compData+'">⚖ Comparables</button>';
   c += '<button class="pa-btn" onclick="openSlPicker(this)" data-clientonly="1" '+dataAttrs+'>👤 Client</button>';
   c += '<button class="pa-btn" onclick="addCoBrokerRequest(this,\''+cbData+'\')" data-prop="'+cbData+'">🤝 Co-Broker</button>';
   c += '<button class="pa-btn" onclick="verifyListing(this,\''+_vfData+'\')">🔎 Verify</button>';
@@ -3381,6 +3453,7 @@ function makeCard(p) {
   return c;
 }
 
+function compsFromBtn(btn){ try{ compsFor(JSON.parse(btn.getAttribute('data-comp'))); }catch(e){} }
 function searchSimilar(location, type) {
   setSelectedTypes(type ? [String(type).toLowerCase()] : []);
   buildLocationChips();
@@ -4472,6 +4545,217 @@ function backtestValuator(){
   if(!used) return { error:'Could not generate predictions (too few neighbours per comp).' };
   errs.sort(function(a,b){return a-b;});
   return { n:used, mdape:errs[Math.floor(errs.length/2)], mape:errs.reduce(function(a,b){return a+b;},0)/errs.length, coverage:covered/used };
+}
+/* ════════════════════════════════════════════════
+   COMPARABLES (CMA) — exposes the evidence behind a
+   valuation. Reuses the same scoring philosophy as the
+   land valuator's knnPSF (location / size / recency /
+   source weighting, asking→sold haircut) but returns the
+   ranked comp set for ANY property class, split into sold
+   vs asking. For LAND the headline range comes straight
+   from knnPSF, so the number always matches the Valuator.
+   ════════════════════════════════════════════════ */
+function _compEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function _compClass(t){ t=(t||'').toLowerCase().trim(); if(!t) return 'land'; return /land|lot|parcel|acre/.test(t)?'land':'built'; }
+function _compRegionName(area){
+  if(typeof LOC_REGIONS==='undefined'||typeof _normArea!=='function') return '';
+  var na=_normArea(area);
+  for(var i=0;i<LOC_REGIONS.length;i++){ if(LOC_REGIONS[i].areas.some(function(k){ return na.indexOf(k)!==-1; })) return LOC_REGIONS[i].name; }
+  return '';
+}
+function _compLocScore(subjLoc, candLoc){
+  var a=(subjLoc||'').toLowerCase().split('|')[0].split(',')[0].trim();
+  var b=(candLoc||'').toLowerCase().split('|')[0].split(',')[0].trim();
+  if(!a||!b) return 0;
+  if(a===b) return 1.0;
+  if(b.indexOf(a)!==-1||a.indexOf(b)!==-1) return 0.85;
+  var ra=_compRegionName(a), rb=_compRegionName(b);
+  if(ra && ra===rb) return 0.5;
+  return 0;
+}
+function findComparables(subject){
+  compsLoad();
+  var cls=_compClass(subject.type);
+  var subjSize=Number(subject.size)>0?Number(subject.size):0;
+  var subjBeds=Number(subject.beds)||0;
+  var cands=[];
+  soldComps.concat(activeSharedSold()).forEach(function(c){
+    if(subject.excludeId && c.id===subject.excludeId) return;
+    if(_compClass(c.type)!==cls) return;
+    var size=parseSizeSqft(c.size)||0, price=Number(c.price)||0;
+    var psf=Number(c.psf)||(price&&size?price/size:0);
+    cands.push({ kind:'sold', title:(c.notes||c.loc||'Sold comp'), loc:c.loc, size:size, price:price, psf:psf, beds:Number(c.beds)||0, dateMs:_parseDateMs(c.date), url:'', raw:c });
+  });
+  (activeRepo()||[]).forEach(function(p){
+    if(_compClass(p.type)!==cls) return;
+    var size=parseSizeSqft(p.size)||0, price=Number(p.price)||0;
+    var psf=(price&&size)?price/size:0;
+    cands.push({ kind:'asking', title:(p.title||p.location||'Listing'), loc:p.location, size:size, price:price, psf:psf, beds:Number(p.beds)||0, dateMs:(p.lastSeen||Date.now()), url:(typeof bestUrl==='function'?bestUrl(p):(p.url||'')), raw:p });
+  });
+  if(!cands.length) return { cls:cls, sold:[], asking:[], range:null };
+  cands.forEach(function(c){
+    var wLoc=_compLocScore(subject.loc, c.loc);
+    var wSize=1;
+    if(subjSize>0 && c.size>0){ var ls=Math.log(c.size/subjSize); wSize=Math.exp(-(ls*ls)/(2*0.36)); }
+    else if(subjSize>0||c.size>0){ wSize=0.6; }
+    var wBed=1;
+    if(cls==='built' && subjBeds>0 && c.beds>0){ wBed=Math.max(0.2,1-Math.abs(c.beds-subjBeds)/3); }
+    var wRec=Math.exp(-Math.max(0,(Date.now()-c.dateMs)/86400000)/365);
+    var wKind=c.kind==='sold'?1.0:0.6;
+    var matchRaw=(cls==='built') ? (wLoc*0.5 + wSize*0.3 + wBed*0.2) : (wLoc*0.6 + wSize*0.4);
+    c.match=Math.round(Math.max(0,Math.min(1,matchRaw))*100);
+    c.w=Math.max(0.12,wLoc)*wSize*wRec*wKind*(cls==='built'?wBed:1);
+    c.adjPsf=c.kind==='sold'?c.psf:c.psf*(1-ASKING_HAIRCUT);
+    c.adjPrice=c.kind==='sold'?c.price:c.price*(1-ASKING_HAIRCUT);
+  });
+  cands.sort(function(a,b){ return (b.match-a.match)||(b.w-a.w); });
+  var sold=cands.filter(function(c){ return c.kind==='sold'; }).slice(0,12);
+  var asking=cands.filter(function(c){ return c.kind==='asking'; }).slice(0,15);
+  var range=null;
+  if(cls==='land' && subjSize>0 && typeof knnPSF==='function'){
+    var k=knnPSF({loc:subject.loc, size:subjSize, tenure:subject.tenure}, subject.excludeId?{excludeId:subject.excludeId}:{});
+    if(k){
+      var lf=(subject.tenure==='leasehold')?0.65:1;
+      range={ mode:'psf', psf25:k.p25, psf50:k.p50, psf75:k.p75,
+        min:Math.round(k.p25*subjSize*lf), avg:Math.round(k.p50*subjSize*lf), max:Math.round(k.p75*subjSize*lf),
+        n:k.n, nEff:k.nEff, source:k.source, dispersion:k.dispersion, broadened:k.broadened };
+    }
+  }
+  if(!range){
+    var usePsf=subjSize>0;
+    var pool=cands.filter(function(c){ return (usePsf?c.adjPsf>0:c.adjPrice>0) && c.w>0; });
+    var locPool=pool.filter(function(c){ return _compLocScore(subject.loc,c.loc)>0; });
+    var broadened=locPool.length<3;
+    if(!broadened) pool=locPool;
+    if(pool.length){
+      var items=pool.map(function(c){ return { v:(usePsf?c.adjPsf*subjSize:c.adjPrice), w:c.w }; }).sort(function(a,b){ return a.v-b.v; });
+      var sumW=0,sumW2=0; items.forEach(function(x){ sumW+=x.w; sumW2+=x.w*x.w; });
+      var nEff=sumW2>0?(sumW*sumW)/sumW2:items.length;
+      var lf2=(subject.tenure==='leasehold')?0.65:1;
+      var p25=_wQuantile(items,0.25)*lf2, p50=_wQuantile(items,0.5)*lf2, p75=_wQuantile(items,0.75)*lf2;
+      var soldN=pool.filter(function(c){ return c.kind==='sold'; }).length;
+      range={ mode:'price', min:Math.round(p25), avg:Math.round(p50), max:Math.round(p75),
+        n:pool.length, nEff:nEff, source:(soldN>=3?'sold':(soldN>0?'mixed':'asking')), dispersion:(p50>0?(p75-p25)/p50:1), broadened:broadened };
+    }
+  }
+  return { cls:cls, sold:sold, asking:asking, range:range };
+}
+function _compConfText(R){
+  if(!R) return '';
+  var n=R.nEff||R.n||0, lvl;
+  if(R.source==='sold' && n>=4) lvl='High';
+  else if(R.source!=='asking' && n>=3) lvl='Moderate';
+  else if(n>=5) lvl='Moderate';
+  else lvl='Low';
+  var srcTxt=R.source==='sold'?'mostly sold comps':(R.source==='mixed'?'sold + asking':'asking only');
+  var disp=(R.dispersion!=null)?(' &middot; spread &plusmn;'+Math.round(R.dispersion*50)+'%'):'';
+  return 'Confidence: <b>'+lvl+'</b> &mdash; '+(R.n||0)+' comparable'+((R.n||0)===1?'':'s')+' ('+srcTxt+')'+disp+(R.broadened?' &middot; widened island-wide (sparse area)':'');
+}
+/* ── Comparables UI ── */
+var _compMode='repo', _compRepoList=[], _compLastAsking=[], _compCurrentSubject=null;
+function compSetMode(m){
+  _compMode=m;
+  document.getElementById('compModeRepo').classList.toggle('active',m==='repo');
+  document.getElementById('compModeManual').classList.toggle('active',m==='manual');
+  document.getElementById('compRepoPick').style.display=(m==='repo')?'':'none';
+  document.getElementById('compManualForm').style.display=(m==='manual')?'':'none';
+}
+function compSyncBeds(){ var t=document.getElementById('compType'); var g=document.getElementById('compBedsGroup'); if(t&&g) g.style.display=(t.value==='residential')?'':'none'; }
+function compsTabInit(){
+  var sel=document.getElementById('compSubjectSelect');
+  if(sel){
+    _compRepoList=(activeRepo()||[]).slice().sort(function(a,b){ return (a.location||'').localeCompare(b.location||''); });
+    sel.innerHTML='<option value="">Select a property&hellip;</option>'+_compRepoList.map(function(p,i){
+      var lbl=(p.location||'Property')+' · '+(p.type||'?')+(Number(p.price)>0?' · '+fmtPrice(Number(p.price)):'');
+      return '<option value="'+i+'">'+_compEsc(lbl.slice(0,80))+'</option>';
+    }).join('');
+  }
+  var loc=document.getElementById('compLocation');
+  if(loc && loc.options.length<=1){
+    var areas={}; (activeRepo()||[]).forEach(function(p){ var a=((p.location||'').split(',')[0]||'').trim(); if(a&&!/^tobago$/i.test(a)) areas[a]=1; });
+    loc.innerHTML='<option value="">Select&hellip;</option>'+Object.keys(areas).sort().map(function(a){ return '<option value="'+_compEsc(a)+'">'+_compEsc(a)+'</option>'; }).join('');
+  }
+  compSyncBeds();
+}
+function compOnSubjectPick(){ /* read on run */ }
+function runComparables(){
+  var out=document.getElementById('compResults'); if(!out) return;
+  var subject;
+  if(_compMode==='repo'){
+    var sel=document.getElementById('compSubjectSelect');
+    if(!sel||sel.value===''){ out.innerHTML='<div class="card comp-empty">Pick a listing first.</div>'; return; }
+    var p=_compRepoList[Number(sel.value)]; if(!p){ out.innerHTML=''; return; }
+    var blob=((p.title||'')+' '+(p.features||'')+' '+(p.description||'')).toLowerCase();
+    subject={ loc:(p.location||'').split(',')[0].trim(), size:parseSizeSqft(p.size)||0, type:p.type||'land', beds:Number(p.beds)||0, tenure:/leasehold|\blease\b/.test(blob)?'leasehold':'freehold', excludeId:(p.id||null), label:(p.title||p.location) };
+  } else {
+    subject={ loc:document.getElementById('compLocation').value, size:Number(document.getElementById('compSize').value)||0, type:document.getElementById('compType').value, beds:Number(document.getElementById('compBeds').value)||0, tenure:document.getElementById('compTenure').value };
+    if(!subject.loc){ out.innerHTML='<div class="card comp-empty">Select a location first.</div>'; return; }
+  }
+  renderComparables(subject);
+}
+function renderComparables(subject){
+  _compCurrentSubject=subject;
+  var r=findComparables(subject);
+  var el=document.getElementById('compResults'); if(!el) return;
+  var bits=[]; if(subject.loc) bits.push('📍 '+_compEsc(subject.loc)); if(subject.size>0) bits.push('📏 '+subject.size.toLocaleString()+' sqft'); bits.push(r.cls==='land'?'Land':'Residential'); if(subject.tenure==='leasehold') bits.push('Leasehold');
+  var h='<div class="card"><div class="card-title" style="font-size:16px;">'+_compEsc(subject.label||subject.loc||'Subject')+'</div>'+
+        '<div class="comp-main"><div class="m">'+bits.join(' &middot; ')+'</div></div>';
+  if(r.range){
+    var R=r.range;
+    h+='<div class="comp-range">'+
+      '<div class="comp-range-item"><div class="comp-range-label">Low</div><div class="comp-range-price">'+fmtPrice(R.min)+'</div><div class="comp-range-usd">US$'+Math.round(R.min/USD).toLocaleString()+'</div></div>'+
+      '<div class="comp-range-item mid"><div class="comp-range-label">Likely</div><div class="comp-range-price">'+fmtPrice(R.avg)+'</div><div class="comp-range-usd">US$'+Math.round(R.avg/USD).toLocaleString()+'</div></div>'+
+      '<div class="comp-range-item"><div class="comp-range-label">High</div><div class="comp-range-price">'+fmtPrice(R.max)+'</div><div class="comp-range-usd">US$'+Math.round(R.max/USD).toLocaleString()+'</div></div>'+
+    '</div><div class="comp-conf">'+_compConfText(R)+'</div>';
+    if(R.mode==='psf') h+='<div class="comp-conf" style="color:var(--muted)">≈ TT$'+(R.psf50||0).toLocaleString()+'/sqft (P25–P75: '+(R.psf25||0)+'–'+(R.psf75||0)+')</div>';
+  } else {
+    h+='<div class="comp-empty">Not enough comparable data to estimate a range for this subject yet.</div>';
+  }
+  h+='</div>';
+  h+='<div class="card"><div class="comp-sec-title"><span class="pill comp-pill-sold">SOLD</span> Sold comparables <span style="color:var(--muted);font-weight:400;">'+r.sold.length+'</span></div>'+
+     (r.sold.length?r.sold.map(function(c){ return _compRow(c,-1); }).join(''):'<div class="comp-empty">No sold comparables yet. Mark listings as sold to build this — sold data is the only ground truth.</div>')+'</div>';
+  _compLastAsking=r.asking;
+  h+='<div class="card"><div class="comp-sec-title"><span class="pill comp-pill-ask">ASKING</span> Active / asking <span style="color:var(--muted);font-weight:400;">'+r.asking.length+'</span></div>'+
+     (r.asking.length?r.asking.map(function(c,i){ return _compRow(c,i); }).join(''):'<div class="comp-empty">No active listings match this subject.</div>')+
+     '<div class="val-disclaimer" style="margin-top:10px">⚠️ Asking prices only (discounted ~'+Math.round(ASKING_HAIRCUT*100)+'% toward sold-equivalent in the estimate); sold comps are weighted far higher. A range from few or zero sold comps is indicative, not definitive.</div></div>';
+  el.innerHTML=h;
+}
+function _compRow(c,askIdx){
+  var meta=[]; if(c.loc) meta.push(_compEsc(String(c.loc).split('|')[0])); if(c.size>0) meta.push(c.size.toLocaleString()+' sqft'); if(c.beds>0) meta.push(c.beds+' bed');
+  var right='';
+  if(c.price>0) right+='<div class="p">'+fmtPrice(c.price)+'</div>';
+  if(c.psf>0) right+='<div class="psf">TT$'+Math.round(c.psf).toLocaleString()+'/sqft</div>';
+  if(c.kind==='asking'){
+    if(c.url) right+='<div><a href="'+_compEsc(c.url)+'" target="_blank" rel="noopener">View ↗</a></div>';
+    if(askIdx>=0) right+='<button class="comp-addsold" onclick="compMarkSold('+askIdx+')">🏷️ Sold?</button>';
+  } else if(c.dateMs){
+    right+='<div class="psf">'+new Date(c.dateMs).toLocaleDateString()+'</div>';
+  }
+  return '<div class="comp-row"><div class="comp-match"><b>'+c.match+'%</b><span>match</span></div>'+
+    '<div class="comp-main"><div class="t">'+_compEsc(String(c.title).slice(0,72))+'</div><div class="m">'+meta.join(' &middot; ')+'</div></div>'+
+    '<div class="comp-right">'+right+'</div></div>';
+}
+function compMarkSold(i){
+  var c=_compLastAsking[i]; if(!c) return;
+  var ps=prompt('Sold price for "'+String(c.title).slice(0,50)+'" (TT$)?', c.price>0?String(c.price):'');
+  if(ps===null) return;
+  var price=Number(String(ps).replace(/[^0-9.]/g,''));
+  if(!(price>0)){ alert('Enter a valid number.'); return; }
+  compsLoad();
+  var size=c.size||0;
+  soldComps.push({ id:'comp'+Date.now(), loc:String(c.loc||'').split('|')[0].split(',')[0].trim(), size:size?String(size):'', price:price, psf:size?Math.round(price/size):0, tenure:'freehold', date:new Date().toISOString().slice(0,10), notes:String(c.title).slice(0,80), type:(_compClass(c.raw&&c.raw.type)==='land'?'land':'residential'), beds:c.beds||0, source:'agent' });
+  compsSave();
+  try{ renderCompList(); }catch(e){}
+  alert('Added as a sold comp — it now feeds valuations and comparables.');
+  if(_compCurrentSubject) renderComparables(_compCurrentSubject);
+}
+function compsFor(listing){
+  switchTab('comps');
+  compSetMode('manual');
+  var blob=((listing.title||'')+' '+(listing.features||'')).toLowerCase();
+  var subject={ loc:(listing.location||'').split(',')[0].trim(), size:parseSizeSqft(listing.size)||0, type:listing.type||'land', beds:Number(listing.beds)||0, tenure:/leasehold|\blease\b/.test(blob)?'leasehold':'freehold', label:(listing.title||listing.location) };
+  compsTabInit();
+  renderComparables(subject);
 }
 function runBacktest(){
   var el=document.getElementById('backtestResult'); if(!el) return;
