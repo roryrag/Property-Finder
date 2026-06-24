@@ -2174,15 +2174,15 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
                 <select id="compType" onchange="compSyncBeds()"><option value="land">Land</option><option value="residential">Residential</option></select>
               </div>
               <div class="input-group"><label>Location (area)</label>
-                <select id="compLocation"><option value="">Select&hellip;</option></select>
+                <select id="compMLocation"><option value="">Select&hellip;</option></select>
               </div>
             </div>
             <div class="grid-2">
-              <div class="input-group"><label>Size (sq ft)</label><input type="number" id="compSize" placeholder="e.g. 8000" min="100"></div>
+              <div class="input-group"><label>Size (sq ft)</label><input type="number" id="compMSize" placeholder="e.g. 8000" min="100"></div>
               <div class="input-group" id="compBedsGroup" style="display:none;"><label>Bedrooms</label><input type="number" id="compBeds" placeholder="e.g. 3" min="0" max="15"></div>
             </div>
             <div class="input-group"><label>Tenure</label>
-              <select id="compTenure"><option value="freehold">Freehold</option><option value="leasehold">Leasehold</option></select>
+              <select id="compMTenure"><option value="freehold">Freehold</option><option value="leasehold">Leasehold</option></select>
             </div>
           </div>
           <button class="add-client-btn" style="width:100%;margin-top:6px;" onclick="runComparables()">&#9878; Find comparables</button>
@@ -4677,7 +4677,7 @@ function compsTabInit(){
 // (from LOC_REGIONS) merged with real repo spellings — never empty, and not
 // limited to areas that happen to have a current listing.
 function buildCompLocationOptions(){
-  var loc=document.getElementById('compLocation'); if(!loc) return;
+  var loc=document.getElementById('compMLocation'); if(!loc) return;
   var prev=loc.value;
   var titleCase=function(s){ return String(s).replace(/\b\w/g,function(m){ return m.toUpperCase(); }); };
   var key=function(s){ return (typeof _normArea==='function'?_normArea(s):String(s).toLowerCase()).replace(/\s+/g,''); };
@@ -4704,7 +4704,7 @@ function runComparables(){
     var blob=((p.title||'')+' '+(p.features||'')+' '+(p.description||'')).toLowerCase();
     subject={ loc:(p.location||'').split(',')[0].trim(), size:parseSizeSqft(p.size)||0, type:p.type||'land', beds:Number(p.beds)||0, tenure:/leasehold|\blease\b/.test(blob)?'leasehold':'freehold', excludeId:(p.id||null), label:(p.title||p.location) };
   } else {
-    subject={ loc:document.getElementById('compLocation').value, size:Number(document.getElementById('compSize').value)||0, type:document.getElementById('compType').value, beds:Number(document.getElementById('compBeds').value)||0, tenure:document.getElementById('compTenure').value };
+    subject={ loc:document.getElementById('compMLocation').value, size:Number(document.getElementById('compMSize').value)||0, type:document.getElementById('compType').value, beds:Number(document.getElementById('compBeds').value)||0, tenure:document.getElementById('compMTenure').value };
     if(!subject.loc){ out.innerHTML='<div class="card comp-empty">Select a location first.</div>'; return; }
   }
   renderComparables(subject);
