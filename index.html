@@ -1178,27 +1178,8 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
 }
 
 /* ════════════════════════════════
-   TOOLS TAB
+   RESULT CARDS (rental, valuator)
 ════════════════════════════════ */
-.tools-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
-.tool-tile{
-  background:var(--white);border-radius:var(--r-md);
-  padding:18px 14px;border:1px solid var(--border);
-  box-shadow:var(--shadow-xs);cursor:pointer;
-  text-align:center;transition:var(--t);
-}
-.tool-tile:hover{box-shadow:var(--shadow-sm);transform:translateY(-3px);border-color:var(--forest-l);}
-.tool-tile-icon{font-size:28px;margin-bottom:8px;}
-.tool-tile-name{font-size:13px;font-weight:700;color:var(--ink);}
-.tool-tile-desc{font-size:10px;color:var(--ink-l);margin-top:2px;}
-.tool-panel{display:none;}
-.tool-panel.active{display:block;}
-.tool-back{
-  display:flex;align-items:center;gap:6px;
-  font-size:13px;font-weight:600;color:var(--forest-l);
-  cursor:pointer;margin-bottom:14px;
-  background:none;border:none;padding:0;font-family:'DM Sans',sans-serif;
-}
 .result-highlight{
   background:linear-gradient(135deg,var(--forest),var(--forest-l));
   border-radius:var(--r-md);padding:18px;color:#fff;
@@ -1777,8 +1758,8 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
         <span class="nav-icon">&#9878;</span><span class="nav-label">Comparables</span>
       </button>
       <div class="toolbar-divider"></div>
-      <button class="nav-item" id="nav-tools" onclick="switchTab('tools')">
-        <span class="nav-icon">&#128295;</span><span class="nav-label">Tools</span>
+      <button class="nav-item" id="nav-rental" onclick="switchTab('rental')">
+        <span class="nav-icon">&#128176;</span><span class="nav-label">Rental Income</span>
       </button>
       <button class="nav-item" id="nav-shortlist" onclick="switchTab('shortlist')">
         <span class="nav-icon">&#10084;</span><span class="nav-label">Shortlist</span>
@@ -1821,7 +1802,7 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
           <div class="dd-item" onclick="switchTabFromMenu('shortlist')"><span class="dd-icon">&#10084;</span>My Shortlist <span id="ddSlCount" style="margin-left:auto;font-size:11px;color:var(--muted)"></span></div>
           <div class="dd-item" onclick="switchTabFromMenu('cobroker')"><span class="dd-icon">&#129309;</span>Co-Broker Requests <span id="ddCbCount" style="margin-left:auto;font-size:11px;color:var(--muted)"></span></div>
           <div class="dd-divider"></div>
-          <div class="dd-item" onclick="switchTabFromMenu('tools')"><span class="dd-icon">&#128295;</span>Tools &amp; Calculators</div>
+          <div class="dd-item" onclick="switchTabFromMenu('rental')"><span class="dd-icon">&#128176;</span>Rental Income</div>
           <div class="dd-divider"></div>
           <div class="dd-item danger" onclick="doLogout()"><span class="dd-icon">&#128682;</span>Sign Out</div>
         </div>
@@ -2191,130 +2172,47 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
       </div>
     </div>
 
-    <!-- TOOLS PANEL -->
-    <div class="tab-content" id="panel-tools">
+    <!-- RENTAL INCOME PANEL -->
+    <div class="tab-content" id="panel-rental">
       <div class="tab-inner">
-        <div id="toolsHome">
-          <div class="tools-grid">
-            <div class="tool-tile" onclick="showTool('mortgage')">
-              <div class="tool-tile-icon">&#127968;</div>
-              <div class="tool-tile-name">Mortgage</div>
-              <div class="tool-tile-desc">Monthly payment calc</div>
-            </div>
-            <div class="tool-tile" onclick="showTool('rental')">
-              <div class="tool-tile-icon">&#128176;</div>
-              <div class="tool-tile-name">Rental Income</div>
-              <div class="tool-tile-desc">Vacation rental est.</div>
-            </div>
-            <div class="tool-tile" onclick="showTool('currency')">
-              <div class="tool-tile-icon">&#128178;</div>
-              <div class="tool-tile-name">Currency</div>
-              <div class="tool-tile-desc">Price converter</div>
-            </div>
-            <div class="tool-tile" onclick="showTool('roi')">
-              <div class="tool-tile-icon">&#128200;</div>
-              <div class="tool-tile-name">ROI Calculator</div>
-              <div class="tool-tile-desc">Yield & payback</div>
-            </div>
+        <div class="card">
+          <div class="card-title">&#128176; Rental Income Estimator</div>
+          <div class="input-group"><label>Property type</label>
+            <select id="rentType">
+              <option value="studio">Studio / 1-bed</option>
+              <option value="2bed">2-bedroom</option>
+              <option value="3bed" selected>3-bedroom villa</option>
+              <option value="4bed">4-bedroom villa</option>
+              <option value="5bed">5+ bedroom luxury</option>
+            </select>
           </div>
-        </div>
-        <!-- MORTGAGE TOOL -->
-        <div class="tool-panel" id="tool-mortgage">
-          <button class="tool-back" onclick="hideTool()">&#8592; Tools</button>
-          <div class="card">
-            <div class="card-title">&#127968; Mortgage Calculator</div>
-            <div class="grid-2">
-              <div class="input-group"><label>Property Price (TT$)</label><input type="number" id="mortPrice" placeholder="e.g. 1500000"></div>
-              <div class="input-group"><label>Deposit (%)</label><input type="number" id="mortDeposit" placeholder="e.g. 10" min="0" max="100"></div>
-              <div class="input-group"><label>Interest Rate (%)</label><input type="number" id="mortRate" placeholder="e.g. 7.5" step="0.1"></div>
-              <div class="input-group"><label>Term (years)</label><input type="number" id="mortTerm" placeholder="e.g. 25"></div>
-            </div>
-            <button class="btn-primary" onclick="runMortgage()">Calculate</button>
+          <div class="input-group"><label>Location</label>
+            <select id="rentLocation">
+              <option value="">Select...</option>
+              <option value="Crown Point">Crown Point</option>
+              <option value="Bon Accord">Bon Accord</option>
+              <option value="Lowlands">Lowlands</option>
+              <option value="Buccoo">Buccoo</option>
+              <option value="Mt Irvine">Mt Irvine</option>
+              <option value="Grafton">Grafton</option>
+              <option value="Black Rock">Black Rock</option>
+              <option value="Scarborough">Scarborough</option>
+              <option value="Bacolet">Bacolet</option>
+              <option value="Plymouth">Plymouth</option>
+              <option value="Speyside">Speyside</option>
+              <option value="Charlotteville">Charlotteville</option>
+              <option value="Castara">Castara</option>
+              <option value="Other Tobago">Other / Rural</option>
+            </select>
           </div>
-          <div id="mortResult"></div>
-        </div>
-        <!-- RENTAL TOOL -->
-        <div class="tool-panel" id="tool-rental">
-          <button class="tool-back" onclick="hideTool()">&#8592; Tools</button>
-          <div class="card">
-            <div class="card-title">&#128176; Rental Income Estimator</div>
-            <div class="input-group"><label>Property type</label>
-              <select id="rentType">
-                <option value="studio">Studio / 1-bed</option>
-                <option value="2bed">2-bedroom</option>
-                <option value="3bed" selected>3-bedroom villa</option>
-                <option value="4bed">4-bedroom villa</option>
-                <option value="5bed">5+ bedroom luxury</option>
-              </select>
-            </div>
-            <div class="input-group"><label>Location</label>
-              <select id="rentLocation">
-                <option value="">Select...</option>
-                <option value="Crown Point">Crown Point</option>
-                <option value="Bon Accord">Bon Accord</option>
-                <option value="Lowlands">Lowlands</option>
-                <option value="Buccoo">Buccoo</option>
-                <option value="Mt Irvine">Mt Irvine</option>
-                <option value="Grafton">Grafton</option>
-                <option value="Black Rock">Black Rock</option>
-                <option value="Scarborough">Scarborough</option>
-                <option value="Bacolet">Bacolet</option>
-                <option value="Plymouth">Plymouth</option>
-                <option value="Speyside">Speyside</option>
-                <option value="Charlotteville">Charlotteville</option>
-                <option value="Castara">Castara</option>
-                <option value="Other Tobago">Other / Rural</option>
-              </select>
-            </div>
-            <div class="input-group"><label>Purchase price (TT$) — for ROI</label><input type="number" id="rentPurchasePrice" placeholder="Optional — for yield calculation"></div>
-            <div class="grid-2">
-              <div class="toggle-row"><label>&#127946; Has pool</label><label class="toggle-switch"><input type="checkbox" id="rentPool"><span class="toggle-slider"></span></label></div>
-              <div class="toggle-row"><label>&#127968; Fully furnished</label><label class="toggle-switch"><input type="checkbox" id="rentFurnished"><span class="toggle-slider"></span></label></div>
-            </div>
-            <button class="btn-primary" onclick="runRentalFull()">Estimate Income</button>
+          <div class="input-group"><label>Purchase price (TT$) — for ROI</label><input type="number" id="rentPurchasePrice" placeholder="Optional — for yield calculation"></div>
+          <div class="grid-2">
+            <div class="toggle-row"><label>&#127946; Has pool</label><label class="toggle-switch"><input type="checkbox" id="rentPool"><span class="toggle-slider"></span></label></div>
+            <div class="toggle-row"><label>&#127968; Fully furnished</label><label class="toggle-switch"><input type="checkbox" id="rentFurnished"><span class="toggle-slider"></span></label></div>
           </div>
-          <div id="rentalResult"></div>
+          <button class="btn-primary" onclick="runRentalFull()">Estimate Income</button>
         </div>
-        <!-- CURRENCY TOOL -->
-        <div class="tool-panel" id="tool-currency">
-          <button class="tool-back" onclick="hideTool()">&#8592; Tools</button>
-          <div class="card">
-            <div class="card-title">&#128178; Property Price Converter</div>
-            <div class="input-group"><label>Amount</label><input type="number" id="currAmount" placeholder="1,000,000" oninput="runCurrency()"></div>
-            <div class="input-group"><label>From</label>
-              <select id="currFrom" onchange="runCurrency()">
-                <option value="TTD">TT$ — Trinidad &amp; Tobago Dollar</option>
-                <option value="USD">USD — US Dollar</option>
-                <option value="GBP">GBP — British Pound</option>
-                <option value="CAD">CAD — Canadian Dollar</option>
-                <option value="EUR">EUR — Euro</option>
-              </select>
-            </div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
-              <button onclick="setCurrAmt(500000)" style="font-size:11px;padding:5px 9px;border-radius:20px;border:1px solid var(--border);background:var(--white);cursor:pointer;color:var(--muted);">TT$500k</button>
-              <button onclick="setCurrAmt(1000000)" style="font-size:11px;padding:5px 9px;border-radius:20px;border:1px solid var(--border);background:var(--white);cursor:pointer;color:var(--muted);">TT$1M</button>
-              <button onclick="setCurrAmt(2000000)" style="font-size:11px;padding:5px 9px;border-radius:20px;border:1px solid var(--border);background:var(--white);cursor:pointer;color:var(--muted);">TT$2M</button>
-              <button onclick="setCurrAmt(5000000)" style="font-size:11px;padding:5px 9px;border-radius:20px;border:1px solid var(--border);background:var(--white);cursor:pointer;color:var(--muted);">TT$5M</button>
-            </div>
-            <div id="currResult"></div>
-            <div style="font-size:11px;color:var(--muted);text-align:center;line-height:1.6;margin-top:8px;">Rates May 2026: 1 USD=TT$6.80 &middot; 1 GBP=TT$8.65 &middot; 1 CAD=TT$5.02 &middot; 1 EUR=TT$7.36</div>
-          </div>
-        </div>
-        <!-- ROI TOOL -->
-        <div class="tool-panel" id="tool-roi">
-          <button class="tool-back" onclick="hideTool()">&#8592; Tools</button>
-          <div class="card">
-            <div class="card-title">&#128200; ROI Calculator</div>
-            <div class="grid-2">
-              <div class="input-group"><label>Purchase Price (TT$)</label><input type="number" id="roiPrice" placeholder="e.g. 2000000"></div>
-              <div class="input-group"><label>Annual Rental Income (TT$)</label><input type="number" id="roiIncome" placeholder="e.g. 350000"></div>
-              <div class="input-group"><label>Annual Expenses (TT$)</label><input type="number" id="roiExpenses" placeholder="e.g. 80000"></div>
-              <div class="input-group"><label>Est. Annual Growth (%)</label><input type="number" id="roiGrowth" placeholder="e.g. 5" step="0.5"></div>
-            </div>
-            <button class="btn-primary" onclick="runROI()">Calculate ROI</button>
-          </div>
-          <div id="roiResult"></div>
-        </div>
+        <div id="rentalResult"></div>
       </div>
     </div>
 
@@ -2630,7 +2528,7 @@ function switchTab(tab) {
   var titleEl = document.getElementById('hdrPageTitle');
   if (titleEl) titleEl.textContent = TAB_TITLES[tab] || '';
 }
-var TAB_TITLES = { dashboard:'Dashboard', search:'Search', valuator:'Land Valuator', comps:'Comparables', tools:'Tools', shortlist:'Shortlist', cobroker:'Co-Broker', settings:'Settings' };
+var TAB_TITLES = { dashboard:'Dashboard', search:'Search', valuator:'Land Valuator', comps:'Comparables', rental:'Rental Income', shortlist:'Shortlist', cobroker:'Co-Broker', settings:'Settings' };
 
 /* ══════════════════════════════════════
    DASHBOARD (landing) — real-data widgets
@@ -2741,17 +2639,6 @@ function renderDashboard() {
 /* ══════════════════════════════════════
    TOOLS NAV
 ══════════════════════════════════════ */
-function showTool(tool) {
-  document.querySelectorAll('.tool-panel').forEach(function(p){ p.classList.remove('active'); });
-  document.getElementById('toolsHome').style.display = 'none';
-  var panel = document.getElementById('tool-' + tool);
-  if (panel) panel.classList.add('active');
-}
-function hideTool() {
-  document.querySelectorAll('.tool-panel').forEach(function(p){ p.classList.remove('active'); });
-  document.getElementById('toolsHome').style.display = 'block';
-}
-
 /* ══════════════════════════════════════
    API KEY
 ══════════════════════════════════════ */
@@ -3651,32 +3538,6 @@ function runValuator() {
 }
 
 /* ══════════════════════════════════════
-   MORTGAGE CALCULATOR
-══════════════════════════════════════ */
-function runMortgage() {
-  var price   = parseFloat(document.getElementById('mortPrice').value);
-  var deposit = parseFloat(document.getElementById('mortDeposit').value) || 10;
-  var rate    = parseFloat(document.getElementById('mortRate').value);
-  var term    = parseFloat(document.getElementById('mortTerm').value);
-  var area    = document.getElementById('mortResult');
-  if (!price || !rate || !term) { area.innerHTML='<div class="error-box">Please fill in all fields.</div>'; return; }
-  var principal = price * (1 - deposit / 100);
-  var monthlyRate = rate / 100 / 12;
-  var n = term * 12;
-  var monthly = principal * (monthlyRate * Math.pow(1+monthlyRate,n)) / (Math.pow(1+monthlyRate,n)-1);
-  var totalPaid = monthly * n;
-  var totalInterest = totalPaid - principal;
-  area.innerHTML =
-    '<div class="result-highlight"><div class="rh-label">Monthly Payment</div><div class="rh-val">'+fmtPrice(Math.round(monthly))+'</div><div class="rh-sub">USD$'+Math.round(monthly/USD).toLocaleString()+' per month</div></div>' +
-    '<div class="result-grid">' +
-      '<div class="result-box accent"><div class="result-box-label">Loan Amount</div><div class="result-box-val">'+fmtPrice(Math.round(principal))+'</div><div class="result-box-sub">After '+deposit+'% deposit</div></div>' +
-      '<div class="result-box"><div class="result-box-label">Total Interest</div><div class="result-box-val">'+fmtPrice(Math.round(totalInterest))+'</div><div class="result-box-sub">Over '+term+' years</div></div>' +
-      '<div class="result-box"><div class="result-box-label">Total Repaid</div><div class="result-box-val">'+fmtPrice(Math.round(totalPaid))+'</div></div>' +
-      '<div class="result-box"><div class="result-box-label">Deposit Req.</div><div class="result-box-val">'+fmtPrice(Math.round(price*deposit/100))+'</div></div>' +
-    '</div>';
-}
-
-/* ══════════════════════════════════════
    RENTAL INCOME — ENHANCED
 ══════════════════════════════════════ */
 var RENT_DATA = {
@@ -3730,58 +3591,6 @@ function runRentalFull() {
     '</div>' +
     '<div style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:12px;line-height:1.6;">Peak months: '+PEAK_MONTHS.join(' \u00B7 ')+'<br>Off-peak: '+OFF_MONTHS.join(' \u00B7 ')+'</div>' +
     '<div class="val-disclaimer">\u2139\uFE0F Indicative estimate based on Tobago vacation rental data 2024\u20132025. Actual results vary.</div>';
-}
-
-/* ══════════════════════════════════════
-   ROI CALCULATOR
-══════════════════════════════════════ */
-function runROI() {
-  var price    = parseFloat(document.getElementById('roiPrice').value);
-  var income   = parseFloat(document.getElementById('roiIncome').value);
-  var expenses = parseFloat(document.getElementById('roiExpenses').value) || 0;
-  var growth   = parseFloat(document.getElementById('roiGrowth').value) || 0;
-  var area     = document.getElementById('roiResult');
-  if (!price || !income) { area.innerHTML='<div class="error-box">Please enter purchase price and annual income.</div>'; return; }
-  var netIncome  = income - expenses;
-  var grossYield = ((income/price)*100).toFixed(2);
-  var netYield   = ((netIncome/price)*100).toFixed(2);
-  var payback    = Math.round(price/netIncome);
-  var val10yr    = Math.round(price * Math.pow(1+growth/100, 10));
-  area.innerHTML =
-    '<div class="result-highlight"><div class="rh-label">Net Yield</div><div class="rh-val">'+netYield+'%</div><div class="rh-sub">Gross: '+grossYield+'%</div></div>' +
-    '<div class="result-grid">' +
-      '<div class="result-box accent"><div class="result-box-label">Net Annual Income</div><div class="result-box-val">'+fmtPrice(Math.round(netIncome))+'</div></div>' +
-      '<div class="result-box"><div class="result-box-label">Payback Period</div><div class="result-box-val">'+payback+' yrs</div></div>' +
-      (growth ? '<div class="result-box accent"><div class="result-box-label">Est. Value in 10yrs</div><div class="result-box-val">'+fmtPrice(val10yr)+'</div><div class="result-box-sub">at '+growth+'%/yr growth</div></div>' : '') +
-      '<div class="result-box"><div class="result-box-label">Annual Expenses</div><div class="result-box-val">'+fmtPrice(Math.round(expenses))+'</div></div>' +
-    '</div>';
-}
-
-/* ══════════════════════════════════════
-   CURRENCY
-══════════════════════════════════════ */
-var RATES = { TTD:1, USD:6.80, GBP:8.65, CAD:5.02, EUR:7.36 };
-var FLAGS = { TTD:'\uD83C\uDDF9\uD83C\uDDF9', USD:'\uD83C\uDDFA\uD83C\uDDF8', GBP:'\uD83C\uDDEC\uD83C\uDDE7', CAD:'\uD83C\uDDE8\uD83C\uDDE6', EUR:'\uD83C\uDDEA\uD83C\uDDFA' };
-var NAMS  = { TTD:'TT Dollar', USD:'US Dollar', GBP:'Brit. Pound', CAD:'Can. Dollar', EUR:'Euro' };
-function setCurrAmt(n) { document.getElementById('currAmount').value=n; document.getElementById('currFrom').value='TTD'; runCurrency(); }
-function runCurrency() {
-  var amt=parseFloat(document.getElementById('currAmount').value)||0;
-  var from=document.getElementById('currFrom').value;
-  var area=document.getElementById('currResult');
-  if(amt<=0){area.innerHTML='';return;}
-  var ttd=amt*RATES[from];
-  var h='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">';
-  Object.keys(RATES).forEach(function(code){
-    var val=ttd/RATES[code]; var isActive=code===from;
-    var formatted; if(val>=1000000) formatted=code+' '+(val/1000000).toFixed(2)+'M'; else if(val>=1000) formatted=code+' '+Math.round(val/1000)+'k'; else formatted=code+' '+Math.round(val).toLocaleString();
-    h+='<div style="background:'+(isActive?'var(--forest)':'var(--bg)')+';border-radius:var(--radius-sm);padding:10px;text-align:center;border:1px solid var(--border);">' +
-      '<div style="font-size:18px;margin-bottom:3px;">'+FLAGS[code]+'</div>' +
-      '<div style="font-size:9px;font-weight:700;color:'+(isActive?'rgba(255,255,255,.65)':'var(--muted)')+';text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px;">'+NAMS[code]+'</div>' +
-      '<div style="font-size:13px;font-weight:700;color:'+(isActive?'#fff':'var(--dark)')+';">'+formatted+'</div>' +
-    '</div>';
-  });
-  h+='</div>';
-  area.innerHTML=h;
 }
 
 /* ══════════════════════════════════════
