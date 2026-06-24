@@ -4711,7 +4711,10 @@ function renderComparables(subject){
   } else {
     h+='<div class="comp-empty">Not enough comparable data to estimate a range for this subject yet.</div>';
   }
-  if(r.range) h+='<button class="add-client-btn wa-share" style="width:100%;margin-top:10px;background:#25D366;border-color:#25D366;" onclick="shareCmaWhatsApp()">💬 Share CMA via WhatsApp</button>';
+  if(r.range) h+='<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">'+
+    '<button class="add-client-btn" style="flex:1;min-width:150px;background:#25D366;border-color:#25D366;" onclick="shareCmaWhatsApp()">💬 Share via WhatsApp</button>'+
+    '<button class="add-client-btn" style="flex:1;min-width:150px;" onclick="printCMA()">🖨 Print / Save PDF</button>'+
+  '</div>';
   h+='</div>';
   h+='<div class="card"><div class="comp-sec-title"><span class="pill comp-pill-sold">SOLD</span> Sold comparables <span style="color:var(--muted);font-weight:400;">'+r.sold.length+'</span></div>'+
      (r.sold.length?r.sold.map(function(c){ return _compRow(c,-1); }).join(''):'<div class="comp-empty">No sold comparables yet. Mark listings as sold to build this — sold data is the only ground truth.</div>')+'</div>';
@@ -4797,6 +4800,76 @@ function shareCmaWhatsApp(){
   var msg=encodeURIComponent(L.join('\n'));
   if(typeof openContactPicker==='function') openContactPicker(msg, (s.label||s.loc||'CMA'), R.avg);
   else window.open('https://wa.me/?text='+msg,'_blank');
+}
+function _cmaRowHtml(c){
+  var third=(c.beds>0?c.beds+' bd':(c.kind==='sold'&&c.dateMs?new Date(c.dateMs).toLocaleDateString():'—'));
+  return '<tr><td>'+_compEsc(String(c.loc||'').split('|')[0])+'</td>'+
+    '<td>'+(c.size>0?Number(c.size).toLocaleString()+' sqft':'—')+'</td>'+
+    '<td>'+third+'</td>'+
+    '<td class="r">'+(c.price>0?fmtPrice(c.price):'—')+'</td>'+
+    '<td class="r">'+(c.psf>0?'TT$'+Math.round(c.psf).toLocaleString():'—')+'</td>'+
+    '<td class="r">'+c.match+'%</td></tr>';
+}
+function printCMA(){
+  var s=_compCurrentSubject, r=_compLastResult;
+  if(!s||!r||!r.range) return;
+  var R=r.range, p=(typeof loadProfile==='function'?loadProfile():{});
+  var conf=_compConfText(R).replace(/<[^>]+>/g,'').replace(/&mdash;/g,'—').replace(/&middot;/g,'·').replace(/&plusmn;/g,'±').replace(/&amp;/g,'&');
+  var today=new Date().toLocaleDateString('en-TT',{day:'numeric',month:'long',year:'numeric'});
+  var agency=p.agency||'BrokerBuddy';
+  var subjBits=[]; if(s.size>0) subjBits.push(Number(s.size).toLocaleString()+' sq ft'); subjBits.push(r.cls==='land'?'Land':'Residential'); if(s.tenure==='leasehold') subjBits.push('Leasehold');
+  var soldRows=r.sold.length?r.sold.slice(0,8).map(_cmaRowHtml).join(''):'<tr><td colspan="6" class="empty">No sold comparables on record — values rest on asking data only.</td></tr>';
+  var askRows=r.asking.length?r.asking.slice(0,10).map(_cmaRowHtml).join(''):'<tr><td colspan="6" class="empty">No active comparables.</td></tr>';
+  var psfNote=(R.mode==='psf'&&R.psf50)?(' · ≈ TT$'+R.psf50.toLocaleString()+'/sq ft'):'';
+  var doc='<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CMA — '+_compEsc(s.loc||'Tobago')+'</title><style>'+
+    '*{box-sizing:border-box;margin:0;padding:0;}'+
+    'body{font-family:Georgia,\'Times New Roman\',serif;color:#1b2a20;padding:32px 36px;max-width:820px;margin:0 auto;font-size:13px;line-height:1.5;}'+
+    '.hd{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #0E2E1F;padding-bottom:12px;}'+
+    '.brand{font-size:24px;font-weight:700;color:#0E2E1F;letter-spacing:.5px;}.brand span{color:#C9A24B;}'+
+    '.doc-meta{text-align:right;font-size:11px;color:#5b6b60;}'+
+    '.kicker{font-size:11px;letter-spacing:2px;color:#C9A24B;text-transform:uppercase;font-weight:700;margin-top:8px;}'+
+    'h1{font-size:14px;color:#0E2E1F;text-transform:uppercase;letter-spacing:1px;margin:18px 0 8px;}'+
+    '.subj{background:#f4f1e8;border:1px solid #e0d8c2;border-radius:8px;padding:14px 16px;}'+
+    '.subj .loc{font-size:18px;font-weight:700;color:#0E2E1F;}.subj .bits{color:#5b6b60;font-size:12px;margin-top:2px;}'+
+    '.range{display:flex;gap:12px;margin:6px 0;}'+
+    '.rb{flex:1;text-align:center;border:1px solid #e0d8c2;border-radius:8px;padding:14px 8px;}'+
+    '.rb.mid{background:#0E2E1F;color:#fff;border-color:#0E2E1F;}'+
+    '.rb .l{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#8a9488;}.rb.mid .l{color:#C9A24B;}'+
+    '.rb .v{font-size:20px;font-weight:700;margin-top:3px;}.rb .u{font-size:11px;color:#8a9488;}.rb.mid .u{color:#cdd6cf;}'+
+    '.conf{font-size:12px;color:#5b6b60;}'+
+    'table{width:100%;border-collapse:collapse;font-size:12px;}'+
+    'th{text-align:left;background:#0E2E1F;color:#fff;padding:6px 8px;font-size:10px;text-transform:uppercase;letter-spacing:.5px;}'+
+    'th.r,td.r{text-align:right;}td{padding:6px 8px;border-bottom:1px solid #ece8dc;}'+
+    'td.empty{text-align:center;color:#8a9488;font-style:italic;padding:12px;}'+
+    '.ft{margin-top:20px;border-top:2px solid #0E2E1F;padding-top:12px;display:flex;justify-content:space-between;align-items:flex-end;}'+
+    '.ag b{font-size:14px;color:#0E2E1F;}'+
+    '.caveat{font-size:10px;color:#8a9488;margin-top:14px;border-top:1px dotted #ccc;padding-top:8px;line-height:1.4;}'+
+    '.noprint{position:fixed;top:12px;right:12px;}'+
+    '.noprint button{font-family:sans-serif;font-size:13px;padding:9px 16px;background:#0E2E1F;color:#fff;border:none;border-radius:6px;cursor:pointer;}'+
+    '@media print{body{padding:0;}.noprint{display:none;}@page{margin:14mm;}tr{page-break-inside:avoid;}}'+
+    '</style></head><body>'+
+    '<div class="noprint"><button onclick="window.print()">🖨 Print / Save PDF</button></div>'+
+    '<div class="hd"><div class="brand">Broker<span>Buddy</span></div><div class="doc-meta">'+_compEsc(agency)+'<br>'+today+'</div></div>'+
+    '<div class="kicker">Comparative Market Analysis</div>'+
+    '<h1>Subject Property</h1>'+
+    '<div class="subj"><div class="loc">📍 '+_compEsc(s.loc||'Tobago')+', Tobago</div><div class="bits">'+subjBits.join(' · ')+'</div></div>'+
+    '<h1>Estimated Value Range</h1>'+
+    '<div class="range">'+
+      '<div class="rb"><div class="l">Low</div><div class="v">'+fmtPrice(R.min)+'</div><div class="u">US$'+Math.round(R.min/USD).toLocaleString()+'</div></div>'+
+      '<div class="rb mid"><div class="l">Likely</div><div class="v">'+fmtPrice(R.avg)+'</div><div class="u">US$'+Math.round(R.avg/USD).toLocaleString()+'</div></div>'+
+      '<div class="rb"><div class="l">High</div><div class="v">'+fmtPrice(R.max)+'</div><div class="u">US$'+Math.round(R.max/USD).toLocaleString()+'</div></div>'+
+    '</div>'+
+    '<div class="conf">📊 '+conf+psfNote+'</div>'+
+    '<h1>Sold Comparables</h1>'+
+    '<table><thead><tr><th>Location</th><th>Size</th><th>Beds / Date</th><th class="r">Price</th><th class="r">TT$/sqft</th><th class="r">Match</th></tr></thead><tbody>'+soldRows+'</tbody></table>'+
+    '<h1>Active / Asking Comparables</h1>'+
+    '<table><thead><tr><th>Location</th><th>Size</th><th>Beds / Date</th><th class="r">Price</th><th class="r">TT$/sqft</th><th class="r">Match</th></tr></thead><tbody>'+askRows+'</tbody></table>'+
+    '<div class="ft"><div class="ag">'+(p.name?'<b>'+_compEsc(p.name)+'</b><br>':'')+_compEsc(agency)+(p.phone?'<br>📞 '+_compEsc(p.phone):'')+(p.email?'<br>✉ '+_compEsc(p.email):'')+'</div><div style="text-align:right;font-size:10px;color:#8a9488;">Prepared '+today+'</div></div>'+
+    '<div class="caveat">⚠️ Indicative estimate derived from available comparable listings'+(r.sold.length?' and sold records':'')+' — not a formal appraisal. Asking prices in Tobago typically run ~5–15% above achieved sold prices; no public sold-price registry exists in T&T, so figures should be validated against current market conditions. USD conversion at TT$'+USD+'.</div>'+
+    '</body></html>';
+  var w=window.open('','_blank');
+  if(!w){ alert('Please allow pop-ups to open the printable CMA.'); return; }
+  w.document.open(); w.document.write(doc); w.document.close();
 }
 function runBacktest(){
   var el=document.getElementById('backtestResult'); if(!el) return;

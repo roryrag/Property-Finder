@@ -110,6 +110,9 @@ Change tokens at the variable blocks, not per-component.
   (repo lacks clean building sqft) it falls back to a similarity-weighted price
   band keyed on area+beds. "⚖ Comparables" button on every search card jumps in
   with that listing as subject; "🏷️ Sold?" on an asking comp feeds the sold DB.
+  Two client-ready exports: **Share via WhatsApp** (`shareCmaWhatsApp` → contact
+  picker) and **Print / Save PDF** (`printCMA` opens a branded one-page document
+  in a new window with its own print CSS — saves as PDF via the browser dialog).
 - **Shortlist** — general + per-client shortlists, WhatsApp share.
 - **Co-Broker** — request tracker, status workflow, commission calculator,
   WhatsApp/email send.
