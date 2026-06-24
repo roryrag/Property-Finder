@@ -1622,6 +1622,89 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
   font-size:12px;color:var(--ink-xl);
 }
 
+/* ── CLIENT BRIEF (looking-for) + auto-matches ── */
+.brief-box{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:var(--r-sm);padding:10px 12px;margin-bottom:10px;
+}
+.brief-head{display:flex;align-items:center;gap:8px;}
+.brief-head-title{font-size:12px;font-weight:700;color:var(--ink);flex:1;min-width:0;}
+.brief-newpill{
+  font-size:10px;font-weight:700;color:#3A2A05;
+  background:linear-gradient(135deg,var(--gold,#C9A24B),#E2C079);
+  border-radius:20px;padding:2px 8px;white-space:nowrap;
+}
+.brief-edit-btn{
+  background:none;border:1px solid var(--border);border-radius:20px;
+  color:var(--forest-l);font-size:11px;font-weight:600;cursor:pointer;
+  padding:3px 10px;font-family:'DM Sans',sans-serif;white-space:nowrap;
+}
+.brief-summary{font-size:11px;color:var(--ink-l);margin-top:5px;line-height:1.5;}
+.brief-form{display:none;margin-top:8px;}
+.brief-form.open{display:block;}
+.brief-form-row{display:flex;flex-direction:column;gap:3px;margin-bottom:7px;}
+.brief-form-row label{font-size:10px;font-weight:700;color:var(--ink-l);text-transform:uppercase;letter-spacing:.07em;}
+.brief-form-row select,.brief-form-row input{
+  width:100%;padding:7px 9px;border:1.5px solid var(--border);
+  border-radius:var(--r-xs);font-size:12px;color:var(--ink);
+  background:var(--white);font-family:'DM Sans',sans-serif;
+}
+.brief-loc-picker{
+  max-height:200px;overflow-y:auto;border:1.5px solid var(--border);
+  border-radius:var(--r-xs);padding:6px 8px;background:var(--white);
+}
+.brief-loc-group{margin-bottom:6px;}
+.brief-loc-region{
+  display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;
+  color:var(--forest-l);cursor:pointer;padding:2px 0;
+}
+.brief-loc-areas{
+  display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;
+  align-items:start;padding:3px 0 4px 16px;
+}
+.brief-loc-area{
+  display:flex;align-items:center;gap:5px;font-size:11px;
+  color:var(--ink-l);cursor:pointer;min-width:0;
+  white-space:nowrap;overflow:hidden;
+}
+.brief-loc-area span{overflow:hidden;text-overflow:ellipsis;}
+.brief-loc-region input,.brief-loc-area input{cursor:pointer;margin:0;flex-shrink:0;width:14px;height:14px;}
+.brief-form-btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
+.brief-form-btns button{
+  padding:7px 12px;border-radius:var(--r-xs);font-size:12px;font-weight:600;
+  cursor:pointer;font-family:'DM Sans',sans-serif;border:1.5px solid var(--border);
+  background:var(--white);color:var(--ink-l);
+}
+.brief-form-btns button:first-child{background:var(--forest);border-color:var(--forest);color:#fff;}
+.brief-matches{margin-top:8px;}
+.brief-match{
+  display:flex;align-items:flex-start;gap:9px;
+  padding:8px 10px;border-radius:var(--r-xs);margin-bottom:6px;
+  border:1px solid var(--border);background:var(--sand);
+}
+.brief-match.is-new{border-color:rgba(201,162,75,.5);background:rgba(226,192,121,.1);}
+.brief-match-body{flex:1;min-width:0;cursor:pointer;}
+.brief-match-title{font-size:12px;font-weight:600;color:var(--ink);line-height:1.3;}
+.brief-newdot{
+  display:inline-block;font-size:9px;font-weight:800;color:#3A2A05;
+  background:linear-gradient(135deg,var(--gold,#C9A24B),#E2C079);
+  border-radius:4px;padding:1px 5px;margin-right:5px;vertical-align:middle;letter-spacing:.04em;
+}
+.brief-match-meta{font-size:10px;color:var(--ink-xl);margin-top:1px;}
+.brief-match-price{font-size:11px;color:var(--forest-l);font-weight:600;margin-top:2px;}
+.brief-match-actions{display:flex;flex-direction:column;gap:5px;align-items:flex-end;flex-shrink:0;}
+.brief-match-actions a{font-size:11px;color:var(--forest-l);font-weight:600;text-decoration:none;white-space:nowrap;}
+.brief-match-save{
+  background:none;border:none;cursor:pointer;font-size:13px;padding:0;color:var(--ink-xl);
+}
+.brief-match-save:hover{color:var(--danger,#C0392B);}
+.brief-matches-foot{display:flex;gap:7px;margin-top:6px;flex-wrap:wrap;}
+.brief-matches-foot button{
+  font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;
+  border:1px solid var(--border);background:var(--white);color:var(--ink-l);
+  border-radius:20px;padding:4px 11px;
+}
+
 /* ── ADD TO SHORTLIST PICKER ── */
 .sl-picker-sheet{
   background:var(--white);width:100%;max-width:520px;
@@ -2525,6 +2608,7 @@ function switchTab(tab) {
   if (tab === 'dashboard') { try { renderDashboard(); } catch(e) {} }
   if (tab === 'valuator') { try { renderConfirmQueue(); } catch(e) {} }
   if (tab === 'comps') { try { compsTabInit(); } catch(e) {} }
+  if (tab === 'shortlist') { try { renderShortlist(); renderClientShortlists(); } catch(e) {} }
   var titleEl = document.getElementById('hdrPageTitle');
   if (titleEl) titleEl.textContent = TAB_TITLES[tab] || '';
 }
@@ -4418,8 +4502,18 @@ function findComparables(subject){
     c.adjPrice=c.kind==='sold'?c.price:c.price*(1-ASKING_HAIRCUT);
   });
   cands.sort(function(a,b){ return (b.match-a.match)||(b.w-a.w); });
-  var sold=cands.filter(function(c){ return c.kind==='sold'; }).slice(0,12);
-  var asking=cands.filter(function(c){ return c.kind==='asking'; }).slice(0,15);
+  // Restrict displayed comps to the subject's area + same region (locScore>0).
+  // Only widen island-wide when fewer than 3 nearby exist, and flag it so the UI
+  // can say so — same philosophy the value-range pool uses below.
+  var near=function(c){ return _compLocScore(subject.loc,c.loc)>0; };
+  var pickComps=function(kind,limit){
+    var all=cands.filter(function(c){ return c.kind===kind; });
+    var nearby=all.filter(near);
+    var broadened=nearby.length<3;
+    return { list:(broadened?all:nearby).slice(0,limit), broadened:broadened&&all.length>nearby.length };
+  };
+  var soldPick=pickComps('sold',12), askPick=pickComps('asking',15);
+  var sold=soldPick.list, asking=askPick.list;
   var range=null;
   if(cls==='land' && subjSize>0 && typeof knnPSF==='function'){
     var k=knnPSF({loc:subject.loc, size:subjSize, tenure:subject.tenure}, subject.excludeId?{excludeId:subject.excludeId}:{});
@@ -4447,7 +4541,7 @@ function findComparables(subject){
         n:pool.length, nEff:nEff, source:(soldN>=3?'sold':(soldN>0?'mixed':'asking')), dispersion:(p50>0?(p75-p25)/p50:1), broadened:broadened };
     }
   }
-  return { cls:cls, sold:sold, asking:asking, range:range };
+  return { cls:cls, sold:sold, asking:asking, range:range, soldBroadened:soldPick.broadened, askingBroadened:askPick.broadened };
 }
 function _compConfText(R){
   if(!R) return '';
@@ -4541,10 +4635,11 @@ function renderComparables(subject){
     '<button class="add-client-btn" style="flex:1;min-width:150px;" onclick="printCMA()">🖨 Print / Save PDF</button>'+
   '</div>';
   h+='</div>';
-  h+='<div class="card"><div class="comp-sec-title"><span class="pill comp-pill-sold">SOLD</span> Sold comparables <span style="color:var(--muted);font-weight:400;">'+r.sold.length+'</span></div>'+
+  var widenNote='<span style="color:var(--muted);font-weight:400;font-size:11px;"> &middot; widened island-wide (few nearby)</span>';
+  h+='<div class="card"><div class="comp-sec-title"><span class="pill comp-pill-sold">SOLD</span> Sold comparables <span style="color:var(--muted);font-weight:400;">'+r.sold.length+'</span>'+(r.soldBroadened?widenNote:'')+'</div>'+
      (r.sold.length?r.sold.map(function(c){ return _compRow(c,-1); }).join(''):'<div class="comp-empty">No sold comparables yet. Mark listings as sold to build this — sold data is the only ground truth.</div>')+'</div>';
   _compLastAsking=r.asking;
-  h+='<div class="card"><div class="comp-sec-title"><span class="pill comp-pill-ask">ASKING</span> Active / asking <span style="color:var(--muted);font-weight:400;">'+r.asking.length+'</span></div>'+
+  h+='<div class="card"><div class="comp-sec-title"><span class="pill comp-pill-ask">ASKING</span> Active / asking <span style="color:var(--muted);font-weight:400;">'+r.asking.length+'</span>'+(r.askingBroadened?widenNote:'')+'</div>'+
      (r.asking.length?r.asking.map(function(c,i){ return _compRow(c,i); }).join(''):'<div class="comp-empty">No active listings match this subject.</div>')+
      '<div class="val-disclaimer" style="margin-top:10px">⚠️ Asking prices only (discounted ~'+Math.round(ASKING_HAIRCUT*100)+'% toward sold-equivalent in the estimate); sold comps are weighted far higher. A range from few or zero sold comps is indicative, not definitive.</div></div>';
   el.innerHTML=h;
@@ -5119,23 +5214,28 @@ function renderClientShortlists() {
 
   var waIconSvg = '<svg style="width:14px;height:14px;fill:#fff;flex-shrink:0;" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>';
 
+  // Preserve which cards are expanded across the re-render.
+  var openIds = Array.prototype.slice.call(document.querySelectorAll('.client-sl-card.open')).map(function(el){ return el.id; });
+
   var html = '';
   contacts.forEach(function(c) {
     var props  = clientShortlists[c.id] || [];
     var count  = props.length;
     var initial = c.name ? c.name.charAt(0).toUpperCase() : '?';
+    var newCount = briefNewCount(c);
 
     html += '<div class="client-sl-card" id="csl-' + c.id + '">';
     html +=   '<div class="client-sl-header" onclick="toggleClientSl(this.parentElement)">';
     html +=     '<div class="client-sl-av">' + initial + '</div>';
     html +=     '<div class="client-sl-info">';
-    html +=       '<div class="client-sl-name">' + c.name + '</div>';
+    html +=       '<div class="client-sl-name">' + c.name + (newCount ? ' <span class="brief-newpill">' + newCount + ' new</span>' : '') + '</div>';
     html +=       '<div class="client-sl-meta">' + (c.phoneDisplay || c.phone) + (c.note ? ' \u00B7 ' + c.note : '') + '</div>';
     html +=     '</div>';
     html +=     '<div class="client-sl-count' + (count === 0 ? ' empty' : '') + '">' + count + '</div>';
     html +=     '<span class="client-sl-chevron">\u25BC</span>';
     html +=   '</div>';
     html +=   '<div class="client-sl-body">';
+    html +=     briefSectionHtml(c);
 
     if (!count) {
       html += '<div class="client-sl-empty">No properties saved for ' + c.name + ' yet.<br>Tap \u2764 Add on any listing and select this client.</div>';
@@ -5163,6 +5263,241 @@ function renderClientShortlists() {
     html += '</div></div>';
   });
   area.innerHTML = html;
+  openIds.forEach(function(id){ var el = document.getElementById(id); if (el) el.classList.add('open'); });
+}
+
+/* ══════════════════════════════════════════
+   CLIENT BRIEF — "looking for" + repo auto-match
+   A brief lives on the contact: { type, beds, areas[], priceMax }.
+   contact.seen[] holds the keys the agent has acknowledged; it is
+   seeded with all matches at save-time so only listings that appear
+   in the repo LATER are flagged NEW. Viewing/saving a match clears its
+   NEW flag. Area matching reuses _compLocScore (same area + same region).
+══════════════════════════════════════════ */
+function _briefPropKey(p){ return String(p.id || ((p.title||'') + '|' + (p.location||'') + '|' + (p.price||''))); }
+
+function matchBrief(brief){
+  if (!brief) return [];
+  var cls = brief.type === 'land' ? 'land' : (brief.type === 'residential' ? 'built' : null);
+  var regions = brief.regions || [];
+  var areas = brief.areas || [];
+  var pmax = Number(brief.priceMax) || 0;
+  var minBeds = Number(brief.beds) || 0;
+  var out = [];
+  (activeRepo() || []).forEach(function(p){
+    if (cls && _compClass(p.type) !== cls) return;
+    if (cls === 'built' && minBeds > 0 && Number(p.beds || 0) < minBeds) return;
+    if (pmax > 0 && Number(p.price || 0) > 0 && Number(p.price) > pmax) return;
+    if (regions.length || areas.length){
+      var pa = ((p.location || '').split(',')[0] || '').trim();
+      // Region = whole region; Area = that exact area (or name-substring), so
+      // picking specific locations stays precise while regions go broad. A
+      // listing matches if it satisfies ANY selected region OR area.
+      var inRegion = regions.length && regions.indexOf(_compRegionName(pa)) !== -1;
+      var inArea   = areas.length   && areas.some(function(a){ return _compLocScore(a, pa) >= 0.85; });
+      if (!(inRegion || inArea)) return;
+    }
+    out.push(p);
+  });
+  // Newest listings first, then cheapest.
+  out.sort(function(a,b){ return (Number(b.lastSeen||0) - Number(a.lastSeen||0)) || (Number(a.price||0) - Number(b.price||0)); });
+  return out;
+}
+
+function briefNewCount(c){
+  if (!c || !c.brief) return 0;
+  var seen = c.seen || [];
+  return matchBrief(c.brief).filter(function(p){ return seen.indexOf(_briefPropKey(p)) === -1; }).length;
+}
+
+function _briefSummary(b){
+  var t = b.type === 'land' ? 'Land' : (b.type === 'residential' ? ((b.beds > 0 ? b.beds + '+ bed ' : '') + 'residential') : 'Any type');
+  // Region names are like "Southwest · Crown Point" — show just the short half.
+  var regs = (b.regions || []).map(function(r){ return 'all ' + (String(r).split('·').pop() || r).trim(); });
+  var locs = regs.concat(b.areas || []);
+  var a = locs.length ? (' in ' + locs.join(', ')) : ' · any area';
+  var pm = (Number(b.priceMax) > 0) ? (' · up to ' + fmtPrice(Number(b.priceMax))) : '';
+  return '🎯 ' + t + a + pm;
+}
+
+function _briefToSlProp(p){
+  return {
+    title : p.title || p.location || 'Property',
+    price : (Number(p.price) > 0 ? fmtPrice(Number(p.price)) : ''),
+    priceN: Number(p.price) || 0,
+    loc   : (p.location || ''),
+    url   : (typeof bestUrl === 'function' ? bestUrl(p) : (p.url || '')),
+    type  : p.type || ''
+  };
+}
+
+// Checkbox picker: one "All of <region>" checkbox per region, plus an
+// individual checkbox per area. Ticking a region toggles all its areas
+// (handled by briefRegionToggle). Stores region + area selections separately.
+function _briefAreaPickerHtml(idv, selRegions, selAreas){
+  selRegions = selRegions || []; selAreas = selAreas || [];
+  var selANorm = selAreas.map(function(s){ return _normArea(s); });
+  var titleCase = function(s){ return String(s).replace(/\b\w/g, function(m){ return m.toUpperCase(); }); };
+  if (typeof LOC_REGIONS === 'undefined') return '';
+  var html = '<div class="brief-loc-picker" id="briefLoc-' + idv + '">';
+  LOC_REGIONS.forEach(function(r, ri){
+    var rChecked = selRegions.indexOf(r.name) !== -1 ? ' checked' : '';
+    html += '<div class="brief-loc-group">';
+    html += '<label class="brief-loc-region"><input type="checkbox" class="briefRegion" data-ri="' + ri + '" value="' + _compEsc(r.name) + '"' + rChecked + ' onchange="briefRegionToggle(' + idv + ',' + ri + ',this.checked)"> ★ All of ' + _compEsc((String(r.name).split('·').pop() || r.name).trim()) + '</label>';
+    html += '<div class="brief-loc-areas">';
+    var seen = {};
+    r.areas.slice().sort().forEach(function(k){
+      var nk = _normArea(k); if (seen[nk]) return; seen[nk] = 1;
+      var name = titleCase(k);
+      var aChecked = (selANorm.indexOf(nk) !== -1) ? ' checked' : '';
+      html += '<label class="brief-loc-area"><input type="checkbox" class="briefArea" data-ri="' + ri + '" value="' + _compEsc(name) + '"' + aChecked + '><span>' + _compEsc(name) + '</span></label>';
+    });
+    html += '</div></div>';
+  });
+  html += '</div>';
+  return html;
+}
+// Ticking "All of <region>" checks/unchecks every area checkbox in that group.
+function briefRegionToggle(idv, ri, checked){
+  var box = document.getElementById('briefLoc-' + idv); if (!box) return;
+  Array.prototype.slice.call(box.querySelectorAll('.briefArea[data-ri="' + ri + '"]')).forEach(function(cb){ cb.checked = checked; });
+}
+
+function briefSectionHtml(c){
+  var b = c.brief;
+  var idv = c.id;
+  var h = '<div class="brief-box">';
+  h += '<div class="brief-head"><span class="brief-head-title">🎯 ' + (b ? 'Looking for' : 'What is ' + _compEsc((c.name||'').split(' ')[0] || 'this client') + ' looking for?') + '</span>';
+  h += '<button class="brief-edit-btn" onclick="briefToggleForm(' + idv + ')">' + (b ? 'Edit' : '＋ Set brief') + '</button></div>';
+  if (b) h += '<div class="brief-summary">' + _compEsc(_briefSummary(b)) + '</div>';
+
+  // Edit/create form
+  var bt = b ? b.type : 'any', bb = b ? (b.beds||'') : '', bp = b ? (b.priceMax||'') : '';
+  h += '<div class="brief-form" id="briefForm-' + idv + '">';
+  h += '<div class="brief-form-row"><label>Type</label><select id="briefType-' + idv + '" onchange="briefSyncBeds(' + idv + ')">' +
+         '<option value="any"' + (bt==='any'?' selected':'') + '>Any type</option>' +
+         '<option value="land"' + (bt==='land'?' selected':'') + '>Land</option>' +
+         '<option value="residential"' + (bt==='residential'?' selected':'') + '>Residential (house/villa)</option>' +
+       '</select></div>';
+  h += '<div class="brief-form-row" id="briefBedsWrap-' + idv + '" style="' + (bt==='residential'?'':'display:none;') + '"><label>Min bedrooms</label><input type="number" id="briefBeds-' + idv + '" min="0" max="15" placeholder="e.g. 3" value="' + bb + '"></div>';
+  h += '<div class="brief-form-row"><label>Locations — tick a whole region or pick specific areas</label>' + _briefAreaPickerHtml(idv, b ? b.regions : [], b ? b.areas : []) + '</div>';
+  h += '<div class="brief-form-row"><label>Max price TT$ (optional)</label><input type="number" id="briefPriceMax-' + idv + '" placeholder="e.g. 1500000" value="' + bp + '"></div>';
+  h += '<div class="brief-form-btns"><button onclick="saveBrief(' + idv + ')">' + (b ? 'Update & refresh' : 'Save & find matches') + '</button>' +
+       (b ? '<button onclick="clearBrief(' + idv + ')">Clear brief</button>' : '') +
+       '<button onclick="briefToggleForm(' + idv + ')">Cancel</button></div>';
+  h += '</div>';
+
+  // Matches
+  if (b){
+    var seen = c.seen || [];
+    var matches = matchBrief(b);
+    // NEW first, otherwise keep recency order from matchBrief.
+    matches.sort(function(x,y){
+      var nx = seen.indexOf(_briefPropKey(x)) === -1 ? 1 : 0;
+      var ny = seen.indexOf(_briefPropKey(y)) === -1 ? 1 : 0;
+      return ny - nx;
+    });
+    if (!matches.length){
+      h += '<div class="brief-matches"><div class="client-sl-empty" style="padding:8px 0 2px;">No repository listings match this brief yet. You\'ll be alerted here when one appears.</div></div>';
+    } else {
+      var newCount = matches.filter(function(p){ return seen.indexOf(_briefPropKey(p)) === -1; }).length;
+      h += '<div class="brief-matches">';
+      matches.slice(0, 25).forEach(function(p){
+        var key = _briefPropKey(p);
+        var isNew = seen.indexOf(key) === -1;
+        var meta = [];
+        var loc = ((p.location || '').split(',')[0] || '').trim(); if (loc) meta.push(_compEsc(loc));
+        if (Number(p.beds) > 0) meta.push(p.beds + ' bed');
+        var sz = parseSizeSqft(p.size) || 0; if (sz > 0) meta.push(sz.toLocaleString() + ' sqft');
+        var url = (typeof bestUrl === 'function' ? bestUrl(p) : (p.url || ''));
+        h += '<div class="brief-match' + (isNew ? ' is-new' : '') + '">';
+        h += '<div class="brief-match-body" onclick="briefMarkSeen(' + idv + ',\'' + _compEsc(key).replace(/'/g,"\\'") + '\')">';
+        h += '<div class="brief-match-title">' + (isNew ? '<span class="brief-newdot">NEW</span>' : '') + _compEsc(String(p.title || p.location || 'Property').slice(0,72)) + '</div>';
+        if (meta.length) h += '<div class="brief-match-meta">' + meta.join(' · ') + '</div>';
+        h += '<div class="brief-match-price">' + (Number(p.price) > 0 ? fmtPrice(Number(p.price)) : 'Price on request') + ' ' + dealBadge({price:Number(p.price)||0, type:p.type}) + '</div>';
+        h += '</div>';
+        h += '<div class="brief-match-actions">';
+        if (url) h += '<a href="' + _compEsc(url) + '" target="_blank" rel="noopener" onclick="briefMarkSeen(' + idv + ',\'' + _compEsc(key).replace(/'/g,"\\'") + '\')">View ↗</a>';
+        h += '<button class="brief-match-save" title="Add to ' + _compEsc((c.name||'').split(' ')[0]) + '\'s shortlist" onclick="briefSaveMatch(' + idv + ',\'' + _compEsc(key).replace(/'/g,"\\'") + '\')">❤</button>';
+        h += '</div></div>';
+      });
+      h += '<div class="brief-matches-foot">';
+      if (matches.length > 25) h += '<span style="font-size:11px;color:var(--ink-xl);align-self:center;">Showing 25 of ' + matches.length + '</span>';
+      if (newCount > 0) h += '<button onclick="briefMarkAllSeen(' + idv + ')">✓ Mark all seen</button>';
+      h += '</div></div>';
+    }
+  }
+  h += '</div>';
+  return h;
+}
+
+function briefToggleForm(id){
+  var f = document.getElementById('briefForm-' + id);
+  if (f) f.classList.toggle('open');
+}
+function briefSyncBeds(id){
+  var t = document.getElementById('briefType-' + id);
+  var g = document.getElementById('briefBedsWrap-' + id);
+  if (t && g) g.style.display = (t.value === 'residential') ? '' : 'none';
+}
+function saveBrief(contactId){
+  contactsLoad();
+  var c = contacts.find(function(x){ return x.id == contactId; });
+  if (!c) return;
+  var type = (document.getElementById('briefType-' + contactId) || {}).value || 'any';
+  var beds = Number((document.getElementById('briefBeds-' + contactId) || {}).value) || 0;
+  var pmax = Number(String((document.getElementById('briefPriceMax-' + contactId) || {}).value || '').replace(/[^0-9.]/g, '')) || 0;
+  var box = document.getElementById('briefLoc-' + contactId);
+  var regions = [], areas = [];
+  if (box){
+    Array.prototype.slice.call(box.querySelectorAll('.briefRegion:checked')).forEach(function(cb){ regions.push(cb.value); });
+    var regRi = {}; box.querySelectorAll('.briefRegion:checked').forEach(function(cb){ regRi[cb.getAttribute('data-ri')] = 1; });
+    // Skip individual areas whose whole region is already ticked (redundant).
+    Array.prototype.slice.call(box.querySelectorAll('.briefArea:checked')).forEach(function(cb){ if (!regRi[cb.getAttribute('data-ri')]) areas.push(cb.value); });
+  }
+  c.brief = { type:type, beds:(type==='residential'?beds:0), regions:regions, areas:areas, priceMax:pmax };
+  // Seed seen with everything that matches right now → only future listings are NEW.
+  c.seen = matchBrief(c.brief).map(_briefPropKey);
+  contactsSave();
+  renderClientShortlists();
+}
+function clearBrief(contactId){
+  if (!confirm('Clear this client\'s brief and stop matching?')) return;
+  contactsLoad();
+  var c = contacts.find(function(x){ return x.id == contactId; });
+  if (!c) return;
+  delete c.brief; delete c.seen;
+  contactsSave();
+  renderClientShortlists();
+}
+function briefMarkSeen(contactId, key){
+  contactsLoad();
+  var c = contacts.find(function(x){ return x.id == contactId; });
+  if (!c || !c.brief) return;
+  c.seen = c.seen || [];
+  // Defer the re-render so a "View ↗" link's new-tab navigation isn't
+  // cancelled by replacing the DOM mid-click.
+  if (c.seen.indexOf(key) === -1){ c.seen.push(key); contactsSave(); setTimeout(renderClientShortlists, 0); }
+}
+function briefMarkAllSeen(contactId){
+  contactsLoad();
+  var c = contacts.find(function(x){ return x.id == contactId; });
+  if (!c || !c.brief) return;
+  c.seen = matchBrief(c.brief).map(_briefPropKey);
+  contactsSave();
+  renderClientShortlists();
+}
+function briefSaveMatch(contactId, key){
+  contactsLoad();
+  var c = contacts.find(function(x){ return x.id == contactId; });
+  if (!c || !c.brief) return;
+  var m = matchBrief(c.brief).filter(function(p){ return _briefPropKey(p) === key; })[0];
+  if (!m) return;
+  addPropToClientSl(contactId, _briefToSlProp(m));
+  c.seen = c.seen || [];
+  if (c.seen.indexOf(key) === -1) c.seen.push(key);
+  contactsSave();
+  renderClientShortlists();
 }
 
 /* ══════════════════════════════════════════
