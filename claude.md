@@ -205,8 +205,13 @@ reconciling so live search reflects what actually works.
 
 ## Deploy
 - Repo: `github.com/roryrag/Property-Finder`
-- Host: **Cloudflare Pages** (free, no credit limits), connected to the repo;
-  every push auto-deploys. (Was on Netlify — hit credit limits. Avoid.)
+- Host: **GitHub Pages** (free), served at
+  `https://roryrag.github.io/Property-Finder/`, connected to the repo; every push
+  to `main` auto-deploys via the `github-pages` environment. Note: GitHub's
+  deployment-status API can sit on `in_progress` for a couple of minutes after
+  the CDN is already serving the new content — verify by fetching the live URL,
+  not by the reported status. (Previously on Cloudflare Pages, and Netlify before
+  that — Netlify hit credit limits, avoid.)
 - The GitHub Actions secret `ANTHROPIC_API_KEY` powers the crawler.
 - Workflow runs twice daily (groups A then B) and `workflow_dispatch` allows a
   manual run with a group dropdown (A / B / all).
