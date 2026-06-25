@@ -1,20 +1,18 @@
 # ═══════════════════════════════════════════════
-# TOBAGO PROPERTY FINDER — Daily Listings Refresh
+# TOBAGO PROPERTY FINDER — Weekly Listings Refresh
 # Place this file at: .github/workflows/refresh-listings.yml
 #
-# Runs TWICE daily with alternating search groups so the
-# search-based sites each get fresh quota instead of
-# starving at the back of one big queue. Crawl sites run
-# every time. The repo MERGES, so both runs accumulate.
+# Runs ONCE weekly (Monday) with RUN_GROUP=all, so every crawl
+# site plus both search groups (A + B) run in a single pass.
+# The repo MERGES at read-time, so listings accumulate across
+# runs. (Was twice-daily A/B; reduced to weekly all-in-one.)
 # ═══════════════════════════════════════════════
 name: Refresh Tobago Listings
 
 on:
   schedule:
-    # Group A — 10:00 UTC (6 AM Tobago): caribbeanMLS, villas
-    - cron: '0 10 * * *'
-    # Group B — 14:00 UTC (10 AM Tobago): pin.tt, terracaribbean
-    - cron: '0 14 * * *'
+    # Weekly — Monday 10:00 UTC (6 AM Tobago): crawl all + both search groups
+    - cron: '0 10 * * 1'
   workflow_dispatch:
     inputs:
       group:
@@ -47,13 +45,11 @@ jobs:
       - name: Determine run group
         id: group
         run: |
-          # Manual run -> use the dropdown input. Scheduled run -> pick by cron time.
+          # Manual run -> use the dropdown input. Scheduled (weekly) run -> all groups.
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "RUN_GROUP=${{ github.event.inputs.group }}" >> "$GITHUB_ENV"
-          elif [ "${{ github.event.schedule }}" = "0 14 * * *" ]; then
-            echo "RUN_GROUP=B" >> "$GITHUB_ENV"
           else
-            echo "RUN_GROUP=A" >> "$GITHUB_ENV"
+            echo "RUN_GROUP=all" >> "$GITHUB_ENV"
           fi
           echo "Selected group: $RUN_GROUP"
 

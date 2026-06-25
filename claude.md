@@ -15,7 +15,7 @@ repository that the app reads for free.
 Property-Finder/
 ├── index.html                          ← the entire app (~227KB, HTML+CSS+JS inline)
 ├── refresh.js                          ← shared-repo crawler (Node, runs in CI)
-├── .github/workflows/refresh-listings.yml  ← twice-daily schedule (groups A/B)
+├── .github/workflows/refresh-listings.yml  ← weekly schedule (Monday, RUN_GROUP=all)
 └── data/repo.json                      ← crawler output; app fetches this
 ```
 
@@ -175,8 +175,10 @@ scratch — they were established empirically over many runs.**
   (top of refresh.js) reject rentals and non-Tobago (Trinidad) listings both at
   the URL stage and post-extraction, and purge any already in the repo. National
   agencies (mybunchofkeys, pin.tt) leak Trinidad listings; rain leaks rentals.
-- **SEARCH_GROUPS A/B**: search batches split into two groups, alternated by
-  `RUN_GROUP` env var across two daily runs so each gets fresh search quota.
+- **SEARCH_GROUPS A/B**: search batches split into two groups via `RUN_GROUP`.
+  The weekly scheduled run uses `RUN_GROUP=all` (both groups in one pass);
+  `workflow_dispatch` can still run A or B alone. (Was alternated across two
+  daily runs so each got fresh quota; now one weekly all-in-one run.)
   A = caribbeanMLS, terracaribbean. B = pin.tt houses, pin.tt land.
 - **Sitemap discovery** (`fetchSitemapUrls`) tries sitemap.xml variants to
   bypass JS index pages (helps some sites, not all).
@@ -213,8 +215,8 @@ reconciling so live search reflects what actually works.
   not by the reported status. (Previously on Cloudflare Pages, and Netlify before
   that — Netlify hit credit limits, avoid.)
 - The GitHub Actions secret `ANTHROPIC_API_KEY` powers the crawler.
-- Workflow runs twice daily (groups A then B) and `workflow_dispatch` allows a
-  manual run with a group dropdown (A / B / all).
+- Workflow runs weekly (Monday 10:00 UTC, `RUN_GROUP=all`) and
+  `workflow_dispatch` allows a manual run with a group dropdown (A / B / all).
 
 ## Valuation data caveat (state honestly to the user)
 There is NO public sold-price source in Trinidad & Tobago (PIMS Land Registry
