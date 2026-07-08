@@ -30,7 +30,10 @@ const DAY = 24 * 60 * 60 * 1000;
 /* ── Budgets (tune to control cost & runtime) ── */
 const MAX_PAGES_PER_SITE    = 8;    // pagination depth
 const MAX_LISTINGS_PER_SITE = 50;   // listing pages fetched per site
-const MAX_EXTRACT_CALLS     = 40;   // Claude HTML-extraction calls (total ceiling)
+const MAX_EXTRACT_CALLS     = 64;   // Claude HTML-extraction calls (total ceiling)
+                                    // = 8 crawl sites x 8 per-site cap, so the greedy
+                                    // counter can never starve trailing sites (islreal,
+                                    // royalty got 0 listings when this was 40)
 const MAX_EXTRACT_CALLS_PER_SITE = 8;  // per-site cap so trailing sites aren't starved
 const EXTRACT_BATCH         = 4;    // listings per extraction call
 const FETCH_DELAY_MS        = 400;  // politeness delay between fetches
@@ -507,8 +510,20 @@ async function searchBatch(batch) {
 /* ══════════════════════════════════════════
    MERGE + FRESHNESS
 ══════════════════════════════════════════ */
+/* Normalised listing URL, or '' when the listing has no usable URL
+   (pin.tt search results often arrive without one). */
+function normUrl(p) {
+  const u = (p.url || '').toLowerCase().trim().replace(/[?#].*$/, '').replace(/\/+$/, '');
+  return /^https?:\/\/.{8,}/.test(u) ? u : '';
+}
+
+/* Merge key: URL when we have one — Claude re-phrases titles slightly on
+   every extraction run, so title-keyed merging piled up 4x duplicates per
+   property (seajade had 120 entries over 30 URLs). Title|site is only the
+   fallback for URL-less search results. */
 function listingKey(p) {
-  return ((p.title || '') + '|' + (p.site || '')).toLowerCase().replace(/\s+/g, ' ').trim();
+  return normUrl(p) ||
+    ((p.title || '') + '|' + (p.site || '')).toLowerCase().replace(/\s+/g, ' ').trim();
 }
 
 /* Parse a free-text size string ("5000 sq ft") to a numeric sqft value */
@@ -569,6 +584,7 @@ function parseSizeSqft(sizeStr) {
     const prev = existing.get(key);
     if (prev) {
       prev.lastSeen = now; prev.status = 'active';
+      if (p.title) prev.title = p.title;   // safe now that the key is the URL
       if (p.price > 0) prev.price = p.price;
       if (p.url && !prev.url) prev.url = p.url;
       if (p.beds > 0) prev.beds = p.beds;
@@ -641,14 +657,16 @@ function parseSizeSqft(sizeStr) {
   };
   fs.writeFileSync(SOLD_FILE, JSON.stringify(sold, null, 1));
 
-  /* Dedup: collapse the same property appearing twice (e.g. the dead
-     seajadeinvestments.com vs the live seajaderealty.com). Key on normalised
-     title; keep the best copy (live domain > has-URL > priced > fresh > recent). */
+  /* Dedup: collapse the same property appearing twice. Key on normalised URL
+     when there is one (title-keyed dedup misses Claude's run-to-run title
+     re-phrasings — seajade piled up 120 entries over 30 URLs); URL-less
+     entries (search results) still collapse by normalised title.
+     Keep the best copy (live domain > has-URL > priced > fresh > recent). */
   const _dnorm = t => (t||'').toLowerCase().replace(/[^a-z0-9 ]/g,'').replace(/\s+/g,' ').trim();
-  const _dscore = p => { let s=0; if(!/seajadeinvestments\.com/i.test(p.site||'')) s+=4; if(p.url && p.url.indexOf('http')===0 && p.url.length>15) s+=2; if(Number(p.price)>0) s+=2; if(p.status!=='stale') s+=1; s+=(Number(p.lastSeen)||0)/1e15; return s; };
-  const _best = {}, _untitled = []; let dupDropped = 0;
-  merged.forEach(p => { const k=_dnorm(p.title); if(!k){ _untitled.push(p); return; } if(!_best[k]){ _best[k]=p; } else { dupDropped++; if(_dscore(p)>_dscore(_best[k])) _best[k]=p; } });
-  const deduped = Object.keys(_best).map(k=>_best[k]).concat(_untitled);
+  const _dscore = p => { let s=0; if(!/seajadeinvestments\.com/i.test(p.site||'')) s+=4; if(normUrl(p)) s+=2; if(Number(p.price)>0) s+=2; if(p.status!=='stale') s+=1; s+=(Number(p.lastSeen)||0)/1e15; return s; };
+  const _best = {}, _unkeyed = []; let dupDropped = 0;
+  merged.forEach(p => { const k = normUrl(p) || _dnorm(p.title); if(!k){ _unkeyed.push(p); return; } if(!_best[k]){ _best[k]=p; } else { dupDropped++; if(_dscore(p)>_dscore(_best[k])) _best[k]=p; } });
+  const deduped = Object.keys(_best).map(k=>_best[k]).concat(_unkeyed);
 
   const sources = {};
   deduped.forEach(p => { const s = p.site || 'unknown'; sources[s] = (sources[s] || 0) + 1; });

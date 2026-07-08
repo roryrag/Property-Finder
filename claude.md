@@ -183,12 +183,18 @@ scratch — they were established empirically over many runs.**
 - **Sitemap discovery** (`fetchSitemapUrls`) tries sitemap.xml variants to
   bypass JS index pages (helps some sites, not all).
 - **Budgets**: MAX_PAGES_PER_SITE=8, MAX_LISTINGS_PER_SITE=50,
-  MAX_EXTRACT_CALLS=40 (global ceiling), MAX_EXTRACT_CALLS_PER_SITE=8,
-  EXTRACT_BATCH=4. The per-site cap exists because the budget is a single
-  greedy counter consumed in crawl order — without it, the first sites
-  (charb, keys) ate all 30 calls and starved trailing sites (seajade) to 0.
-- **Merge logic**: listings accumulate across runs (keyed title|site). Unseen
-  14+ days → status 'stale' (shows "possibly sold"); unseen 30+ days → dropped.
+  MAX_EXTRACT_CALLS=64 (global ceiling = 8 crawl sites × the per-site cap),
+  MAX_EXTRACT_CALLS_PER_SITE=8, EXTRACT_BATCH=4. The budget is a single
+  greedy counter consumed in crawl order, so the global ceiling MUST stay
+  ≥ sites × per-site cap — at 40, trailing sites (islreal, royalty) were
+  starved to 0 listings for weeks. Keep this invariant when adding sites.
+- **Merge logic**: listings accumulate across runs, keyed on the normalised
+  listing URL (`normUrl`); title|site is the fallback only for URL-less
+  search results (pin.tt). It was keyed title|site until 2026-07, but Claude
+  re-phrases titles slightly on every extraction run, so the same property
+  piled up as duplicates (seajade hit 120 entries over 30 URLs — a one-time
+  cleanup collapsed 105 dupes). Unseen 14+ days → status 'stale' (shows
+  "possibly sold"); unseen 30+ days → dropped.
 - **JSON truncation recovery**: when a Claude response is cut off by max_tokens
   (no closing `]`), slice from first `[` to end and recover complete objects up
   to the last `}`. This bug silently discarded whole batches before it was
