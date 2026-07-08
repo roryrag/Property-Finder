@@ -15,8 +15,10 @@ repository that the app reads for free.
 Property-Finder/
 ├── index.html                          ← the entire app (~227KB, HTML+CSS+JS inline)
 ├── refresh.js                          ← shared-repo crawler (Node, runs in CI)
+├── watchlist-notify.js                 ← Watch List WhatsApp alerts (Node, runs in CI after refresh)
 ├── .github/workflows/refresh-listings.yml  ← weekly schedule (Monday, RUN_GROUP=all)
-└── data/repo.json                      ← crawler output; app fetches this
+├── data/repo.json                      ← crawler output; app fetches this
+└── data/watchlist.json                 ← per-client alert criteria, published from the app
 ```
 
 ## Login
@@ -54,6 +56,9 @@ hardcoded `APP_PIN = '1234'`.
 | `tpf_sold_comps` | agent-entered sold comparables (valuator) |
 | `tpf_val_cal` | per-area valuation calibration % |
 | `tpf_usage` | weekly API-call usage tracker |
+| `tpf_watchlist` | per-client Watch List criteria (+ dirty/publishedAt sync state) |
+| `tpf_watch_seen` | timestamp of last Watch List tab visit (drives the nav badge) |
+| `tpf_gh_token` | fine-grained GitHub PAT for publishing the watch list (excluded from backup export) |
 | `anthropic_key` | the agent's API key (never leaves device) |
 
 ---
@@ -113,6 +118,19 @@ Change tokens at the variable blocks, not per-component.
   Two client-ready exports: **Share via WhatsApp** (`shareCmaWhatsApp` → contact
   picker) and **Print / Save PDF** (`printCMA` opens a branded one-page document
   in a new window with its own print CSS — saves as PDF via the browser dialog).
+- **Watch List** — `panel-watchlist`. Per-client search criteria (types, areas,
+  price range, min beds) with two match surfaces: (1) in-app — matches from the
+  last 14 days of repo additions, nav badge for ones newer than the last tab
+  visit, one-tap WhatsApp forward to the client (auto-links the contact by
+  name); (2) phone alerts — "Publish watches" writes the criteria to
+  `data/watchlist.json` via the GitHub contents API (fine-grained PAT stored in
+  Settings → `tpf_gh_token`), and the weekly Action runs `watchlist-notify.js`
+  after refresh.js: it matches THIS RUN's new listings (firstSeen ≥
+  meta.lastRefresh − 10 min) and WhatsApps the agent one digest via **CallMeBot**
+  (free personal gateway; secrets `CALLMEBOT_PHONE` + `CALLMEBOT_APIKEY`;
+  fail-soft — never blocks the data commit). The matching function exists in
+  BOTH index.html (`watchMatches`) and watchlist-notify.js (`matches`) — keep
+  them in sync. Unpriced listings pass the price filter by design.
 - **Shortlist** — general + per-client shortlists, WhatsApp share.
 - **Co-Broker** — request tracker, status workflow, commission calculator,
   WhatsApp/email send.
@@ -220,7 +238,8 @@ reconciling so live search reflects what actually works.
   the CDN is already serving the new content — verify by fetching the live URL,
   not by the reported status. (Previously on Cloudflare Pages, and Netlify before
   that — Netlify hit credit limits, avoid.)
-- The GitHub Actions secret `ANTHROPIC_API_KEY` powers the crawler.
+- The GitHub Actions secret `ANTHROPIC_API_KEY` powers the crawler; optional
+  `CALLMEBOT_PHONE` + `CALLMEBOT_APIKEY` enable Watch List WhatsApp alerts.
 - Workflow runs weekly (Monday 10:00 UTC, `RUN_GROUP=all`) and
   `workflow_dispatch` allows a manual run with a group dropdown (A / B / all).
 

@@ -1852,6 +1852,10 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
         <span class="nav-icon">&#129309;</span><span class="nav-label">Co-Broker</span>
         <span class="nav-badge" id="badge-cobroker"></span>
       </button>
+      <button class="nav-item" id="nav-watchlist" onclick="switchTab('watchlist')">
+        <span class="nav-icon">&#128276;</span><span class="nav-label">Watch List</span>
+        <span class="nav-badge" id="badge-watchlist"></span>
+      </button>
       <div class="toolbar-divider"></div>
       <button class="nav-item" id="nav-settings" onclick="switchTab('settings')">
         <span class="nav-icon">&#9881;</span><span class="nav-label">Settings</span>
@@ -2368,6 +2372,44 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
       </div>
     </div>
 
+    <!-- WATCH LIST PANEL -->
+    <div class="tab-content" id="panel-watchlist">
+      <div class="tab-inner">
+        <div class="card">
+          <div class="card-title">&#128276; Client Watch List</div>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.55;">Save search criteria per client. Every weekly repository refresh checks new listings against these and WhatsApps you a digest (client name + matched listing) &mdash; even with the app closed. Matches also appear below with one-tap forwarding.</p>
+          <button class="btn-primary" onclick="toggleWatchForm()" id="watchFormToggleBtn">&#65291; Add watch</button>
+          <div id="watchForm" style="display:none;margin-top:14px;">
+            <div class="input-group"><label>Client name</label><input type="text" id="watchClient" list="watchClientOptions" placeholder="Pick a contact or type a name"><datalist id="watchClientOptions"></datalist></div>
+            <div class="input-group"><label>Property types (blank = any)</label><div id="watchTypeChips" style="display:flex;flex-wrap:wrap;gap:6px;"></div></div>
+            <div class="input-group"><label>Areas, comma-separated (blank = anywhere)</label><input type="text" id="watchAreas" placeholder="e.g. Buccoo, Mt Irvine, Black Rock"></div>
+            <div class="pin-row">
+              <div class="input-group"><label>Min price TT$</label><input type="number" id="watchPriceMin" placeholder="0"></div>
+              <div class="input-group"><label>Max price TT$</label><input type="number" id="watchPriceMax" placeholder="No limit"></div>
+            </div>
+            <div class="input-group"><label>Min bedrooms (0 = any / land)</label><input type="number" id="watchBedsMin" placeholder="0" min="0" max="10"></div>
+            <button class="btn-primary" onclick="saveWatch()">&#10003; Save watch</button>
+          </div>
+        </div>
+        <div id="watchMatchesArea"></div>
+        <div id="watchListArea"></div>
+        <div class="card" style="margin-top:14px;">
+          <div class="card-title">&#128228; Publish to phone alerts</div>
+          <p style="font-size:12px;color:var(--ink-l);line-height:1.55;margin-bottom:10px;">Phone alerts run on GitHub, so your watches must be published to the shared repository after changes. In-app matches above always use your latest local watches.</p>
+          <div id="watchSyncStatus" style="font-size:12px;margin-bottom:10px;"></div>
+          <button class="btn-primary" onclick="publishWatchlist(this)">&#128228; Publish watches</button>
+          <details style="margin-top:12px;font-size:12px;color:var(--ink-l);line-height:1.6;">
+            <summary style="cursor:pointer;color:var(--gold-l);font-weight:600;">One-time setup for WhatsApp alerts</summary>
+            <ol style="margin:8px 0 0 18px;">
+              <li>Save CallMeBot&rsquo;s number <b>+34 621 331 709</b> as a contact, then WhatsApp it: <i>I allow callmebot to send me messages</i>. It replies with your <b>API key</b>.</li>
+              <li>In the GitHub repo &rarr; Settings &rarr; Secrets and variables &rarr; Actions, add <b>CALLMEBOT_PHONE</b> (your WhatsApp number with country code, e.g. +1868&hellip;) and <b>CALLMEBOT_APIKEY</b>.</li>
+              <li>Create a fine-grained GitHub token (github.com &rarr; Settings &rarr; Developer settings) scoped to <b>only this repository</b> with <b>Contents: Read and write</b>, and paste it in the app&rsquo;s Settings tab so &ldquo;Publish watches&rdquo; works.</li>
+            </ol>
+          </details>
+        </div>
+      </div>
+    </div>
+
     <!-- SETTINGS PANEL -->
     <div class="tab-content" id="panel-settings">
       <div class="tab-inner">
@@ -2391,6 +2433,8 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
           <div class="card-title">&#127760; Shared Repository</div>
           <p style="font-size:12px;color:var(--ink-l);margin-bottom:10px;line-height:1.55;">Connect to a shared listings database that refreshes automatically and is used by all your devices. See setup guide.</p>
           <div class="input-group"><label>Shared Repository URL</label><input type="url" id="settingRepoUrl" placeholder="https://raw.githubusercontent.com/.../repo.json"></div>
+          <div class="input-group"><label>GitHub Token (Watch List publish)</label><input type="password" id="settingGhToken" placeholder="Fine-grained PAT, Contents: read/write" autocomplete="off"></div>
+          <div style="font-size:11px;color:var(--ink-xl);margin-top:-4px;">Lets the Watch List tab save your alert criteria to the repo. Stored only on this device.</div>
         </div>
         <div class="card">
           <div class="card-title">&#128273; Change PIN</div>
@@ -2609,10 +2653,11 @@ function switchTab(tab) {
   if (tab === 'valuator') { try { renderConfirmQueue(); } catch(e) {} }
   if (tab === 'comps') { try { compsTabInit(); } catch(e) {} }
   if (tab === 'shortlist') { try { renderShortlist(); renderClientShortlists(); } catch(e) {} }
+  if (tab === 'watchlist') { try { renderWatchlist(); } catch(e) {} }
   var titleEl = document.getElementById('hdrPageTitle');
   if (titleEl) titleEl.textContent = TAB_TITLES[tab] || '';
 }
-var TAB_TITLES = { dashboard:'Dashboard', search:'Search', valuator:'Land Valuator', comps:'Comparables', rental:'Rental Income', shortlist:'Shortlist', cobroker:'Co-Broker', settings:'Settings' };
+var TAB_TITLES = { dashboard:'Dashboard', search:'Search', valuator:'Land Valuator', comps:'Comparables', rental:'Rental Income', shortlist:'Shortlist', cobroker:'Co-Broker', watchlist:'Watch List', settings:'Settings' };
 
 /* ══════════════════════════════════════
    DASHBOARD (landing) — real-data widgets
@@ -3738,6 +3783,8 @@ function loadSettings() {
   Object.keys(map).forEach(function(id){ var el=document.getElementById(id); if(el&&p[map[id]]) el.value=p[map[id]]; });
   var ruEl = document.getElementById('settingRepoUrl');
   if (ruEl) ruEl.value = localStorage.getItem('tpf_shared_repo_url') || '';
+  var ghEl = document.getElementById('settingGhToken');
+  if (ghEl) ghEl.value = localStorage.getItem('tpf_gh_token') || '';
 }
 function saveSettings() {
   var get=function(id){var el=document.getElementById(id);return el?el.value.trim():'';};
@@ -3760,6 +3807,12 @@ function saveSettings() {
     if (ru) { localStorage.setItem('tpf_shared_repo_url', ru); sharedRepoSync(true); sharedSoldSync(false); }
     else localStorage.removeItem('tpf_shared_repo_url');
   }
+  var ghTokEl = document.getElementById('settingGhToken');
+  if (ghTokEl) {
+    var ghTok = ghTokEl.value.trim();
+    if (ghTok) localStorage.setItem('tpf_gh_token', ghTok);
+    else localStorage.removeItem('tpf_gh_token');
+  }
   var msg=document.getElementById('settingsSavedMsg');
   if(msg){msg.style.display='block';setTimeout(function(){msg.style.display='none';},3000);}
   try { updateDropdownProfile(); } catch(e) {}
@@ -3770,7 +3823,7 @@ function saveSettings() {
    Exports all agent-created tpf_* data (NOT the re-syncable repo cache
    or the API key) to a JSON file; restore merges it back in.
 ══════════════════════════════════════ */
-var _BACKUP_SKIP = { 'tpf_repo':1, 'tpf_repo_date':1, 'tpf_repo_source':1, 'tpf_shared_sold_comps':1 };
+var _BACKUP_SKIP = { 'tpf_repo':1, 'tpf_repo_date':1, 'tpf_repo_source':1, 'tpf_shared_sold_comps':1, 'tpf_gh_token':1 };
 function exportWorkspace(){
   var data={}, n=0;
   for (var i=0;i<localStorage.length;i++){
@@ -5876,6 +5929,305 @@ onAppLoad = function() {
     </button>
   </div>
 </div>
+
+<script>
+/* ══════════════════════════════════════════
+   WATCH LIST — per-client criteria + weekly
+   WhatsApp alerts (CallMeBot via GitHub Actions).
+   Local watches live in tpf_watchlist; "Publish"
+   writes them to data/watchlist.json in the repo
+   so watchlist-notify.js can read them in CI.
+══════════════════════════════════════════ */
+var WATCH_KEY = 'tpf_watchlist';
+var WATCH_SEEN_KEY = 'tpf_watch_seen';
+var GH_TOKEN_KEY = 'tpf_gh_token';
+var WATCH_TYPES = ['house', 'villa', 'apartment', 'land', 'commercial'];
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function watchLoad() {
+  try { var d = JSON.parse(localStorage.getItem(WATCH_KEY)) || {}; d.watches = d.watches || []; return d; }
+  catch(e) { return { watches: [] }; }
+}
+function watchSave(d) { localStorage.setItem(WATCH_KEY, JSON.stringify(d)); }
+
+/* Same matching semantics as matches() in watchlist-notify.js — keep in sync.
+   Unpriced listings pass the price filter (leads worth a look). */
+function watchMatches(w, p) {
+  if (w.active === false) return false;
+  if (w.types && w.types.length && w.types.indexOf(String(p.type || '').toLowerCase()) === -1) return false;
+  if (w.areas && w.areas.length) {
+    var hay = ((p.location || '') + ' ' + (p.title || '')).toLowerCase();
+    var hit = w.areas.some(function(a){ return a && hay.indexOf(String(a).toLowerCase().trim()) !== -1; });
+    if (!hit) return false;
+  }
+  var price = Number(p.price) || 0;
+  if (price > 0) {
+    if (Number(w.priceMin) > 0 && price < Number(w.priceMin)) return false;
+    if (Number(w.priceMax) > 0 && price > Number(w.priceMax)) return false;
+  }
+  if (Number(w.bedsMin) > 0 && !(Number(p.beds) >= Number(w.bedsMin))) return false;
+  return true;
+}
+
+/* Matches from the last 14 days of repo additions, newest first */
+function watchRecentMatches() {
+  var d = watchLoad();
+  var active = d.watches.filter(function(w){ return w.active !== false; });
+  if (!active.length) return [];
+  var cutoff = Date.now() - 14 * 24 * 3600 * 1000;
+  var repo = activeRepo();
+  var out = [];
+  repo.forEach(function(p) {
+    if (!(Number(p.firstSeen) > cutoff)) return;
+    active.forEach(function(w) {
+      if (watchMatches(w, p)) out.push({ w: w, p: p });
+    });
+  });
+  out.sort(function(a, b){ return Number(b.p.firstSeen) - Number(a.p.firstSeen); });
+  return out;
+}
+
+function updateWatchBadge() {
+  var badge = document.getElementById('badge-watchlist');
+  if (!badge) return;
+  var seen = Number(localStorage.getItem(WATCH_SEEN_KEY)) || 0;
+  var n = watchRecentMatches().filter(function(m){ return Number(m.p.firstSeen) > seen; }).length;
+  if (n > 0) { badge.textContent = n; badge.classList.add('show'); }
+  else { badge.textContent = ''; badge.classList.remove('show'); }
+}
+
+/* ── form ── */
+var _watchTypeSel = {};
+function toggleWatchForm() {
+  var form = document.getElementById('watchForm');
+  if (!form) return;
+  var open = form.style.display !== 'none';
+  form.style.display = open ? 'none' : 'block';
+  if (!open) {
+    _watchTypeSel = {};
+    renderWatchTypeChips();
+    contactsLoad();
+    var dl = document.getElementById('watchClientOptions');
+    if (dl) dl.innerHTML = contacts.map(function(c){ return '<option value="' + escapeHtml(c.name) + '">'; }).join('');
+    var el = document.getElementById('watchClient'); if (el) el.focus();
+  }
+}
+function renderWatchTypeChips() {
+  var box = document.getElementById('watchTypeChips');
+  if (!box) return;
+  box.innerHTML = WATCH_TYPES.map(function(t) {
+    var on = !!_watchTypeSel[t];
+    return '<button type="button" onclick="toggleWatchType(\'' + t + '\')" style="padding:6px 12px;border-radius:20px;font-size:12px;cursor:pointer;border:1px solid ' +
+      (on ? 'var(--gold)' : 'var(--border)') + ';background:' + (on ? 'rgba(201,162,75,.18)' : 'transparent') +
+      ';color:' + (on ? 'var(--gold-l)' : 'var(--muted)') + ';">' + t + '</button>';
+  }).join('');
+}
+function toggleWatchType(t) { _watchTypeSel[t] = !_watchTypeSel[t]; renderWatchTypeChips(); }
+
+function saveWatch() {
+  var get = function(id){ var el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  var client = get('watchClient');
+  if (!client) { alert('Enter a client name.'); return; }
+  var areas = get('watchAreas').split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+  var types = WATCH_TYPES.filter(function(t){ return _watchTypeSel[t]; });
+  var d = watchLoad();
+  d.watches.push({
+    id: Date.now(),
+    client: client,
+    types: types,
+    areas: areas,
+    priceMin: Number(get('watchPriceMin')) || 0,
+    priceMax: Number(get('watchPriceMax')) || 0,
+    bedsMin: Number(get('watchBedsMin')) || 0,
+    active: true,
+    created: new Date().toISOString().slice(0, 10)
+  });
+  d.dirty = true;
+  watchSave(d);
+  ['watchClient','watchAreas','watchPriceMin','watchPriceMax','watchBedsMin'].forEach(function(id){ var el = document.getElementById(id); if (el) el.value = ''; });
+  toggleWatchForm();
+  renderWatchlist();
+}
+
+function deleteWatch(id) {
+  if (!confirm('Remove this watch?')) return;
+  var d = watchLoad();
+  d.watches = d.watches.filter(function(w){ return w.id !== id; });
+  d.dirty = true;
+  watchSave(d);
+  renderWatchlist();
+}
+function toggleWatchActive(id) {
+  var d = watchLoad();
+  var w = d.watches.find(function(x){ return x.id === id; });
+  if (w) { w.active = w.active === false; d.dirty = true; watchSave(d); renderWatchlist(); }
+}
+
+function watchCriteriaText(w) {
+  var bits = [];
+  bits.push(w.types && w.types.length ? w.types.join('/') : 'any type');
+  bits.push(w.areas && w.areas.length ? w.areas.join(', ') : 'anywhere in Tobago');
+  if (w.priceMin || w.priceMax) bits.push((w.priceMin ? fmtPrice(w.priceMin) : 'TT$0') + ' – ' + (w.priceMax ? fmtPrice(w.priceMax) : 'no max'));
+  if (w.bedsMin) bits.push(w.bedsMin + '+ beds');
+  return bits.join(' · ');
+}
+
+/* ── render ── */
+function renderWatchlist() {
+  var d = watchLoad();
+  var seen = Number(localStorage.getItem(WATCH_SEEN_KEY)) || 0;
+
+  var listArea = document.getElementById('watchListArea');
+  if (listArea) {
+    if (!d.watches.length) {
+      listArea.innerHTML = '<div class="empty-state"><div class="empty-icon">&#128276;</div><div class="empty-text">No watches yet.<br>Add criteria for a client above.</div></div>';
+    } else {
+      listArea.innerHTML = '<div class="card" style="margin-top:14px;"><div class="card-title">Watching for ' + d.watches.length + ' client' + (d.watches.length !== 1 ? 's' : '') + '</div>' +
+        d.watches.map(function(w) {
+          var paused = w.active === false;
+          return '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);' + (paused ? 'opacity:.5;' : '') + '">' +
+            '<div style="flex:1;min-width:0;"><b style="font-size:13.5px;">' + escapeHtml(w.client) + '</b>' + (paused ? ' <span style="font-size:10px;color:var(--muted);">(paused)</span>' : '') +
+            '<div style="font-size:11.5px;color:var(--muted);margin-top:2px;">' + escapeHtml(watchCriteriaText(w)) + '</div></div>' +
+            '<button onclick="toggleWatchActive(' + w.id + ')" title="' + (paused ? 'Resume' : 'Pause') + '" style="background:none;border:1px solid var(--border);border-radius:8px;padding:5px 9px;cursor:pointer;color:var(--muted);font-size:12px;">' + (paused ? '&#9654;' : '&#10074;&#10074;') + '</button>' +
+            '<button onclick="deleteWatch(' + w.id + ')" title="Delete" style="background:none;border:1px solid var(--border);border-radius:8px;padding:5px 9px;cursor:pointer;color:var(--muted);font-size:12px;">&#128465;</button>' +
+            '</div>';
+        }).join('') + '</div>';
+    }
+  }
+
+  var matchArea = document.getElementById('watchMatchesArea');
+  if (matchArea) {
+    var ms = watchRecentMatches();
+    if (!ms.length) {
+      matchArea.innerHTML = d.watches.length
+        ? '<div class="card" style="margin-top:14px;"><div class="card-title">&#127919; Recent matches</div><div style="font-size:12.5px;color:var(--muted);">No listings from the last 14 days match your watches yet. New listings arrive with the Monday refresh.</div></div>'
+        : '';
+    } else {
+      matchArea.innerHTML = '<div class="card" style="margin-top:14px;"><div class="card-title">&#127919; Recent matches (last 14 days)</div>' +
+        ms.slice(0, 30).map(function(m) {
+          var p = m.p, w = m.w;
+          var isNew = Number(p.firstSeen) > seen;
+          var url = bestUrl(p);
+          return '<div style="padding:10px 0;border-bottom:1px solid var(--border);">' +
+            '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+            (isNew ? '<span class="chip gold" style="font-size:10px;">NEW</span>' : '') +
+            '<b style="font-size:13px;">' + escapeHtml(p.title || 'Listing') + '</b></div>' +
+            '<div style="font-size:12px;color:var(--muted);margin-top:3px;">' + fmtPrice(Number(p.price)) +
+            (p.location ? ' · ' + escapeHtml(p.location) : '') + (p.site ? ' · ' + escapeHtml(p.site) : '') +
+            ' &nbsp;&mdash;&nbsp; for <b style="color:var(--gold-l);">' + escapeHtml(w.client) + '</b></div>' +
+            '<div style="display:flex;gap:8px;margin-top:7px;">' +
+            '<button onclick="watchForward(' + w.id + ',\'' + String(p.firstSeen) + '\',this)" data-title="' + escapeHtml(p.title || '') + '" style="background:#25D366;color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">&#128172; WhatsApp ' + escapeHtml(w.client.split(' ')[0]) + '</button>' +
+            (url ? '<a href="' + url + '" target="_blank" rel="noopener" style="font-size:12px;padding:6px 12px;border:1px solid var(--border);border-radius:8px;color:var(--muted);text-decoration:none;">View listing &#8599;</a>' : '') +
+            '</div></div>';
+        }).join('') + '</div>';
+    }
+    // Seen = now: badge clears, NEW chips persist until the next visit
+    localStorage.setItem(WATCH_SEEN_KEY, String(Date.now()));
+    updateWatchBadge();
+  }
+
+  renderWatchSyncStatus(d);
+}
+
+function renderWatchSyncStatus(d) {
+  var el = document.getElementById('watchSyncStatus');
+  if (!el) return;
+  d = d || watchLoad();
+  if (!d.watches.length) { el.innerHTML = ''; return; }
+  if (d.dirty || !d.publishedAt) {
+    el.innerHTML = '<span style="color:var(--gold-l);">&#9888;&#65039; Local changes not published — phone alerts still use ' + (d.publishedAt ? 'the version published ' + new Date(d.publishedAt).toLocaleDateString() : 'NO criteria (nothing published yet)') + '.</span>';
+  } else {
+    el.innerHTML = '<span style="color:var(--forest-l);">&#9989; Published ' + new Date(d.publishedAt).toLocaleString() + ' — phone alerts are in sync.</span>';
+  }
+}
+
+/* Forward a match to the client on WhatsApp (uses their contact number if
+   the watch's client name matches a saved contact) */
+function watchForward(watchId, firstSeen, btn) {
+  var d = watchLoad();
+  var w = d.watches.find(function(x){ return x.id === watchId; });
+  var repo = activeRepo();
+  var p = repo.find(function(x){ return String(x.firstSeen) === firstSeen && (x.title || '') === (btn.getAttribute('data-title') || x.title); }) ||
+          repo.find(function(x){ return String(x.firstSeen) === firstSeen; });
+  if (!w || !p) return;
+  var pf = loadProfile();
+  var msg = encodeURIComponent(
+    'Hi ' + w.client.split(' ')[0] + '! \u{1F3E0} A new listing just came up that fits what you’re looking for:\n\n' +
+    '*' + (p.title || 'Property') + '*\n' +
+    '\u{1F4B0} ' + fmtPrice(Number(p.price)) + '\n' +
+    (p.location ? '\u{1F4CD} ' + p.location + ', Tobago\n' : '') +
+    (p.beds ? '\u{1F6CF} ' + p.beds + ' bed' + (p.baths ? ' / ' + p.baths + ' bath' : '') + '\n' : '') +
+    (bestUrl(p) ? '\u{1F517} ' + bestUrl(p) + '\n' : '') +
+    '\nWant to view it? — ' + (pf.name || 'Your agent'));
+  contactsLoad();
+  var c = contacts.find(function(x){ return x.name.toLowerCase() === w.client.toLowerCase(); });
+  window.open(c && c.phone ? 'https://wa.me/' + c.phone + '?text=' + msg : 'https://wa.me/?text=' + msg, '_blank');
+}
+
+/* ── publish to GitHub so the CI notifier can read criteria ── */
+function _watchRepoTarget() {
+  var url = localStorage.getItem(SHARED_REPO_URL_KEY) || DEFAULT_SHARED_REPO_URL;
+  var m = url.match(/^https:\/\/raw\.githubusercontent\.com\/([^\/]+)\/([^\/]+)\/([^\/]+)\//);
+  if (m) return { owner: m[1], repo: m[2], branch: m[3] };
+  return { owner: 'roryrag', repo: 'Property-Finder', branch: 'main' };
+}
+async function publishWatchlist(btn) {
+  var token = localStorage.getItem(GH_TOKEN_KEY);
+  if (!token) { alert('Add your GitHub token in Settings first (see the one-time setup steps below).'); return; }
+  var d = watchLoad();
+  var t = _watchRepoTarget();
+  var api = 'https://api.github.com/repos/' + t.owner + '/' + t.repo + '/contents/data/watchlist.json';
+  var headers = { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json' };
+  if (btn) { btn.disabled = true; btn.textContent = 'Publishing…'; }
+  try {
+    var sha = null;
+    var getResp = await fetch(api + '?ref=' + t.branch, { headers: headers });
+    if (getResp.ok) sha = (await getResp.json()).sha;
+    else if (getResp.status !== 404) throw new Error('HTTP ' + getResp.status + ' reading current file');
+
+    var payload = { updated: new Date().toISOString(), watches: d.watches };
+    var json = JSON.stringify(payload, null, 1);
+    var body = {
+      message: 'Update watch list (' + d.watches.filter(function(w){ return w.active !== false; }).length + ' active)',
+      content: btoa(unescape(encodeURIComponent(json))),
+      branch: t.branch
+    };
+    if (sha) body.sha = sha;
+    var putResp = await fetch(api, { method: 'PUT', headers: headers, body: JSON.stringify(body) });
+    if (!putResp.ok) {
+      var err = await putResp.json().catch(function(){ return {}; });
+      throw new Error('HTTP ' + putResp.status + (err.message ? ' — ' + err.message : ''));
+    }
+    d.dirty = false;
+    d.publishedAt = new Date().toISOString();
+    watchSave(d);
+    renderWatchSyncStatus(d);
+    alert('✅ Watch list published! The Monday refresh will alert you on WhatsApp for new matches.');
+  } catch(e) {
+    alert('⚠️ Publish failed: ' + e.message + '\n\nCheck the GitHub token in Settings (needs Contents: read/write on ' + t.owner + '/' + t.repo + ').');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '&#128228; Publish watches'; }
+  }
+}
+
+/* Badge on app load + after every shared-repo sync */
+var _prevOnAppLoad_watch = onAppLoad;
+onAppLoad = function() {
+  _prevOnAppLoad_watch();
+  try { updateWatchBadge(); } catch(e) {}
+};
+var _prevSharedRepoSync_watch = sharedRepoSync;
+sharedRepoSync = async function(showAlert) {
+  var r = await _prevSharedRepoSync_watch(showAlert);
+  try { updateWatchBadge(); } catch(e) {}
+  return r;
+};
+</script>
 
 </body>
 </html>
