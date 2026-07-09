@@ -176,28 +176,35 @@ scratch — they were established empirically over many runs.**
 | islreal.com | CRAWL | Island Investments (Tobago-only). WordPress "Directorist" plugin: index pages `/properties-for-sale/` + `/?directory_type=land` server-render all detail links (27 sale + 68 land, single page, no pagination); detail pages `/directory/{sale,land}/[slug]/` server-render the TT$ price. listingHint limited to `sale\|land` so `/directory/rental/` is excluded at the URL stage. |
 | royaltytobago.com | CRAWL | Royalty Tobago. WordPress real-estate theme: index pages `/status/for-sale/` + `/property-type/land/` server-render `/property/<slug>/` detail links (~17 for-sale + ~19 land); detail pages server-render the price (`<span class="price-prefix">TTD </span>$…`). |
 | realestatetobago.com | CRAWL (via Sucuri solver) | Behind **Sucuri CloudProxy** (`Server: Sucuri/Cloudproxy`) — every fetch gets a JS challenge. `fetchPage` solves it in-process: the challenge is a deterministic obfuscated script (NOT a CAPTCHA) that sets a `sucuri_cloudproxy_uuid_*` cookie; `solveSucuri()` evals it in a `vm` sandbox to recover the cookie, caches it per host, and retries. Indexes: `/property-type/houses-for-sale/` + `/property-type/land-for-sale/` (9/page, paginated), detail `/property/[slug]/` with real prices. Two anti-inflation guards: tight listingHint (`/property/[slug]/$`) AND `noSitemap: true` — its `/property-sitemap.xml` dumps ALL 141 property pages (rentals + sold + every category), so we skip the sitemap and rely on the for-sale category indexes + pagination (~64 clean for-sale URLs). Has some Trinidad listings (caught by TRINIDAD_RE). If the solver ever breaks, Sucuri changed its challenge format. |
-| pin.tt | SEARCH only | richest search source (~17–26) but JS-rendered index defeats crawl; covers ALL of T&T so filter to Tobago areas |
+| pin.tt | **REMOVED (2026-07-09, owner decision)** | was the richest search source (~17–26) but JS-rendered index defeats crawl AND search results arrived without URLs — unverifiable, undedupable, no click-through. Its 45 repo entries were purged; refresh.js also purges any straggler (`p.site === 'pin.tt'`) so they can't become fake sold candidates. Do NOT re-add without solving the URL problem. |
 | terracaribbean.com | SEARCH | weak (1–6); JS-rendered |
 | caribbeanrealestatemls.com | SEARCH | listings at `/real-estate/tobago/[id]`; weak via search; JS-rendered index |
 
 ### refresh.js architecture
-- **CRAWL_SITES**: pin (search-only in practice), charb, rain, keys, seajade
-  (seajaderealty.com), ralestate (realestatetobago.com) — each with `seeds[]`
-  and a `listingHint` regex; optional `mustMatch` (pin.tt uses it to keep only
-  Tobago URLs) and optional `idPattern`/`idBase` (seajade uses it to extract
-  listing IDs embedded in the index HTML).
+- **CRAWL_SITES**: charb, rain, keys, ralestate (realestatetobago.com),
+  seajade (seajaderealty.com), islreal, royalty — each with `seeds[]` and a
+  `listingHint` regex; optional `mustMatch`, `noSitemap` (ralestate + royalty:
+  their sitemaps dump rentals/sold pages), and `idPattern`/`idBase` (seajade
+  extracts listing IDs embedded in the index HTML).
 - **Sucuri WAF solver** (`solveSucuri` + `fetchPage`): realestatetobago.com
   serves a deterministic JS cookie-challenge; fetchPage solves it in a `vm`
   sandbox and caches the cookie per host. No browser/dep needed.
 - **Data hygiene**: this is a Tobago FOR-SALE repo. `RENTAL_RE` + `TRINIDAD_RE`
   (top of refresh.js) reject rentals and non-Tobago (Trinidad) listings both at
   the URL stage and post-extraction, and purge any already in the repo. National
-  agencies (mybunchofkeys, pin.tt) leak Trinidad listings; rain leaks rentals.
+  agencies (mybunchofkeys) leak Trinidad listings; rain/charbonne leak rentals.
+  Extra guards (2026-07-09): `isSuspectRental` price floor — a non-land listing
+  priced under TT$150k is a disguised rental rate (monthly/nightly), reject +
+  purge; types are CANONICALIZED at merge ("residential land"/"agricultural
+  land"/etc → `land`, `townhouse` → `house`, original kept in `subtype`)
+  because the app compares types with exact equality everywhere (valuator land
+  PSF pool, watch list, dashboard averages).
 - **SEARCH_GROUPS A/B**: search batches split into two groups via `RUN_GROUP`.
   The weekly scheduled run uses `RUN_GROUP=all` (both groups in one pass);
   `workflow_dispatch` can still run A or B alone. (Was alternated across two
   daily runs so each got fresh quota; now one weekly all-in-one run.)
-  A = caribbeanMLS, terracaribbean. B = pin.tt houses, pin.tt land.
+  A = caribbeanMLS, villas. B = terracaribbean. (pin.tt batches removed
+  2026-07-09 with the source.)
 - **Sitemap discovery** (`fetchSitemapUrls`) tries sitemap.xml variants to
   bypass JS index pages (helps some sites, not all).
 - **Budgets**: MAX_PAGES_PER_SITE=8, MAX_LISTINGS_PER_SITE=50,
@@ -211,8 +218,10 @@ scratch — they were established empirically over many runs.**
   search results (pin.tt). It was keyed title|site until 2026-07, but Claude
   re-phrases titles slightly on every extraction run, so the same property
   piled up as duplicates (seajade hit 120 entries over 30 URLs — a one-time
-  cleanup collapsed 105 dupes). Unseen 14+ days → status 'stale' (shows
-  "possibly sold"); unseen 30+ days → dropped.
+  cleanup collapsed 105 dupes). Freshness thresholds are calibrated to the
+  WEEKLY cadence: unseen 16+ days (missed 2+ runs) → status 'stale' (shows
+  "possibly sold"); unseen 35+ days (missed ~5) → dropped. One missed crawl
+  must never flag "possibly sold".
 - **JSON truncation recovery**: when a Claude response is cut off by max_tokens
   (no closing `]`), slice from first `[` to end and recover complete objects up
   to the last `}`. This bug silently discarded whole batches before it was
@@ -221,11 +230,10 @@ scratch — they were established empirically over many runs.**
   crawler (separate Node process) has its own equivalent copy; preserve it.
 
 ### Known cleanup task
-The app's built-in live-search site list (index.html) and the crawler's tuned
-crawl/search split (refresh.js) are NOT perfectly in sync — the app still lists
-all 9 sites for live search while the crawler has moved most to crawl. Since the
-app primarily reads the shared repo now, this is low-priority, but worth
-reconciling so live search reflects what actually works.
+(Resolved 2026-07-09: pin.tt removed from the app's SITES list and the dead
+seajadeinvestments.com domain updated to seajaderealty.com. The remaining
+SITES entries still don't mirror the crawler's crawl/search split exactly,
+but the app primarily reads the shared repo, so this stays low-priority.)
 
 ---
 

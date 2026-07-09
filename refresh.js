@@ -42,7 +42,13 @@ const FETCH_TIMEOUT_MS      = 15000;
 /* ── Data hygiene: this is a TOBAGO FOR-SALE repo ──
    Some sources (rain, mybunchofkeys) mix in rentals and Trinidad
    listings. These regexes purge them so the repo stays on-goal. */
-const RENTAL_RE = /\brental|for[-\s]?rent\b|per[-\s]?night|nightly|\/night\b/i;
+const RENTAL_RE = /\brental|for[-\s]?rent\b|long[-\s]?rent|holiday[-\s]?rent|per[-\s]?night|nightly|\/night\b/i;
+// A "for sale" price this low on a built property is a rental rate in
+// disguise (monthly or nightly) — e.g. TT$4,760 hotel studio, TT$57,600
+// long-let apartment. Land is exempt (small plots can be cheap).
+const MIN_SALE_PRICE = 150000;
+const isSuspectRental = p => Number(p.price) > 0 && Number(p.price) < MIN_SALE_PRICE &&
+  String(p.type || '').toLowerCase() !== 'land';
 // Major Trinidad areas — used to reject non-Tobago listings that leak in
 // from national agencies (mybunchofkeys, pin.tt). Positive match = drop;
 // blank/unknown locations are kept (we don't guess them away).
@@ -54,14 +60,10 @@ const isNonTobago = p => TRINIDAD_RE.test((p.location || '') + ' ' + (p.url || '
 /* ══════════════════════════════════════════
    SITE CONFIG
 ══════════════════════════════════════════ */
+/* pin.tt was REMOVED as a source (2026-07-09, owner decision): its index is
+   JS-rendered (crawl gets nothing) and search-sourced listings arrived
+   without URLs — unverifiable, undedupable, no agent click-through. */
 const CRAWL_SITES = [
-  {
-    id: 'pin', name: 'pin.tt',
-    seeds: ['https://pin.tt/realestate/tobago/'],
-    listingHint: /pin\.tt\/(realestate\/|property|listing|ad\/)/i,
-    // pin.tt covers all of T&T — keep only Tobago-area URLs
-    mustMatch: /(tobago|crown-point|scarborough|bon-accord|buccoo|plymouth|charlotteville|speyside|signal-hill|lambeau|canaan|carnbee|mt-irvine|black-rock|grafton|castara|roxborough|mason-hall|lowlands|bacolet|patience-hill|les-coteaux)/i
-  },
   {
     id: 'charb', name: 'charbonnerealty.com',
     seeds: ['https://charbonnerealty.com/properties/', 'https://charbonnerealty.com/'],
@@ -120,7 +122,10 @@ const CRAWL_SITES = [
     id: 'royalty', name: 'royaltytobago.com',
     seeds: ['https://royaltytobago.com/status/for-sale/',
             'https://royaltytobago.com/property-type/land/'],
-    listingHint: /royaltytobago\.com\/property\/[a-z0-9-]+/i
+    listingHint: /royaltytobago\.com\/property\/[a-z0-9-]+/i,
+    // its sitemap dumps EVERY /property/ page including rentals (a TT$4,760
+    // hotel studio leaked in via sitemap discovery) — for-sale seeds suffice
+    noSitemap: true
   }
 ];
 
@@ -135,8 +140,6 @@ const SEARCH_GROUPS = {
     { label: 'villas',       query: 'site:villasoftobago.com villa for sale', twoStage: true }
   ],
   B: [
-    { label: 'pin.tt houses',  query: 'site:pin.tt/realestate/tobago house for sale', twoStage: false },
-    { label: 'pin.tt land',    query: 'site:pin.tt/realestate/tobago land for sale', twoStage: false },
     { label: 'terracaribbean', query: 'site:terracaribbean.com Tobago for sale', twoStage: true }
   ]
 };
@@ -400,8 +403,10 @@ async function crawlSite(site) {
       }
       // listing detail links
       if (site.listingHint.test(link) && !site.seeds.includes(link)) {
-        // filter out obvious non-listing paths
-        if (/\/(tag|category|author|wp-|feed|login|contact|about|blog)\//i.test(link)) continue;
+        // filter out obvious non-listing paths (property-type/property-status
+        // are WP category indexes — a /property-type/long-rent/ page leaked in
+        // as a "listing" through charbonne's loose hint)
+        if (/\/(tag|category|author|wp-|feed|login|contact|about|blog|property-type|property-status)\//i.test(link)) continue;
         if (RENTAL_RE.test(link)) continue;   // skip rentals at the URL stage
         if (site.mustMatch && !site.mustMatch.test(link)) continue;
         listingUrls.add(link);
@@ -428,7 +433,7 @@ async function crawlSite(site) {
   let smMatched = 0;
   for (const u of smUrls) {
     if (!site.listingHint.test(u)) continue;
-    if (/\/(tag|category|author|wp-|feed|login|contact|about|blog)\//i.test(u)) continue;
+    if (/\/(tag|category|author|wp-|feed|login|contact|about|blog|property-type|property-status)\//i.test(u)) continue;
     if (RENTAL_RE.test(u)) continue;   // skip rentals at the URL stage
     if (site.mustMatch && !site.mustMatch.test(u)) continue;
     if (!listingUrls.has(u)) { listingUrls.add(u); smMatched++; }
@@ -574,9 +579,17 @@ function parseSizeSqft(sizeStr) {
     // Keep the repo on-goal: Tobago, for sale only.
     if (isRental(p))    { rejRental++;   continue; }
     if (isNonTobago(p)) { rejTrinidad++; continue; }
-    // Normalize: lowercase type, treat 0/blank price as unknown (null).
-    if (p.type) p.type = String(p.type).toLowerCase().trim();
+    // Canonicalize type: the app (valuator PSF pool, watch list, dashboard
+    // averages) compares types with exact equality, so "residential land" /
+    // "agricultural land" / "townhouse" variants silently fall out of every
+    // land- and house-keyed feature. Keep the original flavour in `subtype`.
+    if (p.type) {
+      p.type = String(p.type).toLowerCase().trim();
+      if (p.type !== 'land' && /\bland\b/.test(p.type)) { p.subtype = p.type; p.type = 'land'; }
+      else if (p.type === 'townhouse') { p.subtype = 'townhouse'; p.type = 'house'; }
+    }
     if (!(Number(p.price) > 0)) p.price = null;
+    if (isSuspectRental(p)) { rejRental++; continue; }
     // size must be a string — the app calls p.size.replace() (search
     // extraction sometimes returns a bare number, which crashed card render)
     if (p.size != null && typeof p.size !== 'string') p.size = String(p.size);
@@ -598,7 +611,7 @@ function parseSizeSqft(sizeStr) {
     }
   }
 
-  /* Freshness pass — listings unseen >30 days are dropped from the
+  /* Freshness pass — listings unseen >35 days are dropped from the
      for-sale repo. If they had a price, they become "candidate sold"
      comparables: the listing disappeared (sold, withdrawn, or
      re-listed elsewhere), so the last known price is a useful but
@@ -607,11 +620,13 @@ function parseSizeSqft(sizeStr) {
   const merged = [];
   const candidates = [];
   for (const [key, p] of existing) {
-    // Purge off-goal entries already in the repo (rentals / non-Tobago).
-    // These are not real Tobago sales, so they don't become sold candidates.
-    if (isRental(p) || isNonTobago(p)) { purgedCount++; continue; }
+    // Purge off-goal entries already in the repo (rentals / non-Tobago /
+    // retired sources). Not real Tobago sales → never become sold candidates.
+    if (isRental(p) || isNonTobago(p) || isSuspectRental(p) || p.site === 'pin.tt') { purgedCount++; continue; }
+    // Thresholds are calibrated to the WEEKLY cadence: >16d = missed 2+ runs
+    // (one missed crawl must NOT flag "possibly sold"), >35d = missed ~5.
     const unseenDays = (now - (p.lastSeen || now)) / DAY;
-    if (unseenDays > 30) {
+    if (unseenDays > 35) {
       droppedCount++;
       if (p.price > 0) {
         candidates.push({
@@ -632,7 +647,7 @@ function parseSizeSqft(sizeStr) {
       }
       continue;
     }
-    if (unseenDays > 14) { p.status = 'stale'; staleCount++; }
+    if (unseenDays > 16) { p.status = 'stale'; staleCount++; }
     merged.push(p);
   }
 
@@ -697,8 +712,8 @@ function parseSizeSqft(sizeStr) {
   console.log(`New this run   : ${newCount}`);
   console.log(`Rejected       : ${rejRental} rentals, ${rejTrinidad} non-Tobago (incoming)`);
   console.log(`Purged from repo: ${purgedCount} off-goal entries (existing)`);
-  console.log(`Stale (>14d)   : ${staleCount}`);
-  console.log(`Dropped (>30d) : ${droppedCount}`);
+  console.log(`Stale (>16d)   : ${staleCount}`);
+  console.log(`Dropped (>35d) : ${droppedCount}`);
   console.log(`Sold candidates: ${sold.listings.length} total (${newCandidates} new this run)`);
   console.log(`Claude extract calls used: ${extractCallsUsed}/${MAX_EXTRACT_CALLS}`);
   console.log('\nPer-site:');

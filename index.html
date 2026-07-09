@@ -2478,14 +2478,14 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
 var APP_PIN = '1234';
 var SITES = [
   // Tier 1 — strongest data sources (verified rich snippets with prices)
-  { id:'pin',       name:'pin.tt',                     base:'https://pin.tt/realestate/tobago/',                tier:1, twoStage:false, sitePath:'pin.tt/realestate/tobago' },
+  // (pin.tt removed 2026-07: JS-rendered, listings arrived without URLs)
   { id:'terra',     name:'terracaribbean.com',         base:'https://www.terracaribbean.com',                   tier:1, twoStage:true, fetchUrl:'https://www.terracaribbean.com/Trinidad/Search/?market=sale&zone=residential&PageSize=All' },
   { id:'charb',     name:'charbonnerealty.com',        base:'https://charbonnerealty.com',                      tier:1, twoStage:false },
   { id:'keys',      name:'mybunchofkeys.com',          base:'https://mybunchofkeys.com',                        tier:1, twoStage:false },
   { id:'islreal',   name:'islreal.com',                base:'https://islreal.com',                              tier:1, twoStage:true, fetchUrl:'https://islreal.com/properties-for-sale/' },
   { id:'royalty',   name:'royaltytobago.com',          base:'https://royaltytobago.com',                        tier:1, twoStage:true, fetchUrl:'https://royaltytobago.com/status/for-sale/' },
   // Tier 2 — listings exist but need two-stage fetch to get prices
-  { id:'seajade',   name:'seajadeinvestments.com',     base:'https://seajadeinvestments.com',                   tier:2, twoStage:true },
+  { id:'seajade',   name:'seajaderealty.com',          base:'https://www.seajaderealty.com',                    tier:2, twoStage:true },
   { id:'crmls',     name:'caribbeanrealestatemls.com', base:'https://caribbeanrealestatemls.com/destinations/trinidad-tobago/tobago/', tier:1, twoStage:true, sitePath:'caribbeanrealestatemls.com/real-estate/tobago' },
   { id:'villas',    name:'villasoftobago.com',         base:'https://villasoftobago.com',                       tier:2, twoStage:true },
   // Tier 3 — dead via snippets, rescue with two-stage fetch
