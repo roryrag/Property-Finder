@@ -1,10 +1,10 @@
 {
  "meta": {
-  "lastRefresh": "2026-07-20T12:19:09.107Z",
-  "totalComps": 11,
+  "lastRefresh": "2026-07-27T12:56:10.578Z",
+  "totalComps": 18,
   "agentCount": 0,
-  "candidateCount": 11,
-  "newCandidatesThisRun": 11
+  "candidateCount": 18,
+  "newCandidatesThisRun": 7
  },
  "listings": [
   {
@@ -171,6 +171,111 @@
    "title": "Canaan Land",
    "site": "charbonnerealty.com",
    "url": "https://charbonnerealty.com/property/canaan-land/"
+  },
+  {
+   "id": "cand_https_www_terracaribbean_com_t32668_trinidad_residential_sale_land_tobago_plantations_tobago",
+   "loc": "Tobago Plantations, Tobago",
+   "size": 32533,
+   "price": "3300000",
+   "psf": 101,
+   "tenure": "freehold",
+   "date": "2026-06-15",
+   "notes": "Tobago Plantations Land (32,533 sq ft) — delisted from terracaribbean.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Tobago Plantations Land (32,533 sq ft)",
+   "site": "terracaribbean.com",
+   "url": "https://www.terracaribbean.com/T32668/Trinidad/Residential-Sale/Land/Tobago-Plantations--Tobago"
+  },
+  {
+   "id": "cand_https_realestatetobago_com_property_samaan_grove_99",
+   "loc": "Canaan, Buccoo",
+   "size": 6711,
+   "price": 3450000,
+   "psf": 514,
+   "tenure": "freehold",
+   "date": "2026-06-18",
+   "notes": "Samaan Grove 99 — delisted from realestatetobago.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Samaan Grove 99",
+   "site": "realestatetobago.com",
+   "url": "https://realestatetobago.com/property/samaan-grove-99/"
+  },
+  {
+   "id": "cand_https_realestatetobago_com_property_bacolet_point_apaertments",
+   "loc": "Bacolet",
+   "size": 11048,
+   "price": 3000000,
+   "psf": 272,
+   "tenure": "freehold",
+   "date": "2026-06-18",
+   "notes": "Bacolet Point Apartments — delisted from realestatetobago.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Bacolet Point Apartments",
+   "site": "realestatetobago.com",
+   "url": "https://realestatetobago.com/property/bacolet-point-apaertments/"
+  },
+  {
+   "id": "cand_https_mybunchofkeys_com_property_land_for_sale_george_trace_studley_park_tobago",
+   "loc": "Studley Park, Tobago",
+   "size": 76230,
+   "price": 700000,
+   "psf": 9,
+   "tenure": "freehold",
+   "date": "2026-06-15",
+   "notes": "LAND FOR SALE George Trace, Studley Park, Tobago — delisted from mybunchofkeys.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "LAND FOR SALE George Trace, Studley Park, Tobago",
+   "site": "mybunchofkeys.com",
+   "url": "https://mybunchofkeys.com/property/land-for-sale-george-trace-studley-park-tobago/"
+  },
+  {
+   "id": "cand_https_realestatetobago_com_property_black_rock_black_rock_dreams",
+   "loc": "Black Rock, Grafton",
+   "size": 2069.9,
+   "price": 5100000,
+   "psf": 2464,
+   "tenure": "freehold",
+   "date": "2026-06-17",
+   "notes": "Black Rock, Black Rock Dreams — delisted from realestatetobago.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Black Rock, Black Rock Dreams",
+   "site": "realestatetobago.com",
+   "url": "https://realestatetobago.com/property/black-rock-black-rock-dreams/"
+  },
+  {
+   "id": "cand_https_mybunchofkeys_com_property_f0_9f_8f_9d_ef_b8_8f_land_for_sale_rockly_vale_tobago_f0_9f_8f_9d_ef_b8_8f",
+   "loc": "Scarborough",
+   "size": 30445,
+   "price": 1500000,
+   "psf": 49,
+   "tenure": "freehold",
+   "date": "2026-06-18",
+   "notes": "Land For Sale – Rockly Vale, Tobago — delisted from mybunchofkeys.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Land For Sale – Rockly Vale, Tobago",
+   "site": "mybunchofkeys.com",
+   "url": "https://mybunchofkeys.com/property/%f0%9f%8f%9d%ef%b8%8f-land-for-sale-rockly-vale-tobago-%f0%9f%8f%9d%ef%b8%8f/"
+  },
+  {
+   "id": "cand_https_mybunchofkeys_com_property_ocean_view_lambeau_land",
+   "loc": "Lambeau",
+   "size": 12454,
+   "price": 904000,
+   "psf": 73,
+   "tenure": "freehold",
+   "date": "2026-06-21",
+   "notes": "Ocean View Lambeau land — delisted from mybunchofkeys.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Ocean View Lambeau land",
+   "site": "mybunchofkeys.com",
+   "url": "https://mybunchofkeys.com/property/ocean-view-lambeau-land/"
   }
  ]
 }
