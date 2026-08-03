@@ -1,10 +1,10 @@
 {
  "meta": {
-  "lastRefresh": "2026-07-27T12:56:10.578Z",
-  "totalComps": 18,
+  "lastRefresh": "2026-08-03T12:55:51.185Z",
+  "totalComps": 26,
   "agentCount": 0,
-  "candidateCount": 18,
-  "newCandidatesThisRun": 7
+  "candidateCount": 26,
+  "newCandidatesThisRun": 8
  },
  "listings": [
   {
@@ -276,6 +276,126 @@
    "title": "Ocean View Lambeau land",
    "site": "mybunchofkeys.com",
    "url": "https://mybunchofkeys.com/property/ocean-view-lambeau-land/"
+  },
+  {
+   "id": "cand_https_www_terracaribbean_com_t29958_trinidad_residential_sale_land_tobago_plantations_tobago",
+   "loc": "Tobago Plantations, Tobago",
+   "size": 27193,
+   "price": "2300000",
+   "psf": 85,
+   "tenure": "freehold",
+   "date": "2026-06-24",
+   "notes": "Tobago Plantations Land — delisted from terracaribbean.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Tobago Plantations Land",
+   "site": "terracaribbean.com",
+   "url": "https://www.terracaribbean.com/T29958/Trinidad/Residential-Sale/Land/Tobago-Plantations--Tobago"
+  },
+  {
+   "id": "cand_https_terracaribbean_com_t32330_trinidad_residential_sale_house_tobago_fairways_villa_tobago_plantations",
+   "loc": "Tobago Plantations, Tobago",
+   "size": 2900,
+   "price": 4200000,
+   "psf": 1448,
+   "tenure": "freehold",
+   "date": "2026-06-24",
+   "notes": "Tobago Fairways Villa, Tobago Plantations — delisted from terracaribbean.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Tobago Fairways Villa, Tobago Plantations",
+   "site": "terracaribbean.com",
+   "url": "https://terracaribbean.com/T32330/Trinidad/Residential-Sale/House/Tobago-Fairways-Villa--Tobago-Plantations/"
+  },
+  {
+   "id": "cand_https_terracaribbean_com_t28890_trinidad_residential_sale_land_the_inez_bacolet_pamela_gardens_tobago",
+   "loc": "Bacolet, Tobago",
+   "size": 5005,
+   "price": 507604,
+   "psf": 101,
+   "tenure": "freehold",
+   "date": "2026-06-23",
+   "notes": "The Inez, Bacolet — delisted from terracaribbean.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "The Inez, Bacolet",
+   "site": "terracaribbean.com",
+   "url": "https://terracaribbean.com/T28890/Trinidad/Residential-Sale/Land/The-Inez--Bacolet--Pamela-Gardens--Tobago/"
+  },
+  {
+   "id": "cand_https_www_terracaribbean_com_t28229_trinidad_residential_sale_house_bougainvillea_tobago",
+   "loc": "Black Rock, Tobago",
+   "size": 3400,
+   "price": 4250000,
+   "psf": 1250,
+   "tenure": "freehold",
+   "date": "2026-06-24",
+   "notes": "Bougainvillea, Black Rock — delisted from terracaribbean.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Bougainvillea, Black Rock",
+   "site": "terracaribbean.com",
+   "url": "https://www.terracaribbean.com/T28229/Trinidad/Residential-Sale/House/Bougainvillea--Tobago"
+  },
+  {
+   "id": "cand_https_mybunchofkeys_com_property_lily_heights_st_anns_4",
+   "loc": "St. Ann's",
+   "size": 1600,
+   "price": 2500000,
+   "psf": 1563,
+   "tenure": "freehold",
+   "date": "2026-06-24",
+   "notes": "Lily Heights, St. Anns — delisted from mybunchofkeys.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Lily Heights, St. Anns",
+   "site": "mybunchofkeys.com",
+   "url": "https://mybunchofkeys.com/property/lily-heights-st-anns-4/"
+  },
+  {
+   "id": "cand_https_terracaribbean_com_t23778_trinidad_residential_sale_land_juzani_garden_signal_hill_rd_tobago",
+   "loc": "Signal Hill, Juzani Garden, Tobago",
+   "size": 8132,
+   "price": 850000,
+   "psf": 105,
+   "tenure": "freehold",
+   "date": "2026-06-24",
+   "notes": "Juzani Garden, Signal Hill — delisted from terracaribbean.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Juzani Garden, Signal Hill",
+   "site": "terracaribbean.com",
+   "url": "https://terracaribbean.com/T23778/Trinidad/Residential-Sale/Land/Juzani-Garden,-Signal-Hill-Rd,-Tobago/"
+  },
+  {
+   "id": "cand_https_mybunchofkeys_com_property_hermitage_road_belmont",
+   "loc": "Belmont",
+   "size": 3600,
+   "price": 900000,
+   "psf": 250,
+   "tenure": "freehold",
+   "date": "2026-06-25",
+   "notes": "Hermitage Road, Belmont — delisted from mybunchofkeys.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Hermitage Road, Belmont",
+   "site": "mybunchofkeys.com",
+   "url": "https://mybunchofkeys.com/property/hermitage-road-belmont/"
+  },
+  {
+   "id": "cand_https_mybunchofkeys_com_property_apartment_for_sale_stratford_south_thompson_trace_el_socorro_1_295mtt",
+   "loc": "El Socorro",
+   "size": 1008,
+   "price": 1195000,
+   "psf": 1186,
+   "tenure": "freehold",
+   "date": "2026-06-25",
+   "notes": "Apartment For Sale Stratford South, Thompson Trace, El Socorro — delisted from mybunchofkeys.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Apartment For Sale Stratford South, Thompson Trace, El Socorro",
+   "site": "mybunchofkeys.com",
+   "url": "https://mybunchofkeys.com/property/apartment-for-sale-stratford-south-thompson-trace-el-socorro-1-295mtt/"
   }
  ]
 }
