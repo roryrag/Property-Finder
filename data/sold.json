@@ -1,10 +1,10 @@
 {
  "meta": {
-  "lastRefresh": "2026-08-17T10:34:35.196Z",
-  "totalComps": 49,
+  "lastRefresh": "2026-08-24T10:39:09.088Z",
+  "totalComps": 51,
   "agentCount": 0,
-  "candidateCount": 49,
-  "newCandidatesThisRun": 23
+  "candidateCount": 51,
+  "newCandidatesThisRun": 2
  },
  "listings": [
   {
@@ -741,6 +741,36 @@
    "title": "Land in Hope Estate for Sale",
    "site": "royaltytobago.com",
    "url": "https://royaltytobago.com/property/land-in-hope-estate-for-sale/"
+  },
+  {
+   "id": "cand_https_www_seajaderealty_com_properties_rs398",
+   "loc": "Mount Irvine",
+   "size": 2000,
+   "price": 4386000,
+   "psf": 2193,
+   "tenure": "freehold",
+   "date": "2026-07-13",
+   "notes": "Mount Irvine, Jacamar Drive RS398 — delisted from www.seajaderealty.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Mount Irvine, Jacamar Drive RS398",
+   "site": "www.seajaderealty.com",
+   "url": "https://www.seajaderealty.com/properties/rs398"
+  },
+  {
+   "id": "cand_https_islreal_com_directory_sale_bacolet_crescent_bougain_villa",
+   "loc": "Bacolet Crescent",
+   "size": 0,
+   "price": 4000000,
+   "psf": 0,
+   "tenure": "freehold",
+   "date": "2026-07-13",
+   "notes": "Bacolet Crescent - Bougain Villa — delisted from islreal.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Bacolet Crescent - Bougain Villa",
+   "site": "islreal.com",
+   "url": "https://islreal.com/directory/sale/bacolet-crescent-bougain-villa/"
   }
  ]
 }
