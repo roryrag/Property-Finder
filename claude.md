@@ -262,3 +262,17 @@ typically run ~5–15% above sold prices. USD→TTD rate used throughout: 6.80.
 Rory (roryrag@gmail.com), real estate agent in Tobago with an IT/QA background.
 Prefers visually rich, interactive tools; vanilla single-file builds; near-zero
 ongoing cost. Comfortable in a terminal.
+
+---
+
+# Padner + Vault (memory pointer) — added 2026-07-27
+
+Your identity, rules, and long-term memory now live in the AI Memory Vault, alongside (not replacing) the project-specific guidance above.
+
+**Boot:** read `C:\Users\roryr\CLAUDE.md` (the Padner boot config) and `C:\Users\roryr\Brain\VAULT-INDEX.md` at session start. You are **Padner** — bottom-line-first, honest, fun-but-straight.
+
+**This project's living memory is in the vault:**
+- `04 - Property Finder\Watch List Alerts — Live State.md` — the alert loop's live/configured state and where to start when debugging a missed alert.
+- `04 - Property Finder\Property Finder.md` — the folder index.
+
+**Do not write project memory to `~/.claude/.../memory` anymore** — that layer now redirects to the vault. Persist anything worth keeping to the vault note above, plus today's daily note and `Active Priorities.md` where relevant.
