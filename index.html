@@ -3092,7 +3092,6 @@ function cacheKey(f) { return [f.maxPrice,f.beds,f.baths,(f.types||[]).join(',')
 
 startSearch = async function() {
   var apiKey = localStorage.getItem('anthropic_key');
-  if (!apiKey) { alert('Please save your API key first.'); return; }
   var filters = getFilters();
   var ck = cacheKey(filters);
 
@@ -3122,6 +3121,7 @@ startSearch = async function() {
 
   // Live search
   if (searchCache[ck]) { allResults=searchCache[ck]; showCachedResults(allResults); return; }
+  if (!apiKey) { alert('The repository is empty, so this search would use the live API. Save your API key first (Settings > API Key), or load the shared repository to search for free.'); return; }
 
   var btn=document.getElementById('searchBtn'); var stopBtn=document.getElementById('stopBtn');
   btn.disabled=true; searchAborted=false; activeControllers=[]; allResults=[];
