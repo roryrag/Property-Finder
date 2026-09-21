@@ -1,10 +1,10 @@
 {
  "meta": {
-  "lastRefresh": "2026-09-14T16:13:31.588Z",
-  "totalComps": 61,
+  "lastRefresh": "2026-09-21T16:19:04.578Z",
+  "totalComps": 64,
   "agentCount": 0,
-  "candidateCount": 61,
-  "newCandidatesThisRun": 0
+  "candidateCount": 64,
+  "newCandidatesThisRun": 3
  },
  "listings": [
   {
@@ -921,6 +921,51 @@
    "title": "Hope Development Lot 57",
    "site": "realestatetobago.com",
    "url": "https://realestatetobago.com/property/hope-development-lot-57/"
+  },
+  {
+   "id": "cand_https_realestatetobago_com_property_bon_accord_moore_drive",
+   "loc": "Bon Accord, Crown Point",
+   "size": 0,
+   "price": 3200000,
+   "psf": 0,
+   "tenure": "freehold",
+   "date": "2026-08-17",
+   "notes": "Bon Accord Moore Drive — delisted from realestatetobago.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Bon Accord Moore Drive",
+   "site": "realestatetobago.com",
+   "url": "https://realestatetobago.com/property/bon-accord-moore-drive/"
+  },
+  {
+   "id": "cand_https_charbonnerealty_com_property_land_at_kimme_drive_mt_irvine",
+   "loc": "Mount Irvine",
+   "size": 21631,
+   "price": 1100000,
+   "psf": 51,
+   "tenure": "freehold",
+   "date": "2026-08-17",
+   "notes": "Land at Kimme Drive, Mt. Irvine — delisted from charbonnerealty.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Land at Kimme Drive, Mt. Irvine",
+   "site": "charbonnerealty.com",
+   "url": "https://charbonnerealty.com/property/land-at-kimme-drive-mt-irvine/"
+  },
+  {
+   "id": "cand_https_mybunchofkeys_com_property_f0_9f_8f_a1_e2_9c_a8_new_sale_listing_lily_heights_st_anns_e2_9c_a8_f0_9f_8f_a1_f0_9f_8c_bf_newly_constructed_modern_living_stunning_mountain_views_f0_9f_8c_bf",
+   "loc": "St. Ann's",
+   "size": 1600,
+   "price": 2500000,
+   "psf": 1563,
+   "tenure": "freehold",
+   "date": "2026-08-17",
+   "notes": "NEW SALE LISTING — LILY HEIGHTS, ST. ANN'S Newly Constructed | Modern Living | Stunning Mountain Views — delisted from mybunchofkeys.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "NEW SALE LISTING — LILY HEIGHTS, ST. ANN'S Newly Constructed | Modern Living | Stunning Mountain Views",
+   "site": "mybunchofkeys.com",
+   "url": "https://mybunchofkeys.com/property/%f0%9f%8f%a1%e2%9c%a8-new-sale-listing-lily-heights-st-anns-%e2%9c%a8%f0%9f%8f%a1-%f0%9f%8c%bf-newly-constructed-modern-living-stunning-mountain-views-%f0%9f%8c%bf/"
   }
  ]
 }
