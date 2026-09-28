@@ -1,10 +1,10 @@
 {
  "meta": {
-  "lastRefresh": "2026-09-21T16:19:04.578Z",
-  "totalComps": 64,
+  "lastRefresh": "2026-09-28T18:00:22.596Z",
+  "totalComps": 66,
   "agentCount": 0,
-  "candidateCount": 64,
-  "newCandidatesThisRun": 3
+  "candidateCount": 66,
+  "newCandidatesThisRun": 2
  },
  "listings": [
   {
@@ -966,6 +966,36 @@
    "title": "NEW SALE LISTING — LILY HEIGHTS, ST. ANN'S Newly Constructed | Modern Living | Stunning Mountain Views",
    "site": "mybunchofkeys.com",
    "url": "https://mybunchofkeys.com/property/%f0%9f%8f%a1%e2%9c%a8-new-sale-listing-lily-heights-st-anns-%e2%9c%a8%f0%9f%8f%a1-%f0%9f%8c%bf-newly-constructed-modern-living-stunning-mountain-views-%f0%9f%8c%bf/"
+  },
+  {
+   "id": "cand_https_charbonnerealty_com_property_land_in_calder_hall",
+   "loc": "Calder Hall",
+   "size": 6407,
+   "price": 525000,
+   "psf": 82,
+   "tenure": "freehold",
+   "date": "2026-08-24",
+   "notes": "Land in Calder Hall — delisted from charbonnerealty.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Land in Calder Hall",
+   "site": "charbonnerealty.com",
+   "url": "https://charbonnerealty.com/property/land-in-calder-hall/"
+  },
+  {
+   "id": "cand_https_islreal_com_directory_sale_scarborough",
+   "loc": "Scarborough",
+   "size": 5332,
+   "price": 9200000,
+   "psf": 1725,
+   "tenure": "freehold",
+   "date": "2026-08-24",
+   "notes": "Scarborough — delisted from islreal.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Scarborough",
+   "site": "islreal.com",
+   "url": "https://islreal.com/directory/sale/scarborough/"
   }
  ]
 }
