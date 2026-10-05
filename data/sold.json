@@ -1,10 +1,10 @@
 {
  "meta": {
-  "lastRefresh": "2026-09-28T18:00:22.596Z",
-  "totalComps": 66,
+  "lastRefresh": "2026-10-05T19:07:30.496Z",
+  "totalComps": 70,
   "agentCount": 0,
-  "candidateCount": 66,
-  "newCandidatesThisRun": 2
+  "candidateCount": 70,
+  "newCandidatesThisRun": 4
  },
  "listings": [
   {
@@ -996,6 +996,66 @@
    "title": "Scarborough",
    "site": "islreal.com",
    "url": "https://islreal.com/directory/sale/scarborough/"
+  },
+  {
+   "id": "cand_https_realestatetobago_com_property_signal_view_lot_11",
+   "loc": "Signal Hill, Scarborough, Tobago",
+   "size": 8333,
+   "price": 795000,
+   "psf": 95,
+   "tenure": "freehold",
+   "date": "2026-08-31",
+   "notes": "Signal View Lot 11 — delisted from realestatetobago.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Signal View Lot 11",
+   "site": "realestatetobago.com",
+   "url": "https://realestatetobago.com/property/signal-view-lot-11/"
+  },
+  {
+   "id": "cand_https_realestatetobago_com_property_signal_view_lot_10",
+   "loc": "Signal Hill, Scarborough, Tobago",
+   "size": 7427,
+   "price": 795000,
+   "psf": 107,
+   "tenure": "freehold",
+   "date": "2026-08-31",
+   "notes": "Signal View Lot 10 — delisted from realestatetobago.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Signal View Lot 10",
+   "site": "realestatetobago.com",
+   "url": "https://realestatetobago.com/property/signal-view-lot-10/"
+  },
+  {
+   "id": "cand_https_realestatetobago_com_property_diamond_heights",
+   "loc": "Signal Hill, Scarborough",
+   "size": 7502,
+   "price": 3900000,
+   "psf": 520,
+   "tenure": "freehold",
+   "date": "2026-08-31",
+   "notes": "Diamond Heights — delisted from realestatetobago.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Diamond Heights",
+   "site": "realestatetobago.com",
+   "url": "https://realestatetobago.com/property/diamond-heights/"
+  },
+  {
+   "id": "cand_https_islreal_com_directory_sale_high_more_scarborough",
+   "loc": "Scarborough",
+   "size": 2,
+   "price": 5250000,
+   "psf": 2625000,
+   "tenure": "freehold",
+   "date": "2026-08-31",
+   "notes": "High-More Scarborough — delisted from islreal.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "High-More Scarborough",
+   "site": "islreal.com",
+   "url": "https://islreal.com/directory/sale/high-more-scarborough/"
   }
  ]
 }
