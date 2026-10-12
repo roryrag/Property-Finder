@@ -1,10 +1,10 @@
 {
  "meta": {
-  "lastRefresh": "2026-10-05T19:07:30.496Z",
-  "totalComps": 70,
+  "lastRefresh": "2026-10-12T19:40:46.095Z",
+  "totalComps": 72,
   "agentCount": 0,
-  "candidateCount": 70,
-  "newCandidatesThisRun": 4
+  "candidateCount": 72,
+  "newCandidatesThisRun": 2
  },
  "listings": [
   {
@@ -1056,6 +1056,36 @@
    "title": "High-More Scarborough",
    "site": "islreal.com",
    "url": "https://islreal.com/directory/sale/high-more-scarborough/"
+  },
+  {
+   "id": "cand_https_islreal_com_directory_sale_grange_tambrind_villa",
+   "loc": "Grange, Buccoo, Tobago",
+   "size": 0,
+   "price": 2600000,
+   "psf": 0,
+   "tenure": "freehold",
+   "date": "2026-09-07",
+   "notes": "Grange, Tambrind Villa — delisted from islreal.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Grange, Tambrind Villa",
+   "site": "islreal.com",
+   "url": "https://islreal.com/directory/sale/grange-tambrind-villa/"
+  },
+  {
+   "id": "cand_https_charbonnerealty_com_property_chaconia_suite",
+   "loc": "Grafton",
+   "size": 2069,
+   "price": 4250000,
+   "psf": 2054,
+   "tenure": "freehold",
+   "date": "2026-09-07",
+   "notes": "Chaconia Suite — delisted from charbonnerealty.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Chaconia Suite",
+   "site": "charbonnerealty.com",
+   "url": "https://charbonnerealty.com/property/chaconia-suite/"
   }
  ]
 }
