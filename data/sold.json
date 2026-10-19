@@ -1,9 +1,9 @@
 {
  "meta": {
-  "lastRefresh": "2026-10-12T19:40:46.095Z",
-  "totalComps": 72,
+  "lastRefresh": "2026-10-19T16:51:00.403Z",
+  "totalComps": 74,
   "agentCount": 0,
-  "candidateCount": 72,
+  "candidateCount": 74,
   "newCandidatesThisRun": 2
  },
  "listings": [
@@ -1086,6 +1086,36 @@
    "title": "Chaconia Suite",
    "site": "charbonnerealty.com",
    "url": "https://charbonnerealty.com/property/chaconia-suite/"
+  },
+  {
+   "id": "cand_https_islreal_com_directory_sale_shirvan_bella_oasis",
+   "loc": "Shirvan Road",
+   "size": 0,
+   "price": 2100000,
+   "psf": 0,
+   "tenure": "freehold",
+   "date": "2026-09-14",
+   "notes": "Shirvan Bella Oasis — delisted from islreal.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Shirvan Bella Oasis",
+   "site": "islreal.com",
+   "url": "https://islreal.com/directory/sale/shirvan-bella-oasis/"
+  },
+  {
+   "id": "cand_https_islreal_com_directory_sale_grafton_indigo_inn",
+   "loc": "Grafton",
+   "size": 0,
+   "price": 4200000,
+   "psf": 0,
+   "tenure": "freehold",
+   "date": "2026-09-14",
+   "notes": "Grafton Indigo Inn — delisted from islreal.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Grafton Indigo Inn",
+   "site": "islreal.com",
+   "url": "https://islreal.com/directory/sale/grafton-indigo-inn/"
   }
  ]
 }
