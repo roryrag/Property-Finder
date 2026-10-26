@@ -1,10 +1,10 @@
 {
  "meta": {
-  "lastRefresh": "2026-10-19T16:51:00.403Z",
-  "totalComps": 74,
+  "lastRefresh": "2026-10-26T16:38:07.208Z",
+  "totalComps": 81,
   "agentCount": 0,
-  "candidateCount": 74,
-  "newCandidatesThisRun": 2
+  "candidateCount": 81,
+  "newCandidatesThisRun": 7
  },
  "listings": [
   {
@@ -1116,6 +1116,111 @@
    "title": "Grafton Indigo Inn",
    "site": "islreal.com",
    "url": "https://islreal.com/directory/sale/grafton-indigo-inn/"
+  },
+  {
+   "id": "cand_https_realestatetobago_com_property_26606_2",
+   "loc": "Tobago Plantations, Lowlands, Scarborough",
+   "size": 0,
+   "price": 2250000,
+   "psf": 0,
+   "tenure": "freehold",
+   "date": "2026-09-21",
+   "notes": "Tobago Plantations Villa Cluster B — delisted from realestatetobago.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Tobago Plantations Villa Cluster B",
+   "site": "realestatetobago.com",
+   "url": "https://realestatetobago.com/property/26606-2/"
+  },
+  {
+   "id": "cand_https_realestatetobago_com_property_tobago_plantations_villa_cluster_a",
+   "loc": "Tobago Plantations, Lowlands, Scarborough",
+   "size": 0,
+   "price": 2750000,
+   "psf": 0,
+   "tenure": "freehold",
+   "date": "2026-09-21",
+   "notes": "Tobago Plantations Villa Cluster A — delisted from realestatetobago.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Tobago Plantations Villa Cluster A",
+   "site": "realestatetobago.com",
+   "url": "https://realestatetobago.com/property/tobago-plantations-villa-cluster-a/"
+  },
+  {
+   "id": "cand_https_charbonnerealty_com_property_income_generating_home_in_lowlands",
+   "loc": "Lowlands",
+   "size": 3258,
+   "price": 2650000,
+   "psf": 813,
+   "tenure": "freehold",
+   "date": "2026-09-21",
+   "notes": "Income Generating Home in Lowlands — delisted from charbonnerealty.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Income Generating Home in Lowlands",
+   "site": "charbonnerealty.com",
+   "url": "https://charbonnerealty.com/property/income-generating-home-in-lowlands/"
+  },
+  {
+   "id": "cand_https_charbonnerealty_com_property_12275_square_feet_of_land_in_patience_hill",
+   "loc": "Patience Hill",
+   "size": 12275,
+   "price": 1200000,
+   "psf": 98,
+   "tenure": "freehold",
+   "date": "2026-09-21",
+   "notes": "12,275 square feet of land in Patience Hill — delisted from charbonnerealty.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "12,275 square feet of land in Patience Hill",
+   "site": "charbonnerealty.com",
+   "url": "https://charbonnerealty.com/property/12275-square-feet-of-land-in-patience-hill/"
+  },
+  {
+   "id": "cand_https_charbonnerealty_com_property_commercial_property_on_shirvan_road",
+   "loc": "Buccoo",
+   "size": 8859,
+   "price": 2210000,
+   "psf": 249,
+   "tenure": "freehold",
+   "date": "2026-09-21",
+   "notes": "Commercial Property on Shirvan Road — delisted from charbonnerealty.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Commercial Property on Shirvan Road",
+   "site": "charbonnerealty.com",
+   "url": "https://charbonnerealty.com/property/commercial-property-on-shirvan-road/"
+  },
+  {
+   "id": "cand_https_islreal_com_directory_sale_signal_hill",
+   "loc": "Signal Hill, Scarborough",
+   "size": 0,
+   "price": 3500000,
+   "psf": 0,
+   "tenure": "freehold",
+   "date": "2026-09-21",
+   "notes": "Signal Hill — delisted from islreal.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Signal Hill",
+   "site": "islreal.com",
+   "url": "https://islreal.com/directory/sale/signal-hill/"
+  },
+  {
+   "id": "cand_https_mybunchofkeys_com_property_grafton_ridge_tobago_exceptional_5_bedroom_villa_with_panoramic_ocean_views_for_sale",
+   "loc": "Grafton",
+   "size": 0,
+   "price": 8160000,
+   "psf": 0,
+   "tenure": "freehold",
+   "date": "2026-09-21",
+   "notes": "Grafton Ridge, Tobago Exceptional 5-Bedroom Villa with Panoramic Ocean Views For Sale — delisted from mybunchofkeys.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Grafton Ridge, Tobago Exceptional 5-Bedroom Villa with Panoramic Ocean Views For Sale",
+   "site": "mybunchofkeys.com",
+   "url": "https://mybunchofkeys.com/property/grafton-ridge-tobago-exceptional-5-bedroom-villa-with-panoramic-ocean-views-for-sale/"
   }
  ]
 }
