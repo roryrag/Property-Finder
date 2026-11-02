@@ -1,10 +1,10 @@
 {
  "meta": {
-  "lastRefresh": "2026-10-26T16:38:07.208Z",
-  "totalComps": 81,
+  "lastRefresh": "2026-11-02T20:03:26.389Z",
+  "totalComps": 85,
   "agentCount": 0,
-  "candidateCount": 81,
-  "newCandidatesThisRun": 7
+  "candidateCount": 85,
+  "newCandidatesThisRun": 4
  },
  "listings": [
   {
@@ -1221,6 +1221,66 @@
    "title": "Grafton Ridge, Tobago Exceptional 5-Bedroom Villa with Panoramic Ocean Views For Sale",
    "site": "mybunchofkeys.com",
    "url": "https://mybunchofkeys.com/property/grafton-ridge-tobago-exceptional-5-bedroom-villa-with-panoramic-ocean-views-for-sale/"
+  },
+  {
+   "id": "cand_https_www_seajaderealty_com_properties_tl532",
+   "loc": "Signal Hill",
+   "size": 8.95,
+   "price": 6500000,
+   "psf": 726257,
+   "tenure": "freehold",
+   "date": "2026-09-28",
+   "notes": "Land for Sale - Signal Hill — delisted from www.seajaderealty.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Land for Sale - Signal Hill",
+   "site": "www.seajaderealty.com",
+   "url": "https://www.seajaderealty.com/properties/tl532"
+  },
+  {
+   "id": "cand_https_www_terracaribbean_com_t21568_trinidad_residential_sale_dvlp_20land_20condos_mt_pelier_scarborough_tobago",
+   "loc": "Mt. Pelier, Scarborough, Tobago",
+   "size": 2.8,
+   "price": 10000000,
+   "psf": 3571429,
+   "tenure": "freehold",
+   "date": "2026-09-28",
+   "notes": "Mt. Pelier, Scarborough, Tobago — delisted from terracaribbean.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Mt. Pelier, Scarborough, Tobago",
+   "site": "terracaribbean.com",
+   "url": "https://www.terracaribbean.com/T21568/Trinidad/Residential-Sale/Dvlp%20Land%20Condos/Mt-Pelier--Scarborough--Tobago"
+  },
+  {
+   "id": "cand_https_islreal_com_directory_land_auchenskeoch_f3",
+   "loc": "Auchenskeoch",
+   "size": 43560,
+   "price": 4500000,
+   "psf": 103,
+   "tenure": "freehold",
+   "date": "2026-09-28",
+   "notes": "Auchenskeoch F3 — delisted from islreal.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Auchenskeoch F3",
+   "site": "islreal.com",
+   "url": "https://islreal.com/directory/land/auchenskeoch-f3/"
+  },
+  {
+   "id": "cand_https_islreal_com_directory_land_bacolet_land",
+   "loc": "Bacolet, Tobago",
+   "size": 11104,
+   "price": 1100000,
+   "psf": 99,
+   "tenure": "freehold",
+   "date": "2026-09-28",
+   "notes": "Bacolet Land — delisted from islreal.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Bacolet Land",
+   "site": "islreal.com",
+   "url": "https://islreal.com/directory/land/bacolet-land/"
   }
  ]
 }
