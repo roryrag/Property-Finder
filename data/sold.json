@@ -1,10 +1,10 @@
 {
  "meta": {
-  "lastRefresh": "2026-11-02T20:03:26.389Z",
-  "totalComps": 85,
+  "lastRefresh": "2026-11-09T20:30:36.073Z",
+  "totalComps": 91,
   "agentCount": 0,
-  "candidateCount": 85,
-  "newCandidatesThisRun": 4
+  "candidateCount": 91,
+  "newCandidatesThisRun": 6
  },
  "listings": [
   {
@@ -1281,6 +1281,96 @@
    "title": "Bacolet Land",
    "site": "islreal.com",
    "url": "https://islreal.com/directory/land/bacolet-land/"
+  },
+  {
+   "id": "cand_https_www_terracaribbean_com_t28315_trinidad_residential_sale_land_river_road_tobago",
+   "loc": "River Road, Tobago",
+   "size": 5460,
+   "price": 550000,
+   "psf": 101,
+   "tenure": "freehold",
+   "date": "2026-10-05",
+   "notes": "River Road, Tobago — delisted from terracaribbean.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "River Road, Tobago",
+   "site": "terracaribbean.com",
+   "url": "https://www.terracaribbean.com/T28315/Trinidad/Residential-Sale/Land/River-Road--Tobago"
+  },
+  {
+   "id": "cand_https_www_terracaribbean_com_t30029_trinidad_residential_sale_apartment_tobago_plantations_villa",
+   "loc": "Tobago Plantations, Lowlands, Tobago",
+   "size": 900,
+   "price": 2100000,
+   "psf": 2333,
+   "tenure": "freehold",
+   "date": "2026-10-05",
+   "notes": "Tobago Plantations Villa — delisted from terracaribbean.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Tobago Plantations Villa",
+   "site": "terracaribbean.com",
+   "url": "https://www.terracaribbean.com/T30029/Trinidad/Residential-Sale/Apartment/Tobago-Plantations-Villa"
+  },
+  {
+   "id": "cand_https_caribbeanrealestatemls_com_real_estate_tobago_8a64c7_100_acres_of_land_for_sale_cotton_bay_tobago",
+   "loc": "Cotton Bay, Tobago",
+   "size": 4356000,
+   "price": "6000000",
+   "psf": 1,
+   "tenure": "freehold",
+   "date": "2026-10-05",
+   "notes": "100 Acres of Land for Sale, Cotton Bay, Tobago — delisted from caribbeanrealestatemls.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "100 Acres of Land for Sale, Cotton Bay, Tobago",
+   "site": "caribbeanrealestatemls.com",
+   "url": "https://caribbeanrealestatemls.com/real-estate/tobago/8a64c7-100-acres-of-land-for-sale-cotton-bay-tobago/"
+  },
+  {
+   "id": "cand_https_villasoftobago_com_cluster55_property_page_html",
+   "loc": "Tobago Plantations",
+   "size": 0,
+   "price": 3200000,
+   "psf": 0,
+   "tenure": "freehold",
+   "date": "2026-10-05",
+   "notes": "Cluster 55 TPL — delisted from villasoftobago.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Cluster 55 TPL",
+   "site": "villasoftobago.com",
+   "url": "https://villasoftobago.com/cluster55-property-page.html"
+  },
+  {
+   "id": "cand_https_www_villasoftobago_com_99samaangrove_forsale_property_html",
+   "loc": "Samaan Grove",
+   "size": 1800,
+   "price": 3150000,
+   "psf": 1750,
+   "tenure": "freehold",
+   "date": "2026-10-05",
+   "notes": "#99 Samaan Grove — delisted from villasoftobago.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "#99 Samaan Grove",
+   "site": "villasoftobago.com",
+   "url": "https://www.villasoftobago.com/99samaangrove-forsale-property.html"
+  },
+  {
+   "id": "cand_https_villasoftobago_com_old_20site_burleighheights_sale_htm",
+   "loc": "Signal Hill",
+   "size": 2500,
+   "price": 2950000,
+   "psf": 1180,
+   "tenure": "freehold",
+   "date": "2026-10-05",
+   "notes": "Burleigh Heights — delisted from villasoftobago.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Burleigh Heights",
+   "site": "villasoftobago.com",
+   "url": "https://villasoftobago.com/old%20site/burleighheights_sale.htm"
   }
  ]
 }
