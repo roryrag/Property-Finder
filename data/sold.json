@@ -1,10 +1,10 @@
 {
  "meta": {
-  "lastRefresh": "2026-11-09T20:30:36.073Z",
-  "totalComps": 91,
+  "lastRefresh": "2026-11-16T20:03:49.850Z",
+  "totalComps": 94,
   "agentCount": 0,
-  "candidateCount": 91,
-  "newCandidatesThisRun": 6
+  "candidateCount": 94,
+  "newCandidatesThisRun": 3
  },
  "listings": [
   {
@@ -1371,6 +1371,51 @@
    "title": "Burleigh Heights",
    "site": "villasoftobago.com",
    "url": "https://villasoftobago.com/old%20site/burleighheights_sale.htm"
+  },
+  {
+   "id": "cand_https_islreal_com_directory_land_englishmans_bay",
+   "loc": "Englishman's Bay",
+   "size": 1067220,
+   "price": 17000000,
+   "psf": 16,
+   "tenure": "freehold",
+   "date": "2026-10-12",
+   "notes": "Englishman's Bay Land — delisted from islreal.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Englishman's Bay Land",
+   "site": "islreal.com",
+   "url": "https://islreal.com/directory/land/englishmans-bay/"
+  },
+  {
+   "id": "cand_https_islreal_com_directory_land_lambeau_land_for_sale",
+   "loc": "Lambeau, Scarborough",
+   "size": 15790,
+   "price": 1500000,
+   "psf": 95,
+   "tenure": "freehold",
+   "date": "2026-10-12",
+   "notes": "Lambeau Land — delisted from islreal.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Lambeau Land",
+   "site": "islreal.com",
+   "url": "https://islreal.com/directory/land/lambeau-land-for-sale/"
+  },
+  {
+   "id": "cand_https_realestatetobago_com_property_samaan_grove",
+   "loc": "Canaan, Buccoo, Tobago",
+   "size": 9156,
+   "price": 3850000,
+   "psf": 420,
+   "tenure": "freehold",
+   "date": "2026-10-12",
+   "notes": "Samaan Grove — delisted from realestatetobago.com, possibly sold",
+   "source": "candidate",
+   "status": "candidate",
+   "title": "Samaan Grove",
+   "site": "realestatetobago.com",
+   "url": "https://realestatetobago.com/property/samaan-grove/"
   }
  ]
 }
