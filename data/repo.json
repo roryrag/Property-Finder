@@ -1,29 +1,29 @@
 {
  "meta": {
-  "lastRefresh": "2026-11-16T20:03:49.850Z",
-  "totalListings": 189,
-  "activeCount": 169,
-  "staleCount": 20,
-  "withPrice": 161,
-  "newThisRun": 2,
-  "updatedThisRun": 142,
-  "droppedThisRun": 6,
+  "lastRefresh": "2026-11-23T21:55:52.222Z",
+  "totalListings": 178,
+  "activeCount": 155,
+  "staleCount": 23,
+  "withPrice": 150,
+  "newThisRun": 1,
+  "updatedThisRun": 126,
+  "droppedThisRun": 12,
   "duplicatesMergedThisRun": 0,
-  "rejectedRentalThisRun": 21,
+  "rejectedRentalThisRun": 25,
   "rejectedNonTobagoThisRun": 18,
   "purgedFromRepoThisRun": 0,
   "extractCallsUsed": 50,
   "sources": {
-   "www.seajaderealty.com": 31,
+   "www.seajaderealty.com": 29,
    "charbonnerealty.com": 25,
    "rain-properties-tobago.com": 22,
-   "realestatetobago.com": 29,
-   "islreal.com": 32,
-   "terracaribbean.com": 9,
+   "realestatetobago.com": 27,
+   "islreal.com": 30,
+   "terracaribbean.com": 6,
    "royaltytobago.com": 24,
    "caribbeanrealestatemls.com": 11,
-   "villasoftobago.com": 2,
-   "mybunchofkeys.com": 4
+   "villasoftobago.com": 1,
+   "mybunchofkeys.com": 3
   },
   "siteReports": {
    "charbonnerealty.com": {
@@ -35,15 +35,15 @@
    },
    "rain-properties-tobago.com": {
     "method": "crawl",
-    "listings": 4,
-    "urlsFound": 33,
+    "listings": 0,
+    "urlsFound": 35,
     "jsonld": 0,
-    "claude": 4
+    "claude": 0
    },
    "mybunchofkeys.com": {
     "method": "crawl",
     "listings": 15,
-    "urlsFound": 75,
+    "urlsFound": 74,
     "jsonld": 0,
     "claude": 15
    },
@@ -75,23 +75,23 @@
     "jsonld": 0,
     "claude": 24
    },
-   "caribbeanrealestatemls.com": {
+   "caribbeanMLS": {
     "method": "search",
-    "listings": 7
+    "listings": 0
    },
-   "villasoftobago.com": {
+   "villas": {
     "method": "search",
-    "listings": 4
+    "listings": 0
    },
    "terracaribbean.com": {
     "method": "search",
-    "listings": 5
+    "listings": 7
    }
   }
  },
  "listings": [
   {
-   "title": "Attractive 6 Bedroom Seafront Villa in Bacolet",
+   "title": "Attractive 6 bedroom seafront villa in Bacolet",
    "price": 4750000,
    "beds": 6,
    "baths": 6,
@@ -110,11 +110,11 @@
    "url": "https://www.seajaderealty.com/properties/rs394",
    "site": "www.seajaderealty.com",
    "firstSeen": 1781384521270,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
-   "title": "Over one acre of land with ocean views in Bacolet Point",
+   "title": "Over one acre of land in Bacolet Point with views to ocean and Trinidad",
    "price": 2400000,
    "beds": 3,
    "baths": 2,
@@ -133,7 +133,7 @@
    "url": "https://www.seajaderealty.com/properties/rs396",
    "site": "www.seajaderealty.com",
    "firstSeen": 1781384521270,
-   "lastSeen": 1794256236073,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -156,11 +156,11 @@
    "url": "https://www.seajaderealty.com/properties/rs390",
    "site": "www.seajaderealty.com",
    "firstSeen": 1781384521270,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
-   "title": "Two-Storey Holiday Home with Art Studios in Black Rock",
+   "title": "Two-storey holiday home with art studios in Black Rock",
    "price": null,
    "beds": 1,
    "baths": 2,
@@ -179,11 +179,11 @@
    "url": "https://www.seajaderealty.com/properties/rs395",
    "site": "www.seajaderealty.com",
    "firstSeen": 1781384521270,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
-   "title": "Hotel at Crown Point, Store Bay Local Road RS358",
+   "title": "Crown Point, Store Bay Local Road RS358",
    "price": 5250000,
    "beds": 12,
    "baths": 12,
@@ -202,14 +202,14 @@
    "url": "https://www.seajaderealty.com/properties/rs358",
    "site": "www.seajaderealty.com",
    "firstSeen": 1781385461399,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
-   "title": "Villa at Grafton RS305",
+   "title": "Grafton RS305",
    "price": null,
    "beds": 3,
-   "baths": 3,
+   "baths": 2,
    "type": "villa",
    "size": "1800 sq ft",
    "location": "Grafton",
@@ -225,11 +225,11 @@
    "url": "https://www.seajaderealty.com/properties/rs305",
    "site": "www.seajaderealty.com",
    "firstSeen": 1781384521270,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
-   "title": "Apartment at Grafton, Grafton Road RS369",
+   "title": "Grafton, Grafton Road RS369",
    "price": 5100000,
    "beds": 3,
    "baths": 3,
@@ -248,13 +248,13 @@
    "url": "https://www.seajaderealty.com/properties/rs369",
    "site": "www.seajaderealty.com",
    "firstSeen": 1781384521270,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
-   "title": "Villa 9 at Grafton, The Villas at Stonehaven RS363",
+   "title": "Grafton, The Villas at Stonehaven RS363",
    "price": 5780000,
-   "beds": 5,
+   "beds": 4,
    "baths": 5,
    "type": "villa",
    "size": "4100 sq ft",
@@ -271,7 +271,7 @@
    "url": "https://www.seajaderealty.com/properties/rs363",
    "site": "www.seajaderealty.com",
    "firstSeen": 1781384521270,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -294,11 +294,11 @@
    "url": "https://www.seajaderealty.com/properties/rs385",
    "site": "www.seajaderealty.com",
    "firstSeen": 1781384521270,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
-   "title": "Bacolet, Blue Haven Development TL443",
+   "title": "Land for Sale Bacolet, Blue Haven Development TL443",
    "price": 3502000,
    "beds": 0,
    "baths": 0,
@@ -317,7 +317,7 @@
    "url": "https://www.seajaderealty.com/properties/tl443",
    "site": "www.seajaderealty.com",
    "firstSeen": 1781385461399,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -340,7 +340,7 @@
    "url": "https://charbonnerealty.com/property/burleigh-heights-home/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -364,7 +364,7 @@
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
    "lastSeen": 1793649806389,
-   "status": "active"
+   "status": "stale"
   },
   {
    "title": "Income Generating Home in Sherwood Park",
@@ -408,35 +408,12 @@
    "url": "https://charbonnerealty.com/property/lot-106-hope-development/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
-   "title": "Luxury duplex villa in Tobago Plantations",
-   "price": 3300000,
-   "beds": 3,
-   "baths": 3,
-   "type": "villa",
-   "size": "2,700 sq ft",
-   "location": "Tobago Plantations",
-   "pool": true,
-   "description": "Single-level luxury villa with three air-conditioned bedrooms, private plunge pool, and 4.8-star Airbnb rating in premier resort development.",
-   "features": [
-    "Swimming Pool",
-    "Air Conditioning throughout",
-    "Golf Course nearby"
-   ],
-   "agent_name": "Charbonne Realty",
-   "agent_phone": "868-683-7676",
-   "url": "https://charbonnerealty.com/property/three-bedroom-villa-in-tobago-plantations/",
-   "site": "charbonnerealty.com",
-   "firstSeen": 1781219489674,
-   "lastSeen": 1792428660403,
-   "status": "stale"
-  },
-  {
    "title": "Land on the quiet Sunningdale Lane",
-   "price": 2108000,
+   "price": 1972000,
    "beds": 0,
    "baths": 0,
    "type": "land",
@@ -454,7 +431,7 @@
    "url": "https://charbonnerealty.com/property/land-on-the-quiet-sunningdale-lane/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -499,7 +476,7 @@
    "url": "https://charbonnerealty.com/property/bacolet-park-land/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -520,7 +497,7 @@
    "url": "https://charbonnerealty.com/property/lot-5-arnos-vale/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781219489674,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -543,7 +520,7 @@
    "url": "https://charbonnerealty.com/property/gordon-heights-land/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -565,7 +542,7 @@
    "url": "https://charbonnerealty.com/property/davis-drive-bacolet-land/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -589,7 +566,7 @@
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
    "lastSeen": 1793649806389,
-   "status": "active"
+   "status": "stale"
   },
   {
    "title": "Riseland Trace Home",
@@ -611,7 +588,7 @@
    "url": "https://charbonnerealty.com/property/riseland-trace-home/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -634,12 +611,12 @@
    "url": "https://charbonnerealty.com/property/lot-2-3-pentlands-arnos-vale/",
    "site": "charbonnerealty.com",
    "firstSeen": 1782056840538,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
    "title": "Arawak Avenue, Signal Hill",
-   "price": 748000,
+   "price": 791200,
    "beds": 0,
    "baths": 0,
    "type": "land",
@@ -657,7 +634,7 @@
    "url": "https://charbonnerealty.com/property/arawak-avenue-signal-hill/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -680,7 +657,7 @@
    "url": "https://charbonnerealty.com/property/pinehurst-drive-home/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -703,7 +680,7 @@
    "url": "https://charbonnerealty.com/property/whim-development-home/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781234938336,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -860,7 +837,7 @@
    "status": "active"
   },
   {
-   "title": "Riseland, Yorke Trace TL521",
+   "title": "Land for Sale Riseland, Yorke Trace TL521",
    "price": 2550000,
    "beds": 0,
    "baths": 0,
@@ -879,11 +856,11 @@
    "url": "https://www.seajaderealty.com/properties/tl521",
    "site": "www.seajaderealty.com",
    "firstSeen": 1781385461399,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
-   "title": "Orange Hill TL517",
+   "title": "Land for Sale Orange Hill",
    "price": 549000,
    "beds": 0,
    "baths": 0,
@@ -902,11 +879,11 @@
    "url": "https://www.seajaderealty.com/properties/tl517",
    "site": "www.seajaderealty.com",
    "firstSeen": 1781385461399,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
-   "title": "Shirvan, off Cocrico Avenue TL528",
+   "title": "Land for Sale Shirvan, off Cocrico Avenue",
    "price": 730000,
    "beds": 0,
    "baths": 0,
@@ -925,7 +902,7 @@
    "url": "https://www.seajaderealty.com/properties/tl528",
    "site": "www.seajaderealty.com",
    "firstSeen": 1781384521270,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -948,14 +925,14 @@
    "url": "https://www.seajaderealty.com/properties/rs373",
    "site": "www.seajaderealty.com",
    "firstSeen": 1781384521270,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
-   "title": "3 bedroom villa near Petit Trou beach in Lambeau",
+   "title": "3 bedroom property in Lambeau near Petit Trou beach",
    "price": 2385000,
    "beds": 3,
-   "baths": 3.5,
+   "baths": 3,
    "type": "house",
    "size": "7,300 sq ft",
    "location": "Lambeau, Pascal Village",
@@ -971,11 +948,11 @@
    "url": "https://www.seajaderealty.com/properties/rs397",
    "site": "www.seajaderealty.com",
    "firstSeen": 1781384521270,
-   "lastSeen": 1794256236073,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
-   "title": "Land for Sale Lowlands, Tobago Plantations TL487",
+   "title": "Land for Sale in Tobago Plantations",
    "price": 3332000,
    "beds": 0,
    "baths": 0,
@@ -993,11 +970,11 @@
    "url": "https://www.seajaderealty.com/properties/tl487",
    "site": "www.seajaderealty.com",
    "firstSeen": 1781385461399,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
-   "title": "Land for Sale John Dial TL503",
+   "title": "Beachfront Land with Sea Views in John Dial",
    "price": 3500000,
    "beds": 0,
    "baths": 0,
@@ -1017,11 +994,11 @@
    "url": "https://www.seajaderealty.com/properties/tl503",
    "site": "www.seajaderealty.com",
    "firstSeen": 1781385461399,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
-   "title": "Land for Sale Mount Irvine, Kimme Drive",
+   "title": "Land for Sale - Mount Irvine, Kimme Drive TL505",
    "price": 1100000,
    "beds": 0,
    "baths": 0,
@@ -1041,11 +1018,11 @@
    "url": "https://www.seajaderealty.com/properties/tl505",
    "site": "www.seajaderealty.com",
    "firstSeen": 1781385461399,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
-   "title": "Land for Sale Tourism and Commercial Shaw Park",
+   "title": "Land for Sale - Shaw Park TL513",
    "price": 5500000,
    "beds": 0,
    "baths": 0,
@@ -1065,11 +1042,11 @@
    "url": "https://www.seajaderealty.com/properties/tl513",
    "site": "www.seajaderealty.com",
    "firstSeen": 1781384521270,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
-   "title": "Land for Sale Hope, Hope Estate",
+   "title": "Land for Sale - Hope, Hope Estate TL515",
    "price": 925000,
    "beds": 0,
    "baths": 0,
@@ -1088,11 +1065,11 @@
    "url": "https://www.seajaderealty.com/properties/tl515",
    "site": "www.seajaderealty.com",
    "firstSeen": 1781384521270,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
-   "title": "Land for Sale Tourism and Commercial Englishman's Bay, Parrot Hall",
+   "title": "Land for Sale - Englishman's Bay, Parrot Hall TL519",
    "price": 10880000,
    "beds": 0,
    "baths": 0,
@@ -1111,11 +1088,11 @@
    "url": "https://www.seajaderealty.com/properties/tl519",
    "site": "www.seajaderealty.com",
    "firstSeen": 1781384521270,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
-   "title": "Land for Sale - Bacolet, Bluehaven Development",
+   "title": "Bacolet, Bluehaven Development TL520",
    "price": 1200000,
    "beds": 0,
    "baths": 0,
@@ -1134,11 +1111,11 @@
    "url": "https://www.seajaderealty.com/properties/tl520",
    "site": "www.seajaderealty.com",
    "firstSeen": 1781384521270,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
-   "title": "Land for Sale - Arnosvale, Pentlands",
+   "title": "Arnosvale, Pentlands TL522",
    "price": 2000000,
    "beds": 0,
    "baths": 0,
@@ -1157,11 +1134,11 @@
    "url": "https://www.seajaderealty.com/properties/tl522",
    "site": "www.seajaderealty.com",
    "firstSeen": 1781384521270,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
-   "title": "Land for Sale - Carnbee, Mano Cowie Drive",
+   "title": "Carnbee, Mano Cowie Drive TL524",
    "price": 1000000,
    "beds": 0,
    "baths": 0,
@@ -1180,54 +1157,8 @@
    "url": "https://www.seajaderealty.com/properties/tl524",
    "site": "www.seajaderealty.com",
    "firstSeen": 1781452818932,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
-  },
-  {
-   "title": "Land for Sale - Mount Irvine, Pinehurst Drive",
-   "price": 1600000,
-   "beds": 0,
-   "baths": 0,
-   "type": "land",
-   "size": "31987 sq ft",
-   "location": "Mount Irvine",
-   "pool": false,
-   "description": "Prime sloping parcel in well-established Mount Irvine development with proximity to beaches and amenities.",
-   "features": [
-    "Cul-de-sac location",
-    "Near beaches",
-    "Development opportunity"
-   ],
-   "agent_name": "Alison de Freitas",
-   "agent_phone": "+1 (868) 689-6438",
-   "url": "https://www.seajaderealty.com/properties/tl529",
-   "site": "www.seajaderealty.com",
-   "firstSeen": 1781463147393,
-   "lastSeen": 1792428660403,
-   "status": "stale"
-  },
-  {
-   "title": "Land for Sale - Hope Estate, Lot 26",
-   "price": 900000,
-   "beds": 0,
-   "baths": 0,
-   "type": "land",
-   "size": "10535 sq ft",
-   "location": "Hope",
-   "pool": false,
-   "description": "Spacious corner parcel in emerging Hope Estate with peaceful rural atmosphere and convenient access to Scarborough.",
-   "features": [
-    "Leasehold",
-    "Corner lot",
-    "10 min to Scarborough"
-   ],
-   "agent_name": "Alison de Freitas",
-   "agent_phone": "+1 (868) 689-6438",
-   "url": "https://www.seajaderealty.com/properties/tl530",
-   "site": "www.seajaderealty.com",
-   "firstSeen": 1781452818932,
-   "lastSeen": 1792428660403,
-   "status": "stale"
   },
   {
    "title": "La Jolie Villa",
@@ -1246,7 +1177,7 @@
    "site": "rain-properties-tobago.com",
    "firstSeen": 1781385461399,
    "lastSeen": 1793649806389,
-   "status": "active"
+   "status": "stale"
   },
   {
    "title": "Atlantic View House",
@@ -1265,7 +1196,7 @@
    "site": "rain-properties-tobago.com",
    "firstSeen": 1781385461399,
    "lastSeen": 1793649806389,
-   "status": "active"
+   "status": "stale"
   },
   {
    "title": "Moondrops",
@@ -1306,7 +1237,7 @@
    "url": "https://realestatetobago.com/property/bacolet-park-2/",
    "site": "realestatetobago.com",
    "firstSeen": 1781385461399,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -1352,7 +1283,7 @@
    "url": "https://realestatetobago.com/property/tobago-plantations-villa-120/",
    "site": "realestatetobago.com",
    "firstSeen": 1781385461399,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -1375,7 +1306,7 @@
    "url": "https://realestatetobago.com/property/buccoo-homes-2-3/",
    "site": "realestatetobago.com",
    "firstSeen": 1781385461399,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -1398,7 +1329,7 @@
    "url": "https://realestatetobago.com/property/orange-hill/",
    "site": "realestatetobago.com",
    "firstSeen": 1781385461399,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -1421,7 +1352,7 @@
    "url": "https://realestatetobago.com/property/sherwood-court/",
    "site": "realestatetobago.com",
    "firstSeen": 1781385461399,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -1444,7 +1375,7 @@
    "url": "https://realestatetobago.com/property/lambeau-browns-lane/",
    "site": "realestatetobago.com",
    "firstSeen": 1781385461399,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -1467,7 +1398,7 @@
    "url": "https://realestatetobago.com/property/bacolet-park-lot-184-2/",
    "site": "realestatetobago.com",
    "firstSeen": 1781385461399,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -1490,7 +1421,7 @@
    "url": "https://realestatetobago.com/property/bacolet-park-lot-184/",
    "site": "realestatetobago.com",
    "firstSeen": 1781385461399,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -1536,7 +1467,7 @@
    "url": "https://realestatetobago.com/property/goodwood/",
    "site": "realestatetobago.com",
    "firstSeen": 1781385461399,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -1559,7 +1490,7 @@
    "url": "https://realestatetobago.com/property/diamond-heights-2/",
    "site": "realestatetobago.com",
    "firstSeen": 1781385461399,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -1582,7 +1513,7 @@
    "url": "https://realestatetobago.com/property/samaan-grove-2/",
    "site": "realestatetobago.com",
    "firstSeen": 1781385461399,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -1605,7 +1536,7 @@
    "url": "https://realestatetobago.com/property/samaan-grove-104/",
    "site": "realestatetobago.com",
    "firstSeen": 1781385461399,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -1628,7 +1559,7 @@
    "url": "https://realestatetobago.com/property/signal-hill-burleigh-heights/",
    "site": "realestatetobago.com",
    "firstSeen": 1781385461399,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -1651,7 +1582,7 @@
    "url": "https://realestatetobago.com/property/grafton-house-2/",
    "site": "realestatetobago.com",
    "firstSeen": 1781385461399,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -1674,7 +1605,7 @@
    "url": "https://realestatetobago.com/property/crown-point-guesthouse/",
    "site": "realestatetobago.com",
    "firstSeen": 1781385461399,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -1696,7 +1627,7 @@
    "url": "https://realestatetobago.com/property/mt-grace/",
    "site": "realestatetobago.com",
    "firstSeen": 1781385461399,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -1719,11 +1650,11 @@
    "url": "https://realestatetobago.com/property/bacolet-gardens-3/",
    "site": "realestatetobago.com",
    "firstSeen": 1781385461399,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
-   "title": "Land for Sale - Orange Hill",
+   "title": "Orange Hill TL523",
    "price": 800000,
    "beds": 0,
    "baths": 0,
@@ -1742,11 +1673,11 @@
    "url": "https://www.seajaderealty.com/properties/tl523",
    "site": "www.seajaderealty.com",
    "firstSeen": 1781385461399,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
-   "title": "Land for Sale Lowlands, Tobago Plantations TL437",
+   "title": "Land for Sale in Tobago Plantations",
    "price": 2205000,
    "beds": 0,
    "baths": 0,
@@ -1761,7 +1692,7 @@
    "url": "https://www.seajaderealty.com/properties/tl437",
    "site": "www.seajaderealty.com",
    "firstSeen": 1781385461399,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -1784,7 +1715,7 @@
    "url": "https://charbonnerealty.com/property/hillcrest-drive-home/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781463147393,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -1807,7 +1738,7 @@
    "url": "https://charbonnerealty.com/property/bacolet-point-land/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781463147393,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -1830,7 +1761,7 @@
    "url": "https://charbonnerealty.com/property/bacolet-crescent-home/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781463147393,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -1853,31 +1784,8 @@
    "url": "https://charbonnerealty.com/property/lot-15-old-whim-estate/",
    "site": "charbonnerealty.com",
    "firstSeen": 1781463147393,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
-  },
-  {
-   "title": "Mason Hall",
-   "price": 495000,
-   "beds": 0,
-   "baths": 0,
-   "type": "land",
-   "size": "5,707 sq. ft.",
-   "location": "Mason Hall, Tobago",
-   "pool": false,
-   "description": "Residential land parcel on Rolly Quaccoo Drive with relaxing hill and valley views and possible sea views, 7 minutes from Scarborough.",
-   "features": [
-    "Mountain view",
-    "Sea view",
-    "Water and electricity available"
-   ],
-   "agent_name": "real_tobago",
-   "agent_phone": "",
-   "url": "https://realestatetobago.com/property/mason-hall/",
-   "site": "realestatetobago.com",
-   "firstSeen": 1782317511025,
-   "lastSeen": 1792428660403,
-   "status": "stale"
   },
   {
    "title": "Tobago Plantations Ariyana",
@@ -1899,7 +1807,7 @@
    "url": "https://islreal.com/directory/sale/tobago-plantations-ariyana/",
    "site": "islreal.com",
    "firstSeen": 1783528207869,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -1922,7 +1830,7 @@
    "url": "https://islreal.com/directory/sale/signal-hill-new-build/",
    "site": "islreal.com",
    "firstSeen": 1783528207869,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -1945,7 +1853,7 @@
    "url": "https://islreal.com/directory/sale/ottley-street-property/",
    "site": "islreal.com",
    "firstSeen": 1783528207869,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -1968,7 +1876,7 @@
    "url": "https://islreal.com/directory/sale/lambeau/",
    "site": "islreal.com",
    "firstSeen": 1783528207869,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -1991,7 +1899,7 @@
    "url": "https://islreal.com/directory/sale/grange-reef-view-penthouse/",
    "site": "islreal.com",
    "firstSeen": 1783528207869,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2014,7 +1922,7 @@
    "url": "https://islreal.com/directory/sale/grafton-ridge/",
    "site": "islreal.com",
    "firstSeen": 1783528207869,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2037,7 +1945,7 @@
    "url": "https://islreal.com/directory/sale/grafton-villa-la-jolie/",
    "site": "islreal.com",
    "firstSeen": 1783528207869,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2060,7 +1968,7 @@
    "url": "https://islreal.com/directory/sale/charlotteville-property/",
    "site": "islreal.com",
    "firstSeen": 1783528207869,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2083,7 +1991,7 @@
    "url": "https://islreal.com/directory/sale/canoe-bay-cove-estate/",
    "site": "islreal.com",
    "firstSeen": 1783528207869,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2106,7 +2014,7 @@
    "url": "https://islreal.com/directory/sale/bacolet-point/",
    "site": "islreal.com",
    "firstSeen": 1783528207869,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2129,7 +2037,7 @@
    "url": "https://islreal.com/directory/sale/bacolet-emoyeni-villa/",
    "site": "islreal.com",
    "firstSeen": 1783528207869,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2152,7 +2060,7 @@
    "url": "https://islreal.com/directory/sale/arnos-vale-villa-soleil/",
    "site": "islreal.com",
    "firstSeen": 1783528207869,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2175,7 +2083,7 @@
    "url": "https://islreal.com/directory/sale/milford-road-commercial-property/",
    "site": "islreal.com",
    "firstSeen": 1783528207869,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2200,7 +2108,7 @@
    "url": "https://islreal.com/directory/sale/signal-hill-3/",
    "site": "islreal.com",
    "firstSeen": 1783528207869,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2224,7 +2132,7 @@
    "url": "https://islreal.com/directory/sale/new-luxury-condo-units-for-sale/",
    "site": "islreal.com",
    "firstSeen": 1783528207869,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2247,7 +2155,7 @@
    "url": "https://islreal.com/directory/sale/plantations/",
    "site": "islreal.com",
    "firstSeen": 1783528207869,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2270,7 +2178,7 @@
    "url": "https://islreal.com/directory/sale/new-property-in-bacolet/",
    "site": "islreal.com",
    "firstSeen": 1783528207869,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2316,7 +2224,7 @@
    "url": "https://realestatetobago.com/property/silver-palms/",
    "site": "realestatetobago.com",
    "firstSeen": 1785156970578,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2340,7 +2248,7 @@
    "site": "islreal.com",
    "firstSeen": 1785156970578,
    "lastSeen": 1793649806389,
-   "status": "active"
+   "status": "stale"
   },
   {
    "title": "Crown Point",
@@ -2366,29 +2274,6 @@
    "status": "stale"
   },
   {
-   "title": "Main Street, Scarborough",
-   "price": 3200000,
-   "beds": 0,
-   "baths": 0,
-   "type": "land",
-   "size": "909 sq ft",
-   "location": "Main Street, Scarborough",
-   "pool": false,
-   "description": "Two exceptional flat lots in the heart of Scarborough with stunning sea views, ideal for residential or commercial development.",
-   "features": [
-    "Sea views",
-    "Flat terrain",
-    "Prime Main Street location"
-   ],
-   "agent_name": "Pat or Maz",
-   "agent_phone": "+1868 496 3544 & +1868 680 8628",
-   "url": "https://islreal.com/directory/land/main-street-scarborough/",
-   "site": "islreal.com",
-   "firstSeen": 1785156970578,
-   "lastSeen": 1792428660403,
-   "status": "stale"
-  },
-  {
    "title": "2 Signal View",
    "price": 2500000,
    "beds": 3,
@@ -2408,7 +2293,7 @@
    "url": "https://realestatetobago.com/property/2-signal-view/",
    "site": "realestatetobago.com",
    "firstSeen": 1785761751185,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2427,7 +2312,7 @@
    "url": "https://realestatetobago.com/property/community-lane-mt-pleasant/",
    "site": "realestatetobago.com",
    "firstSeen": 1786360237609,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2451,7 +2336,7 @@
    "url": "https://terracaribbean.com/TT30207/trinidad/residential-sale/apartment/tobago-plantations-villa-cluster-38b",
    "site": "terracaribbean.com",
    "firstSeen": 1786360237609,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2493,31 +2378,8 @@
    "url": "https://realestatetobago.com/property/samaan-grove-99/",
    "site": "realestatetobago.com",
    "firstSeen": 1787567949088,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
-  },
-  {
-   "title": "Bacolet Crescent Bougain Villa",
-   "price": 4000000,
-   "beds": 3,
-   "baths": 6,
-   "type": "villa",
-   "size": "",
-   "location": "Bacolet Crescent, Tobago",
-   "pool": true,
-   "description": "Investment property featuring open floor plan, large kitchen, en-suite bedrooms, and pool with parking for 5 cars.",
-   "features": [
-    "Pool",
-    "Parking for 5 cars",
-    "En-suite bedrooms"
-   ],
-   "agent_name": "Pat or Maz",
-   "agent_phone": "+1868 496 3544 & +1868 680 8628",
-   "url": "https://islreal.com/directory/sale/bacolet-crescent-bougain-villa/",
-   "site": "islreal.com",
-   "firstSeen": 1788197218204,
-   "lastSeen": 1792428660403,
-   "status": "stale"
   },
   {
    "title": "Prime Investment Opportunity – Buccoo, Tobago",
@@ -2543,10 +2405,10 @@
    "status": "stale"
   },
   {
-   "title": "Highmoor Estate: House & Land Parcels (Available Separately)",
+   "title": "Highmoor Estate: House & Land Parcels",
    "price": 5250000,
-   "beds": 4,
-   "baths": 4,
+   "beds": 5,
+   "baths": 5,
    "type": "house",
    "size": "2 acres",
    "location": "Scarborough",
@@ -2562,11 +2424,11 @@
    "url": "https://islreal.com/directory/sale/highmoor-scarborough/",
    "site": "islreal.com",
    "firstSeen": 1788795371432,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
-   "title": "Beautifully Positioned Land with Stunning Mountain Views - Top Hill, Mason Hall",
+   "title": "Beautifully Positioned Land in Top Hill, Mason Hall",
    "price": 1300000,
    "beds": 0,
    "baths": 0,
@@ -2585,7 +2447,7 @@
    "url": "https://islreal.com/directory/land/top-hill-mason-hall/",
    "site": "islreal.com",
    "firstSeen": 1790007544578,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2608,11 +2470,11 @@
    "url": "https://royaltytobago.com/property/land-for-sale-riseland-carnbee-tobago/",
    "site": "royaltytobago.com",
    "firstSeen": 1790007544578,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
-   "title": "Land For Sale Old Milford Road Lambeau Tobago",
+   "title": "Land For Sale – Old Milford Road Lambeau Tobago",
    "price": 1500000,
    "beds": 0,
    "baths": 0,
@@ -2631,7 +2493,7 @@
    "url": "https://royaltytobago.com/property/land-for-sale-old-milford-road-lambeau-tobago/",
    "site": "royaltytobago.com",
    "firstSeen": 1790007544578,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2654,7 +2516,7 @@
    "url": "https://royaltytobago.com/property/land-for-sale-bacolet-point-tobago/",
    "site": "royaltytobago.com",
    "firstSeen": 1790007544578,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2677,7 +2539,7 @@
    "url": "https://royaltytobago.com/property/bel-view-condos/",
    "site": "royaltytobago.com",
    "firstSeen": 1790007544578,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2700,7 +2562,7 @@
    "url": "https://royaltytobago.com/property/canoe-bay-bungalows-2/",
    "site": "royaltytobago.com",
    "firstSeen": 1790007544578,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2723,7 +2585,7 @@
    "url": "https://royaltytobago.com/property/1-acre-parcel-bon-accord/",
    "site": "royaltytobago.com",
    "firstSeen": 1790007544578,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2746,7 +2608,7 @@
    "url": "https://royaltytobago.com/property/prime-1-acre-land-arnos-vale/",
    "site": "royaltytobago.com",
    "firstSeen": 1790007544578,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2769,7 +2631,7 @@
    "url": "https://royaltytobago.com/property/tank-road-signal-hill-land/",
    "site": "royaltytobago.com",
    "firstSeen": 1790007544578,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2792,7 +2654,7 @@
    "url": "https://royaltytobago.com/property/8-orange-hill/",
    "site": "royaltytobago.com",
    "firstSeen": 1790007544578,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2815,7 +2677,7 @@
    "url": "https://royaltytobago.com/property/the-original-sunday-school/",
    "site": "royaltytobago.com",
    "firstSeen": 1790007544578,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2838,7 +2700,7 @@
    "url": "https://royaltytobago.com/property/edens-door-development/",
    "site": "royaltytobago.com",
    "firstSeen": 1790007544578,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2857,7 +2719,7 @@
    "url": "https://royaltytobago.com/property/bagatelle-plots/",
    "site": "royaltytobago.com",
    "firstSeen": 1790007544578,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2880,7 +2742,7 @@
    "url": "https://royaltytobago.com/property/burleigh-heights-signal-hill-villa-for-sale/",
    "site": "royaltytobago.com",
    "firstSeen": 1790007544578,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2903,7 +2765,7 @@
    "url": "https://royaltytobago.com/property/land-with-sea-view-for-sale-hope-estate/",
    "site": "royaltytobago.com",
    "firstSeen": 1790007544578,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2926,7 +2788,7 @@
    "url": "https://royaltytobago.com/property/3-bedroom-home-in-calderhall-for-sale/",
    "site": "royaltytobago.com",
    "firstSeen": 1790007544578,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2949,7 +2811,7 @@
    "url": "https://royaltytobago.com/property/land-in-hope-estate-for-sale/",
    "site": "royaltytobago.com",
    "firstSeen": 1790007544578,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2971,7 +2833,7 @@
    "url": "https://royaltytobago.com/property/land-in-orange-hill/",
    "site": "royaltytobago.com",
    "firstSeen": 1790007544578,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -2994,7 +2856,7 @@
    "url": "https://royaltytobago.com/property/17757-2/",
    "site": "royaltytobago.com",
    "firstSeen": 1790007544578,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -3017,7 +2879,7 @@
    "url": "https://royaltytobago.com/property/one-acre-land-in-arnos-vale/",
    "site": "royaltytobago.com",
    "firstSeen": 1790007544578,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -3039,7 +2901,7 @@
    "url": "https://royaltytobago.com/property/land-in-carnbee-with-seaview/",
    "site": "royaltytobago.com",
    "firstSeen": 1790007544578,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -3062,7 +2924,7 @@
    "url": "https://royaltytobago.com/property/land-in-carnbee/",
    "site": "royaltytobago.com",
    "firstSeen": 1790007544578,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -3085,7 +2947,7 @@
    "url": "https://royaltytobago.com/property/large-parcel-in-carnbee/",
    "site": "royaltytobago.com",
    "firstSeen": 1790007544578,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -3108,7 +2970,7 @@
    "url": "https://royaltytobago.com/property/ample-apartment/",
    "site": "royaltytobago.com",
    "firstSeen": 1790007544578,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -3129,7 +2991,7 @@
    "site": "terracaribbean.com",
    "price": 1550000,
    "firstSeen": 1790007544578,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -3152,7 +3014,7 @@
    "url": "https://charbonnerealty.com/property/turnkey-home-in-lowlands/",
    "site": "charbonnerealty.com",
    "firstSeen": 1790618422596,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -3175,7 +3037,7 @@
    "url": "https://charbonnerealty.com/property/cayo-pirata/",
    "site": "charbonnerealty.com",
    "firstSeen": 1790618422596,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -3198,7 +3060,7 @@
    "url": "https://realestatetobago.com/property/black-rock-black-rock-dreams/",
    "site": "realestatetobago.com",
    "firstSeen": 1790618422596,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -3240,7 +3102,7 @@
    "url": "https://islreal.com/directory/sale/lambeau-3/",
    "site": "islreal.com",
    "firstSeen": 1791227250496,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -3263,7 +3125,7 @@
    "url": "https://islreal.com/directory/sale/scarborough-lower-milford-road/",
    "site": "islreal.com",
    "firstSeen": 1791227250496,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -3318,7 +3180,7 @@
    "price": 3950000,
    "price_usd": 26860000,
    "beds": 5,
-   "baths": 4.5,
+   "baths": 4,
    "type": "house",
    "size": "3,400 sq ft",
    "location": "Black Rock, Tobago",
@@ -3334,8 +3196,8 @@
    "url": "https://terracaribbean.com/T28230/trinidad/residential-sale/house/hibiscus-tobago/?exclusive=true",
    "site": "terracaribbean.com",
    "firstSeen": 1791227250496,
-   "lastSeen": 1793032687208,
-   "status": "stale"
+   "lastSeen": 1795470952222,
+   "status": "active"
   },
   {
    "title": "Black Rock Dreams Condo",
@@ -3434,7 +3296,7 @@
    "url": "https://terracaribbean.com/T32670/trinidad/residential-sale/land/pascal-village-street-lot-3/",
    "site": "terracaribbean.com",
    "firstSeen": 1791834046095,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -3515,30 +3377,6 @@
    "status": "active"
   },
   {
-   "title": "Townhouse for Sale | Fort Townhouses, Fort George",
-   "price": 1495000,
-   "beds": 2,
-   "baths": 2.5,
-   "type": "house",
-   "size": "1800 sq.ft.",
-   "location": "Fort George",
-   "pool": true,
-   "description": "3-level townhouse in gated development with well-planned living space, flexible basement area, and peaceful green views.",
-   "features": [
-    "Gated Compound",
-    "Shared Pool",
-    "2 Parking Spaces"
-   ],
-   "agent_name": "Tracy Austin",
-   "agent_phone": "(868) 713 8410",
-   "url": "https://mybunchofkeys.com/property/townhouse-for-sale-fort-townhouses-fort-george/",
-   "site": "mybunchofkeys.com",
-   "subtype": "townhouse",
-   "firstSeen": 1792428660403,
-   "lastSeen": 1792428660403,
-   "status": "stale"
-  },
-  {
    "title": "Mt. Pleasant Buccoo Road",
    "price": 950000,
    "beds": 0,
@@ -3556,30 +3394,8 @@
    "url": "https://realestatetobago.com/property/mt-pleasant-buccoo-road/",
    "site": "realestatetobago.com",
    "firstSeen": 1792428660403,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
-  },
-  {
-   "title": "Franklyn Estate",
-   "price": 6500000,
-   "beds": 0,
-   "baths": 0,
-   "type": "land",
-   "size": "574,992 sq ft",
-   "location": "Arnos Vale, Moriah",
-   "pool": false,
-   "description": "13.5 acre estate with two-bedroom house, caretaker cottage, fruit trees, and potential for eco-tourism or residential development.",
-   "features": [
-    "Sea View",
-    "Mountain View"
-   ],
-   "agent_name": "real_tobago",
-   "agent_phone": "",
-   "url": "https://realestatetobago.com/property/franklyn-estate/",
-   "site": "realestatetobago.com",
-   "firstSeen": 1792428660403,
-   "lastSeen": 1792428660403,
-   "status": "stale"
   },
   {
    "title": "Auchenskeoch Buccoo",
@@ -3601,7 +3417,7 @@
    "url": "https://islreal.com/directory/sale/auchenskeoch-buccoo/",
    "site": "islreal.com",
    "firstSeen": 1792428660403,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -3624,107 +3440,8 @@
    "url": "https://islreal.com/directory/sale/luxury-apartment-for-sale-in-grange-breathtaking-coastal-views/",
    "site": "islreal.com",
    "firstSeen": 1792428660403,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
-  },
-  {
-   "title": "113 Tobago Plantations Resort",
-   "price": 2300000,
-   "price_usd": 11900000,
-   "beds": null,
-   "baths": null,
-   "type": "land",
-   "size": "Almost 1 acre",
-   "location": "Arnosvale",
-   "pool": "No",
-   "description": "Elevated parcel of land in developing area with stunning sea views potential.",
-   "features": [
-    "Almost one acre",
-    "Sea views",
-    "Developing area"
-   ],
-   "agent_name": "Unknown",
-   "agent_phone": "Unknown",
-   "url": "https://www.villasoftobago.com/landforsale.html",
-   "site": "villasoftobago.com",
-   "firstSeen": 1792428660403,
-   "lastSeen": 1792428660403,
-   "status": "stale"
-  },
-  {
-   "title": "Bacolet Gardens",
-   "price": 2482000,
-   "currency": "TTD",
-   "price_usd": 365000,
-   "beds": 3,
-   "baths": 3,
-   "type": "apartment building",
-   "size": "3300 sq ft",
-   "location": "Bacolet Gardens, Tobago",
-   "pool": false,
-   "description": "Three-storey property with three self-contained one-bedroom apartments on lush grounds with ocean views.",
-   "features": [
-    "Ocean views",
-    "Investment property",
-    "Mature fruit trees"
-   ],
-   "agent_name": "Unknown",
-   "agent_phone": "0",
-   "url": "https://www.terracaribbean.com/TT28431/Trinidad/Residential-Sale/Apartment%20Building/Bacolet-Gardens",
-   "site": "terracaribbean.com",
-   "firstSeen": 1792428660403,
-   "lastSeen": 1792428660403,
-   "status": "stale"
-  },
-  {
-   "title": "Lagoon Cove, Tobago lot 19",
-   "price": 948881,
-   "currency": "TTD",
-   "price_usd": 139541,
-   "beds": 0,
-   "baths": 0,
-   "type": "land",
-   "size": "0",
-   "location": "Lagoon Cove, Tobago",
-   "pool": false,
-   "description": "Level, cleared corner parcel of land in gated community perched on a hill with commanding views.",
-   "features": [
-    "Gated community",
-    "Corner lot",
-    "Hill views"
-   ],
-   "agent_name": "Unknown",
-   "agent_phone": "0",
-   "url": "0",
-   "site": "terracaribbean.com",
-   "firstSeen": 1792428660403,
-   "lastSeen": 1792428660403,
-   "status": "stale"
-  },
-  {
-   "title": "Grafton Old Road, Tobago",
-   "price": 1300000,
-   "currency": "TTD",
-   "price_usd": 191176,
-   "beds": 0,
-   "baths": 0,
-   "type": "land",
-   "size": "13350 sq ft",
-   "location": "Grafton, Tobago",
-   "pool": false,
-   "description": "Gently sloping freehold land walking distance from Stovehaven Bay.",
-   "features": [
-    "Freehold",
-    "Near beach",
-    "Investment opportunity"
-   ],
-   "agent_name": "Unknown",
-   "agent_phone": "0",
-   "url": "0",
-   "site": "terracaribbean.com",
-   "firstSeen": 1792428660403,
-   "lastSeen": 1792428660403,
-   "status": "stale"
   },
   {
    "title": "Mary's hill Tobago house- Cash only Negotiable",
@@ -3792,11 +3509,11 @@
    "url": "https://realestatetobago.com/property/kaia-development-3/",
    "site": "realestatetobago.com",
    "firstSeen": 1793032687208,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
-   "title": "Signal Hill TL535",
+   "title": "Land for Sale Signal Hill TL535",
    "price": 707200,
    "beds": 0,
    "baths": 0,
@@ -3815,11 +3532,11 @@
    "url": "https://www.seajaderealty.com/properties/tl535",
    "site": "www.seajaderealty.com",
    "firstSeen": 1793032687208,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
-   "title": "Signal Hill TL536",
+   "title": "Land for Sale Signal Hill TL536",
    "price": 802400,
    "beds": 0,
    "baths": 0,
@@ -3838,7 +3555,7 @@
    "url": "https://www.seajaderealty.com/properties/tl536",
    "site": "www.seajaderealty.com",
    "firstSeen": 1793032687208,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -3884,7 +3601,7 @@
    "url": "https://islreal.com/directory/land/scarborough-happy-hill-trace/",
    "site": "islreal.com",
    "firstSeen": 1793032687208,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -3932,7 +3649,7 @@
    "site": "terracaribbean.com",
    "price": 1750000,
    "firstSeen": 1793032687208,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -3952,7 +3669,7 @@
    "site": "rain-properties-tobago.com",
    "firstSeen": 1793649806389,
    "lastSeen": 1793649806389,
-   "status": "active"
+   "status": "stale"
   },
   {
    "title": "Lowlands Apartment Building",
@@ -3971,7 +3688,7 @@
    "site": "rain-properties-tobago.com",
    "firstSeen": 1793649806389,
    "lastSeen": 1793649806389,
-   "status": "active"
+   "status": "stale"
   },
   {
    "title": "Spacious 3-Bedroom Home in Courland Estate",
@@ -3993,7 +3710,7 @@
    "url": "https://islreal.com/directory/sale/courland-estate/",
    "site": "islreal.com",
    "firstSeen": 1793649806389,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -4017,7 +3734,7 @@
    "site": "caribbeanrealestatemls.com",
    "firstSeen": 1793649806389,
    "lastSeen": 1793649806389,
-   "status": "active"
+   "status": "stale"
   },
   {
    "title": "3 Bedroom Beachfront Home for Sale, Bacolet, Tobago",
@@ -4040,7 +3757,7 @@
    "site": "caribbeanrealestatemls.com",
    "firstSeen": 1793649806389,
    "lastSeen": 1793649806389,
-   "status": "active"
+   "status": "stale"
   },
   {
    "title": "4 Bedroom Waterfront Villa for Sale, Tobago Plantations, Lowlands, Tobago",
@@ -4063,7 +3780,7 @@
    "site": "caribbeanrealestatemls.com",
    "firstSeen": 1793649806389,
    "lastSeen": 1793649806389,
-   "status": "active"
+   "status": "stale"
   },
   {
    "title": "3 Bedroom Home for Sale, Galera Point, Tobago",
@@ -4086,7 +3803,7 @@
    "site": "caribbeanrealestatemls.com",
    "firstSeen": 1793649806389,
    "lastSeen": 1793649806389,
-   "status": "active"
+   "status": "stale"
   },
   {
    "title": "4 Bedroom Luxury Home for Sale, Mount Irvine, Tobago",
@@ -4109,7 +3826,7 @@
    "site": "caribbeanrealestatemls.com",
    "firstSeen": 1793649806389,
    "lastSeen": 1793649806389,
-   "status": "active"
+   "status": "stale"
   },
   {
    "title": "3 Bedroom Townhomes for Sale, Elephant Tree Beach Club & Villas, Tobago",
@@ -4132,7 +3849,7 @@
    "site": "caribbeanrealestatemls.com",
    "firstSeen": 1793649806389,
    "lastSeen": 1793649806389,
-   "status": "active"
+   "status": "stale"
   },
   {
    "title": "100 Acres of Land for Sale, Cotton Bay, Tobago",
@@ -4155,7 +3872,7 @@
    "site": "caribbeanrealestatemls.com",
    "firstSeen": 1793649806389,
    "lastSeen": 1793649806389,
-   "status": "active"
+   "status": "stale"
   },
   {
    "title": "2 Bedroom Townhomes for Sale, Elephant Tree Beach Club & Villas, Tobago",
@@ -4178,7 +3895,7 @@
    "site": "caribbeanrealestatemls.com",
    "firstSeen": 1793649806389,
    "lastSeen": 1793649806389,
-   "status": "active"
+   "status": "stale"
   },
   {
    "title": "6 Bedroom Seafront Villa for Sale in Bacolet, Tobago",
@@ -4201,7 +3918,7 @@
    "site": "caribbeanrealestatemls.com",
    "firstSeen": 1793649806389,
    "lastSeen": 1793649806389,
-   "status": "active"
+   "status": "stale"
   },
   {
    "title": "Mandevilla",
@@ -4223,7 +3940,7 @@
    "url": "https://charbonnerealty.com/property/mandevilla/",
    "site": "charbonnerealty.com",
    "firstSeen": 1794256236073,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -4250,7 +3967,7 @@
    "status": "active"
   },
   {
-   "title": "Prime Land Parcels - James Street, Goodwood",
+   "title": "Prime Land Parcels in James Street, Goodwood",
    "price": 600000,
    "beds": 0,
    "baths": 0,
@@ -4269,7 +3986,7 @@
    "url": "https://islreal.com/directory/land/james-street-goodwood/",
    "site": "islreal.com",
    "firstSeen": 1794256236073,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -4292,7 +4009,7 @@
    "url": "https://terracaribbean.com/T27452/trinidad/residential-sale/house/mirage-tobago/",
    "site": "terracaribbean.com",
    "firstSeen": 1794256236073,
-   "lastSeen": 1794859429850,
+   "lastSeen": 1795470952222,
    "status": "active"
   },
   {
@@ -4339,6 +4056,29 @@
    "site": "caribbeanrealestatemls.com",
    "firstSeen": 1794859429850,
    "lastSeen": 1794859429850,
+   "status": "active"
+  },
+  {
+   "title": "Tomas Villa – A Turnkey Investment Opportunity in Bon Accord, Tobago",
+   "price": 4850000,
+   "beds": 8,
+   "baths": 8,
+   "type": "villa",
+   "size": "",
+   "location": "Bon Accord",
+   "pool": true,
+   "description": "Thoughtfully designed contemporary tropical villa with eight air-conditioned en-suite bedrooms, fully furnished and turnkey, currently listed on Airbnb with excellent guest reviews.",
+   "features": [
+    "Swimming Pool",
+    "Security cameras",
+    "Fully Fenced"
+   ],
+   "agent_name": "Charbonne Realty",
+   "agent_phone": "868-683-7676",
+   "url": "https://charbonnerealty.com/property/tomas-villa-a-turnkey-investment-opportunity-in-bon-accord-tobago/",
+   "site": "charbonnerealty.com",
+   "firstSeen": 1795470952222,
+   "lastSeen": 1795470952222,
    "status": "active"
   }
  ]
