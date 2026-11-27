@@ -1,2 +1,4 @@
 # Local dev helper — static file server, not part of the app
 _serve.js
+dist/
+.wrangler/

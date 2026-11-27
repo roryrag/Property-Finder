@@ -1,6 +1,6 @@
 /* BrokerBuddy service worker — installable + offline.
    Bump CACHE to force clients onto a new app version. */
-var CACHE = 'brokerbuddy-v1';
+var CACHE = 'brokerbuddy-v2';  // v2 2026-11-27: Cloudflare host, private data via GitHub API
 var SHELL = [
   './',
   './index.html',

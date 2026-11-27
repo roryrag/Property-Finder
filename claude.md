@@ -238,8 +238,20 @@ but the app primarily reads the shared repo, so this stays low-priority.)
 ---
 
 ## Deploy
+- **Since 2026-11-27 the app shell is on Cloudflare** (Worker `brokerbuddy`,
+  static assets, TAS account): `https://brokerbuddy.tobagoappstudio.com`
+  (also brokerbuddy.roryrag.workers.dev). Deploy with `node deploy.mjs` — it
+  copies ONLY the shell (index.html, sw.js, manifest, icons) into `dist/` and
+  runs `wrangler deploy`. A push to main does NOT deploy the app any more.
+  Bump `CACHE` in sw.js when the shell changes.
+- **The repo is meant to be PRIVATE** (client names in watchlist.json, agent
+  data). The shell holds no data: `fetchRepoDataFile()` in index.html reads
+  data/repo.json + sold.json through the GitHub contents API with the agent's
+  fine-grained PAT (`tpf_gh_token`, Contents read/write on this repo only).
+  No token = "add your GitHub token in Settings" and local cached data only.
+  A Shared Repository URL that isn't a GitHub raw URL is still fetched directly.
 - Repo: `github.com/roryrag/Property-Finder`
-- Host: **GitHub Pages** (free), served at
+- OLD host (until the repo goes private): **GitHub Pages** (free), served at
   `https://roryrag.github.io/Property-Finder/`, connected to the repo; every push
   to `main` auto-deploys via the `github-pages` environment. Note: GitHub's
   deployment-status API can sit on `in_progress` for a couple of minutes after

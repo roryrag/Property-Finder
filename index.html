@@ -2433,8 +2433,8 @@ body.dark .watermark{color:rgba(255,255,255,.03);}
           <div class="card-title">&#127760; Shared Repository</div>
           <p style="font-size:12px;color:var(--ink-l);margin-bottom:10px;line-height:1.55;">Connect to a shared listings database that refreshes automatically and is used by all your devices. See setup guide.</p>
           <div class="input-group"><label>Shared Repository URL</label><input type="url" id="settingRepoUrl" placeholder="https://raw.githubusercontent.com/.../repo.json"></div>
-          <div class="input-group"><label>GitHub Token (Watch List publish)</label><input type="password" id="settingGhToken" placeholder="Fine-grained PAT, Contents: read/write" autocomplete="off"></div>
-          <div style="font-size:11px;color:var(--ink-xl);margin-top:-4px;">Lets the Watch List tab save your alert criteria to the repo. Stored only on this device.</div>
+          <div class="input-group"><label>GitHub Token (loads listings + publishes watches)</label><input type="password" id="settingGhToken" placeholder="Fine-grained PAT, Contents: read/write" autocomplete="off"></div>
+          <div style="font-size:11px;color:var(--ink-xl);margin-top:-4px;">The listings repository is private: this token loads it, and lets the Watch List tab save your alert criteria. Stored only on this device.</div>
         </div>
         <div class="card">
           <div class="card-title">&#128273; Change PIN</div>
@@ -3810,8 +3810,11 @@ function saveSettings() {
   var ghTokEl = document.getElementById('settingGhToken');
   if (ghTokEl) {
     var ghTok = ghTokEl.value.trim();
+    var hadTok = localStorage.getItem('tpf_gh_token');
     if (ghTok) localStorage.setItem('tpf_gh_token', ghTok);
     else localStorage.removeItem('tpf_gh_token');
+    // the token now also unlocks the listings (private repo): load them right away
+    if (ghTok && ghTok !== hadTok) { sharedRepoSync(true); sharedSoldSync(false); }
   }
   var msg=document.getElementById('settingsSavedMsg');
   if(msg){msg.style.display='block';setTimeout(function(){msg.style.display='none';},3000);}
@@ -5709,16 +5712,35 @@ var SHARED_REPO_URL_KEY = 'tpf_shared_repo_url';
 // still override this in Settings (their localStorage value takes precedence).
 var DEFAULT_SHARED_REPO_URL = 'https://raw.githubusercontent.com/roryrag/Property-Finder/main/data/repo.json';
 
-async function sharedRepoSync(showAlert) {
-  var url = localStorage.getItem(SHARED_REPO_URL_KEY) || DEFAULT_SHARED_REPO_URL;
-  if (!url) return false;
+/* Repo data files (repo.json, sold.json, ...) live in a PRIVATE GitHub repo
+   since 2026-11-27, so they're read through the GitHub contents API with the
+   agent's token (Settings → GitHub Token; the same fine-grained PAT that
+   publishes the watch list). A Shared Repository URL that isn't a GitHub raw
+   URL is still fetched directly, so a custom data host keeps working. */
+async function fetchRepoDataFile(file) {
+  var custom = localStorage.getItem(SHARED_REPO_URL_KEY);
+  if (custom && !/^https:\/\/raw\.githubusercontent\.com\//i.test(custom)) {
+    var u = custom.replace(/repo\.json/i, file);
+    var r0 = await fetch(u + (u.indexOf('?') === -1 ? '?t=' : '&t=') + Date.now(), { cache: 'no-store' });
+    if (!r0.ok) throw new Error('HTTP ' + r0.status);
+    return r0.json();
+  }
+  var token = localStorage.getItem('tpf_gh_token');
+  if (!token) throw new Error('add your GitHub token in Settings to load listings');
+  var t = _watchRepoTarget();
+  var api = 'https://api.github.com/repos/' + t.owner + '/' + t.repo + '/contents/data/' + file + '?ref=' + t.branch + '&t=' + Date.now();
+  var resp = await fetch(api, { cache: 'no-store', headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github.raw' } });
+  if (resp.status === 401) throw new Error('GitHub token rejected (expired?) — paste a new one in Settings');
+  if (resp.status === 404) throw new Error('token can’t see ' + t.owner + '/' + t.repo + ' — check its repository access');
+  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+  return resp.json();
+}
 
+async function sharedRepoSync(showAlert) {
   var metaEl = document.getElementById('repoMeta');
   try {
     if (metaEl) metaEl.textContent = 'Syncing shared repository...';
-    var resp = await fetch(url + (url.indexOf('?') === -1 ? '?t=' : '&t=') + Date.now(), { cache: 'no-store' });
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    var data = await resp.json();
+    var data = await fetchRepoDataFile('repo.json');
 
     var listings = Array.isArray(data) ? data : (data.listings || []);
     var meta     = (data && data.meta) || {};
@@ -5740,7 +5762,7 @@ async function sharedRepoSync(showAlert) {
     return true;
   } catch(e) {
     if (metaEl) metaEl.textContent = '\u26A0\uFE0F Shared repo unavailable (' + e.message + ') \u2014 using local data';
-    if (showAlert) alert('\u26A0\uFE0F Could not sync shared repo: ' + e.message + '\n\nCheck the URL in Settings (must be the Raw URL).');
+    if (showAlert) alert('\u26A0\uFE0F Could not sync shared repo: ' + e.message);
     return false;
   }
 }
@@ -5754,15 +5776,8 @@ async function sharedRepoSync(showAlert) {
    syncing never clobbers locally-added entries.
 ══════════════════════════════════════════ */
 async function sharedSoldSync(showAlert) {
-  var repoUrl = localStorage.getItem(SHARED_REPO_URL_KEY);
-  if (!repoUrl) return false;
-  var soldUrl = repoUrl.replace(/repo.json/i, 'sold.json');
-  if (soldUrl === repoUrl) return false;
-
   try {
-    var resp = await fetch(soldUrl + (soldUrl.indexOf('?') === -1 ? '?t=' : '&t=') + Date.now(), { cache: 'no-store' });
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    var data = await resp.json();
+    var data = await fetchRepoDataFile('sold.json');
     var shared = Array.isArray(data) ? data : (data.listings || []);
 
     localStorage.setItem(SHARED_SOLD_KEY, JSON.stringify(shared));

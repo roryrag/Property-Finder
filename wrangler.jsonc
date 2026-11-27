@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // BrokerBuddy app shell on Cloudflare (2026-11-27). Moved off GitHub Pages so
+  // the repo can be private: the shell holds no data; listings load in the
+  // browser from the private repo via the GitHub API with the agent's token.
+  // Deploy: node deploy.mjs  (copies the shell into ./dist, then wrangler deploy)
+  "name": "brokerbuddy",
+  "compatibility_date": "2026-11-01",
+  "workers_dev": true,
+  "routes": [
+    { "pattern": "brokerbuddy.tobagoappstudio.com", "custom_domain": true }
+  ],
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
+  }
+}
