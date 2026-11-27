@@ -17,7 +17,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const vm = require('vm');
+const { checkMany, solveSucuri, sucuriCookies } = require('./liveness');
 
 const API_KEY = process.env.ANTHROPIC_API_KEY;
 if (!API_KEY) { console.error('Missing ANTHROPIC_API_KEY'); process.exit(1); }
@@ -30,12 +30,17 @@ const DAY = 24 * 60 * 60 * 1000;
 /* ── Budgets (tune to control cost & runtime) ── */
 const MAX_PAGES_PER_SITE    = 8;    // pagination depth
 const MAX_LISTINGS_PER_SITE = 50;   // listing pages fetched per site
-const MAX_EXTRACT_CALLS     = 64;   // Claude HTML-extraction calls (total ceiling)
-                                    // = 8 crawl sites x 8 per-site cap, so the greedy
+const MAX_EXTRACT_CALLS     = 72;   // Claude HTML-extraction calls (total ceiling)
+                                    // = 9 crawl sites x 8 per-site cap, so the greedy
                                     // counter can never starve trailing sites (islreal,
                                     // royalty got 0 listings when this was 40)
 const MAX_EXTRACT_CALLS_PER_SITE = 8;  // per-site cap so trailing sites aren't starved
 const EXTRACT_BATCH         = 4;    // listings per extraction call
+const EXTRACT_CHARS         = 3500; // page text per listing sent to Claude (see focusText)
+const DROP_AFTER_GONE_RUNS  = 2;    // confirmed-gone runs before a listing is dropped
+const UNVERIFIED_DROP_DAYS  = 120;  // unseen this long with no 'gone' proof: drop quietly
+const SOLD_RECHECK_PER_RUN  = 40;   // sold candidates re-checked for liveness each run
+const SOLD_RECHECK_DAYS     = 28;   // ...each one at most this often
 const FETCH_DELAY_MS        = 400;  // politeness delay between fetches
 const FETCH_TIMEOUT_MS      = 15000;
 
@@ -66,18 +71,24 @@ const isNonTobago = p => TRINIDAD_RE.test((p.location || '') + ' ' + (p.url || '
 const CRAWL_SITES = [
   {
     id: 'charb', name: 'charbonnerealty.com',
-    seeds: ['https://charbonnerealty.com/properties/', 'https://charbonnerealty.com/'],
+    // /properties/ 404s since ~2026-10; homepage + sitemap carry the listings
+    seeds: ['https://charbonnerealty.com/'],
     listingHint: /charbonnerealty\.com\/.*(propert|listing|estate|land|villa|house)/i
   },
   {
     id: 'rain', name: 'rain-properties-tobago.com',
-    seeds: ['https://www.rain-properties-tobago.com/villatobuy.html',
-            'https://www.rain-properties-tobago.com/property-sales'],
-    listingHint: /rain-properties-tobago\.com\/(?!index|contact|about)/i
+    // Wix site. villatobuy.html 404s since ~2026-11; for-sale pages are
+    // /property-sales-<slug> (land: /land-for-sale-<slug>). Its giant menu
+    // used to fill the whole Claude window, so 0 listings came back and every
+    // price was null; focusText() now centres on the listing body.
+    seeds: ['https://www.rain-properties-tobago.com/property-sales',
+            'https://www.rain-properties-tobago.com/land-for-sale'],
+    listingHint: /rain-properties-tobago\.com\/(property-sales|land-for-sale)-[a-z0-9-]+$/i
   },
   {
     id: 'keys', name: 'mybunchofkeys.com',
-    seeds: ['https://mybunchofkeys.com/properties/', 'https://mybunchofkeys.com/'],
+    // /properties/ 404s since ~2026-10; homepage + sitemap carry the listings
+    seeds: ['https://mybunchofkeys.com/'],
     listingHint: /mybunchofkeys\.com\/.*(propert|listing|land|villa|house)/i
   },
   {
@@ -126,6 +137,16 @@ const CRAWL_SITES = [
     // its sitemap dumps EVERY /property/ page including rentals (a TT$4,760
     // hotel studio leaked in via sitemap discovery) — for-sale seeds suffice
     noSitemap: true
+  },
+  {
+    // Caribbean Real Estate MLS (2026-11-27): was a web-SEARCH source that
+    // returned 0 most weeks, with URL-less results. Its sitemap lists every
+    // property (/properties/<slug>, ~10k across the Caribbean); mustMatch keeps
+    // Tobago slugs that don't mention Trinidad (~14). No index page needed.
+    id: 'cmls', name: 'caribbeanrealestatemls.com',
+    seeds: [],
+    listingHint: /caribbeanrealestatemls\.com\/properties\/[a-z0-9-]+\/?$/i,
+    mustMatch: /\/properties\/(?!.*trinidad)[a-z0-9-]*tobago/i
   }
 ];
 
@@ -135,10 +156,9 @@ const CRAWL_SITES = [
    back of one giant queue. Controlled by the RUN_GROUP env var
    (set by the workflow): 'A', 'B', or 'all' (default, runs everything). */
 const SEARCH_GROUPS = {
-  A: [
-    { label: 'caribbeanMLS', query: 'site:caribbeanrealestatemls.com/real-estate/tobago for sale', twoStage: true },
-    { label: 'villas',       query: 'site:villasoftobago.com villa for sale', twoStage: true }
-  ],
+  // caribbeanMLS moved to CRAWL_SITES (sitemap) 2026-11-27. villasoftobago
+  // dropped the same day: no for-sale pages left (rentals only), search gave 0.
+  A: [],
   B: [
     { label: 'terracaribbean', query: 'site:terracaribbean.com Tobago for sale', twoStage: true }
   ]
@@ -161,26 +181,8 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
    reloads. It's deterministic (no CAPTCHA), so we evaluate it in a sandbox to
    recover the cookie, then re-fetch with it. Cookie is cached per host.
    (realestatetobago.com needs this; harmless no-op for every other site.) */
-const sucuriCookies = new Map();  // host -> "name=value"
-function solveSucuri(html) {
-  if (!/sucuri_cloudproxy_js/.test(html)) return null;
-  const m = html.match(/S='([^']+)'/);
-  if (!m) return null;
-  try {
-    const S = m[1];
-    const s = {}, w = String.fromCharCode;
-    const A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-    for (let u = 0; u < 64; u++) s[A.charAt(u)] = u;
-    let U = 0, r = '', l = 0, c, a;
-    for (let i = 0; i < S.length; i++) {
-      c = s[S.charAt(i)]; U = (U << 6) + c; l += 6;
-      while (l >= 8) { ((a = (U >>> (l -= 8)) & 0xff) || (i < (S.length - 2))) && (r += w(a)); }
-    }
-    const sandbox = { document: {}, location: { reload() {} } };
-    vm.runInContext(r, vm.createContext(sandbox), { timeout: 1000 });
-    return (sandbox.document.cookie || '').split(';')[0] || null;
-  } catch (e) { return null; }
-}
+/* solveSucuri() and the per-host cookie cache live in liveness.js, shared
+   with the liveness check so a solved cookie is reused there. */
 
 async function fetchPage(url, _retried) {
   const ctrl = new AbortController();
@@ -342,13 +344,36 @@ async function claudeCall(body) {
   return (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
 }
 
+/* Pick the EXTRACT_CHARS window of page text that carries the listing.
+   Big site menus (Rain's Wix nav names ~90 properties) used to fill the
+   whole window, so Claude saw no price or beds and skipped the page. Each
+   window is scored by listing signals and the densest one is sent. */
+const LISTING_SIGNAL_RE = /(TT\$|US\$|\$\s?[0-9]|\bTTD\b|\bUSD\b|bedroom|bathroom|\bbeds?\b|\bbaths?\b|sq\.?\s?ft|square feet|\bacres?\b|freehold|leasehold|\bprice\b)/gi;
+function focusText(text, n = EXTRACT_CHARS) {
+  if (!text || text.length <= n) return text || '';
+  const hits = [];
+  let m;
+  LISTING_SIGNAL_RE.lastIndex = 0;
+  while ((m = LISTING_SIGNAL_RE.exec(text)) !== null) hits.push(m.index);
+  if (!hits.length) return text.slice(0, n);
+  const lead = Math.floor(n * 0.25);   // keep the title that sits above the first signal
+  let best = 0, bestStart = 0;
+  for (let i = 0, k = 0; i < hits.length; i++) {
+    const start = Math.max(0, hits[i] - lead);
+    if (k < i) k = i;
+    while (k < hits.length && hits[k] < start + n) k++;
+    if (k - i > best) { best = k - i; bestStart = start; }
+  }
+  return text.slice(bestStart, bestStart + n);
+}
+
 /* Claude HTML extraction — NO web_search tool = much cheaper */
 let extractCallsUsed = 0;
 async function claudeExtractBatch(pages, siteName) {
   if (extractCallsUsed >= MAX_EXTRACT_CALLS) return [];
   extractCallsUsed++;
   const blocks = pages.map((p, i) =>
-    `--- PAGE ${i + 1} (URL: ${p.url}) ---\n${p.text.slice(0, 3500)}`
+    `--- PAGE ${i + 1} (URL: ${p.url}) ---\n${focusText(p.text)}`
   ).join('\n\n');
   const prompt =
     'Below are text extracts from ' + pages.length + ' Tobago property listing pages on ' + siteName + '.\n\n' +
@@ -375,14 +400,22 @@ async function claudeExtractBatch(pages, siteName) {
 /* ══════════════════════════════════════════
    CRAWL ONE SITE
 ══════════════════════════════════════════ */
-async function crawlSite(site) {
-  const report = { method: 'crawl', indexPages: 0, urlsFound: 0, fetched: 0, jsonld: 0, claude: 0, listings: [] };
+/* `known` = Map(normUrl -> existing listing). Listing URLs already in the repo
+   are NOT re-extracted every week (that spent the whole per-site Claude budget
+   on the same first ~32 pages, so everything past them was never "seen" and
+   got flagged sold). A known URL found on a for-sale INDEX page counts as seen;
+   the rest are confirmed by the liveness check in main(). Claude budget goes to
+   new URLs first, then to known listings still missing a price. */
+async function crawlSite(site, known) {
+  const report = { method: 'crawl', indexPages: 0, urlsFound: 0, fetched: 0, jsonld: 0, claude: 0, listings: [], seenKnown: [] };
+  known = known || new Map();
   console.log(`\n━━ CRAWL ${site.name} ━━`);
 
   /* 1. Crawl index pages + pagination */
   const indexQueue = [...site.seeds];
   const indexSeen = new Set(indexQueue);
   const listingUrls = new Set();
+  const indexFound = new Set();   // listing URLs seen on a for-sale index page (not just the sitemap)
 
   while (indexQueue.length && report.indexPages < MAX_PAGES_PER_SITE) {
     const pageUrl = indexQueue.shift();
@@ -394,8 +427,9 @@ async function crawlSite(site) {
     const links = extractLinks(html, pageUrl);
     for (const link of links) {
       if (!link.includes(site.name.replace('www.', ''))) continue;
-      // pagination links → queue as index pages
-      if (/[?&](page|paged|p|start)=\d+|\/page\/\d+/i.test(link)) {
+      // pagination links → queue as index pages (not WP post links like
+      // royalty's ?post_type=houzez_agent&p=2794, which 404'd as an "index")
+      if (/[?&](page|paged|p|start)=\d+|\/page\/\d+/i.test(link) && !/[?&]post_type=/i.test(link)) {
         if (!indexSeen.has(link) && indexSeen.size < MAX_PAGES_PER_SITE * 2) {
           indexSeen.add(link); indexQueue.push(link);
         }
@@ -409,7 +443,7 @@ async function crawlSite(site) {
         if (/\/(tag|category|author|wp-|feed|login|contact|about|blog|property-type|property-status)\//i.test(link)) continue;
         if (RENTAL_RE.test(link)) continue;   // skip rentals at the URL stage
         if (site.mustMatch && !site.mustMatch.test(link)) continue;
-        listingUrls.add(link);
+        listingUrls.add(link); indexFound.add(link);
       }
     }
     // Some sites (seajade) embed listing IDs in the page (JSON/text) rather
@@ -419,7 +453,7 @@ async function crawlSite(site) {
       for (const id of ids) {
         const u = site.idBase + id;
         if (site.mustMatch && !site.mustMatch.test(u)) continue;
-        listingUrls.add(u);
+        listingUrls.add(u); indexFound.add(u);
       }
     }
     console.log(`  index OK: ${pageUrl} (links so far: ${listingUrls.size})`);
@@ -442,8 +476,18 @@ async function crawlSite(site) {
   console.log(`  sitemap: ${smUrls.length} urls found, ${smMatched} new listing urls matched`);
   report.urlsFound = listingUrls.size;
 
-  /* 2. Fetch listing pages */
-  const urls = [...listingUrls].slice(0, MAX_LISTINGS_PER_SITE);
+  /* 2. Fetch listing pages: new URLs first, then known ones missing a price.
+        Known URLs that came off a for-sale index page are marked seen. */
+  const nu = u => u.toLowerCase().trim().replace(/[?#].*$/, '').replace(/\/+$/, '');
+  const fresh = [], unpriced = [];
+  for (const u of listingUrls) {
+    const prev = known.get(nu(u));
+    if (!prev) { fresh.push(u); continue; }
+    if (indexFound.has(u)) report.seenKnown.push(nu(u));
+    if (!(Number(prev.price) > 0)) unpriced.push(u);
+  }
+  report.newUrls = fresh.length;
+  const urls = [...fresh, ...unpriced].slice(0, MAX_LISTINGS_PER_SITE);
   const pendingForClaude = [];
 
   for (const url of urls) {
@@ -477,7 +521,8 @@ async function crawlSite(site) {
   }
 
   console.log(`  RESULT: ${report.listings.length} listings ` +
-    `(index pages: ${report.indexPages}, urls: ${report.urlsFound}, ` +
+    `(index pages: ${report.indexPages}, urls: ${report.urlsFound}, new: ${report.newUrls}, ` +
+    `known seen on index: ${report.seenKnown.length}, ` +
     `fetched: ${report.fetched}, jsonld: ${report.jsonld}, claude: ${report.claude})`);
   return report;
 }
@@ -553,12 +598,15 @@ function parseSizeSqft(sizeStr) {
   let allFound = [];
 
   /* Phase 1 — crawl the direct-fetch sites */
+  const seenThisRun = new Set();   // keys confirmed on a for-sale index page
   for (const site of CRAWL_SITES) {
-    const rep = await crawlSite(site);
+    const rep = await crawlSite(site, existing);
     siteReports[site.name] = {
       method: 'crawl', listings: rep.listings.length,
-      urlsFound: rep.urlsFound, jsonld: rep.jsonld, claude: rep.claude
+      urlsFound: rep.urlsFound, newUrls: rep.newUrls, seenKnown: rep.seenKnown.length,
+      jsonld: rep.jsonld, claude: rep.claude
     };
+    rep.seenKnown.forEach(k => seenThisRun.add(k));
     allFound.push(...rep.listings);
   }
 
@@ -572,10 +620,13 @@ function parseSizeSqft(sizeStr) {
   }
 
   /* Merge */
-  let newCount = 0, updatedCount = 0, rejRental = 0, rejTrinidad = 0;
+  let newCount = 0, updatedCount = 0, rejRental = 0, rejTrinidad = 0, rejNoUrl = 0;
   for (const p of allFound) {
     if (!p.title) continue;
     delete p._method;
+    // No URL = unverifiable, can't be deduped or liveness-checked, and the agent
+    // can't click through (the pin.tt lesson). Search results only; reject.
+    if (!normUrl(p)) { rejNoUrl++; continue; }
     // Keep the repo on-goal: Tobago, for sale only.
     if (isRental(p))    { rejRental++;   continue; }
     if (isNonTobago(p)) { rejTrinidad++; continue; }
@@ -596,7 +647,7 @@ function parseSizeSqft(sizeStr) {
     const key = listingKey(p);
     const prev = existing.get(key);
     if (prev) {
-      prev.lastSeen = now; prev.status = 'active';
+      prev.lastSeen = now; prev.status = 'active'; prev.missed = 0;
       if (p.title) prev.title = p.title;   // safe now that the key is the URL
       if (p.price > 0) prev.price = p.price;
       if (p.url && !prev.url) prev.url = p.url;
@@ -606,27 +657,55 @@ function parseSizeSqft(sizeStr) {
       if (p.description && !prev.description) prev.description = p.description;
       updatedCount++;
     } else {
-      existing.set(key, Object.assign({}, p, { firstSeen: now, lastSeen: now, status: 'active' }));
+      existing.set(key, Object.assign({}, p, { firstSeen: now, lastSeen: now, status: 'active', missed: 0 }));
       newCount++;
     }
   }
+  // Known listings found on a for-sale index page this run: still for sale.
+  for (const k of seenThisRun) {
+    const prev = existing.get(k);
+    if (prev && prev.lastSeen !== now) { prev.lastSeen = now; prev.status = 'active'; prev.missed = 0; }
+  }
 
-  /* Freshness pass — listings unseen >35 days are dropped from the
-     for-sale repo. If they had a price, they become "candidate sold"
-     comparables: the listing disappeared (sold, withdrawn, or
-     re-listed elsewhere), so the last known price is a useful but
-     UNVERIFIED data point for the valuator until an agent confirms it. */
-  let staleCount = 0, droppedCount = 0, purgedCount = 0;
+  /* Liveness pass — every remaining listing the crawl didn't see gets a free
+     page check. 'alive' = still for sale (the crawl just didn't reach it);
+     'gone' = 404 / redirected away, counted as a MISSED run; 'unknown'
+     (timeout, outage, WAF) changes nothing, so a site being down can never
+     turn its listings into fake sold comps. Replaces the old 16/35-day
+     calendar thresholds, which flagged ~100 live listings as sold. */
+  const toCheck = [];
+  for (const p of existing.values()) if (p.lastSeen !== now && normUrl(p)) toCheck.push(p.url);
+  console.log(`\nLiveness check: ${toCheck.length} listing page(s) not seen by the crawl...`);
+  const verdicts = await checkMany(toCheck);
+  let liveAlive = 0, liveGone = 0, liveUnknown = 0;
+  for (const p of existing.values()) {
+    if (p.lastSeen === now || !normUrl(p)) continue;
+    const v = verdicts.get(p.url);
+    if (v === 'alive')     { p.lastSeen = now; p.missed = 0; liveAlive++; }
+    else if (v === 'gone') { p.missed = (Number(p.missed) || 0) + 1; liveGone++; }
+    else liveUnknown++;
+  }
+  console.log(`  alive ${liveAlive}, gone ${liveGone}, unknown ${liveUnknown}`);
+
+  /* Freshness pass — a listing whose page was confirmed GONE on
+     DROP_AFTER_GONE_RUNS runs is dropped from the for-sale repo. If it had a
+     price it becomes a "candidate sold" comparable: the listing disappeared
+     (sold, withdrawn, or re-listed elsewhere), so the last known price is a
+     useful but UNVERIFIED data point until an agent confirms it. Gone once =
+     'stale' ("possibly sold" in the app). A listing nobody can verify either
+     way for UNVERIFIED_DROP_DAYS is dropped quietly, never as a sold comp. */
+  let staleCount = 0, droppedCount = 0, purgedCount = 0, quietDropped = 0;
   const merged = [];
   const candidates = [];
   for (const [key, p] of existing) {
     // Purge off-goal entries already in the repo (rentals / non-Tobago /
-    // retired sources). Not real Tobago sales → never become sold candidates.
-    if (isRental(p) || isNonTobago(p) || isSuspectRental(p) || p.site === 'pin.tt') { purgedCount++; continue; }
-    // Thresholds are calibrated to the WEEKLY cadence: >16d = missed 2+ runs
-    // (one missed crawl must NOT flag "possibly sold"), >35d = missed ~5.
+    // retired sources / URL-less). Not verifiable Tobago sales → never become
+    // sold candidates.
+    if (isRental(p) || isNonTobago(p) || isSuspectRental(p) || p.site === 'pin.tt' || !normUrl(p)) { purgedCount++; continue; }
+    const missed = Number(p.missed) || 0;
     const unseenDays = (now - (p.lastSeen || now)) / DAY;
-    if (unseenDays > 35) {
+    if (missed < DROP_AFTER_GONE_RUNS && unseenDays > UNVERIFIED_DROP_DAYS) { quietDropped++; continue; }
+    if (missed >= DROP_AFTER_GONE_RUNS) {
       droppedCount++;
       if (p.price > 0) {
         candidates.push({
@@ -647,7 +726,8 @@ function parseSizeSqft(sizeStr) {
       }
       continue;
     }
-    if (unseenDays > 16) { p.status = 'stale'; staleCount++; }
+    if (missed >= 1) { p.status = 'stale'; staleCount++; }
+    else p.status = 'active';
     merged.push(p);
   }
 
@@ -663,12 +743,42 @@ function parseSizeSqft(sizeStr) {
   for (const c of candidates) {
     if (!soldIds.has(c.id)) { sold.listings.push(c); soldIds.add(c.id); newCandidates++; }
   }
+
+  /* Sold-candidate hygiene. (1) A candidate whose URL is back in the for-sale
+     repo was re-listed, not sold: remove it (Cayo Pirata showed as both new
+     and sold). (2) Re-check a rolling batch of candidate pages; one that loads
+     again was never sold (the old calendar timer produced ~100 of these).
+     Agent-verified comps (source !== 'candidate') are never touched. */
+  const activeUrls = new Set(merged.map(p => normUrl(p)).filter(Boolean));
+  let relistedRemoved = 0, aliveRemoved = 0;
+  sold.listings = sold.listings.filter(c => {
+    if (c.source !== 'candidate') return true;
+    if (activeUrls.has(normUrl(c))) { relistedRemoved++; return false; }
+    return true;
+  });
+  const due = sold.listings
+    .filter(c => c.source === 'candidate' && normUrl(c) && (now - (Number(c.checkedAt) || 0)) / DAY > SOLD_RECHECK_DAYS)
+    .sort((a, b) => (Number(a.checkedAt) || 0) - (Number(b.checkedAt) || 0))
+    .slice(0, SOLD_RECHECK_PER_RUN);
+  if (due.length) {
+    const sv = await checkMany(due.map(c => c.url));
+    const drop = new Set();
+    for (const c of due) {
+      const v = sv.get(c.url);
+      if (v === 'alive') { drop.add(c.id); aliveRemoved++; }
+      else if (v === 'gone') c.checkedAt = now;   // confirmed gone: recheck later
+    }
+    sold.listings = sold.listings.filter(c => !drop.has(c.id));
+  }
+  console.log(`Sold candidates: removed ${relistedRemoved} re-listed, ${aliveRemoved} still live (of ${due.length} re-checked)`);
   sold.meta = {
     lastRefresh: new Date(now).toISOString(),
     totalComps: sold.listings.length,
     agentCount: sold.listings.filter(c => c.source !== 'candidate').length,
     candidateCount: sold.listings.filter(c => c.source === 'candidate').length,
-    newCandidatesThisRun: newCandidates
+    newCandidatesThisRun: newCandidates,
+    relistedRemovedThisRun: relistedRemoved,
+    stillLiveRemovedThisRun: aliveRemoved
   };
   fs.writeFileSync(SOLD_FILE, JSON.stringify(sold, null, 1));
 
@@ -695,7 +805,9 @@ function parseSizeSqft(sizeStr) {
       newThisRun: newCount, updatedThisRun: updatedCount, droppedThisRun: droppedCount,
       duplicatesMergedThisRun: dupDropped,
       rejectedRentalThisRun: rejRental, rejectedNonTobagoThisRun: rejTrinidad,
-      purgedFromRepoThisRun: purgedCount,
+      rejectedNoUrlThisRun: rejNoUrl,
+      purgedFromRepoThisRun: purgedCount, quietDroppedThisRun: quietDropped,
+      liveness: { checked: toCheck.length, alive: liveAlive, gone: liveGone, unknown: liveUnknown },
       extractCallsUsed,
       sources, siteReports
     },
@@ -710,10 +822,11 @@ function parseSizeSqft(sizeStr) {
   console.log(`Active         : ${out.meta.activeCount}`);
   console.log(`With price     : ${out.meta.withPrice}`);
   console.log(`New this run   : ${newCount}`);
-  console.log(`Rejected       : ${rejRental} rentals, ${rejTrinidad} non-Tobago (incoming)`);
-  console.log(`Purged from repo: ${purgedCount} off-goal entries (existing)`);
-  console.log(`Stale (>16d)   : ${staleCount}`);
-  console.log(`Dropped (>35d) : ${droppedCount}`);
+  console.log(`Rejected       : ${rejRental} rentals, ${rejTrinidad} non-Tobago, ${rejNoUrl} no-URL (incoming)`);
+  console.log(`Purged from repo: ${purgedCount} off-goal/URL-less entries (existing)`);
+  console.log(`Liveness       : ${liveAlive} alive, ${liveGone} gone, ${liveUnknown} unknown (of ${toCheck.length})`);
+  console.log(`Stale (gone 1x): ${staleCount}`);
+  console.log(`Dropped (gone ${DROP_AFTER_GONE_RUNS}x): ${droppedCount}  | quietly dropped (unverifiable ${UNVERIFIED_DROP_DAYS}d+): ${quietDropped}`);
   console.log(`Sold candidates: ${sold.listings.length} total (${newCandidates} new this run)`);
   console.log(`Claude extract calls used: ${extractCallsUsed}/${MAX_EXTRACT_CALLS}`);
   console.log('\nPer-site:');

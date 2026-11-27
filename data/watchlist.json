@@ -1,36 +1,4 @@
 {
- "updated": "2026-07-08T16:23:36.063Z",
- "watches": [
-  {
-   "id": 1783526258891,
-   "client": "Tony Babolal",
-   "types": [
-    "house",
-    "land"
-   ],
-   "areas": [
-    "Bon Accord"
-   ],
-   "priceMin": 0,
-   "priceMax": 0,
-   "bedsMin": 0,
-   "active": true,
-   "created": "2026-07-08"
-  },
-  {
-   "id": 1783526477854,
-   "client": "Mohan Singh",
-   "types": [
-    "land"
-   ],
-   "areas": [
-    "Bon Accord"
-   ],
-   "priceMin": 0,
-   "priceMax": 0,
-   "bedsMin": 0,
-   "active": true,
-   "created": "2026-07-08"
-  }
- ]
+ "updated": "2026-11-27T15:32:29.825Z",
+ "watches": []
 }
